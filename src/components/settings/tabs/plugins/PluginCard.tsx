@@ -14,6 +14,7 @@ import { React, showToast } from "@webpack/common";
 
 import { cl, logger } from ".";
 import { openPluginModal } from "./PluginModal";
+import { getPluginI18n } from "@plugins/arabicUI/translations";
 
 interface PluginCardProps extends React.HTMLProps<HTMLDivElement> {
     plugin: Plugin;
@@ -75,10 +76,12 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
         settings.enabled = !wasEnabled;
     }
 
+    const { name, description } = getPluginI18n(plugin);
+
     return (
         <AddonCard
-            name={plugin.name}
-            description={plugin.description}
+            name={name}
+            description={description}
             isNew={isNew}
             enabled={isEnabled()}
             setEnabled={toggleEnabled}

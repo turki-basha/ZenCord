@@ -23,6 +23,7 @@ import { hasAnyVisibleSettings, isSettingHidden } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
 import { BaseText } from "@components/BaseText";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { getPluginI18n } from "@plugins/arabicUI/translations";
 import { debounce } from "@shared/debounce";
 import { gitRemote } from "@shared/vencordUserAgent";
 import { classNameFactory } from "@utils/css";
@@ -166,6 +167,8 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
 
     const pluginMeta = PluginMeta[plugin.name];
 
+    const i18n = getPluginI18n(plugin);
+
     return (
         <Modal
             transitionState={transitionState}
@@ -173,7 +176,7 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
             size="lg"
             title={
                 <div className={cl("header")}>
-                    <BaseText tag="h1" weight="semibold" size="lg">{plugin.name}</BaseText>
+                    <BaseText tag="h1" weight="semibold" size="lg">{i18n.name}</BaseText>
                     {!pluginMeta.userPlugin && (
                         <div className="vc-settings-modal-links">
                             <FavoriteButton
@@ -195,7 +198,7 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
             subtitle={
                 <div className={cl("info")}>
                     <div>
-                        <Forms.FormText>{plugin.description}</Forms.FormText>
+                        <Forms.FormText>{i18n.description}</Forms.FormText>
                         {!!plugin.tags?.length && <PluginTags tags={plugin.tags} />}
                     </div>
                 </div>

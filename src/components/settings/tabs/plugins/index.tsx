@@ -21,6 +21,7 @@ import "./styles.css";
 import * as DataStore from "@api/DataStore";
 import { isPluginEnabled } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
+import { getPluginI18n } from "@plugins/arabicUI/translations";
 import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -188,10 +189,13 @@ function PluginSettings() {
 
         if (!search.length) return true;
 
+        const i18n = getPluginI18n(plugin);
         return (
             plugin.name.toLowerCase().includes(search) ||
+            i18n.name.toLowerCase().includes(search) ||
             plugin.name.match(/[A-Z]/g)?.join("").toLowerCase().includes(search) || // acronyms like BF for BetterFolders
             plugin.description.toLowerCase().includes(search) ||
+            i18n.description.toLowerCase().includes(search) ||
             plugin.searchTerms?.some(t => t.toLowerCase().includes(search))
         );
     };
