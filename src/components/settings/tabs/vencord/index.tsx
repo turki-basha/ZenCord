@@ -20,7 +20,7 @@ import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { useSettings } from "@api/Settings";
 import { Divider } from "@components/Divider";
 import { FormSwitch } from "@components/FormSwitch";
-import { FolderIcon, GithubIcon, LogIcon, PaintbrushIcon, RestartIcon } from "@components/Icons";
+import { FolderIcon, GithubIcon, LogIcon, OpenExternalIcon, PaintbrushIcon, RestartIcon, WebsiteIcon } from "@components/Icons";
 import { QuickAction, QuickActionCard } from "@components/settings/QuickAction";
 import { SpecialCard } from "@components/settings/SpecialCard";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
@@ -214,6 +214,16 @@ function VencordSettings() {
                             />
                         </>
                     )}
+                    <QuickAction
+                        Icon={WebsiteIcon}
+                        text="Visit Website"
+                        action={() => VencordNative.native.openExternal("https://zencord-theta.vercel.app/")}
+                    />
+                    <QuickAction
+                        Icon={OpenExternalIcon}
+                        text="Join Discord Server"
+                        action={() => VencordNative.native.openExternal("https://discord.gg/EYzpnZuSba")}
+                    />
                     <QuickAction
                         Icon={GithubIcon}
                         text="View Source Code"
