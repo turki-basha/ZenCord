@@ -1,0 +1,265 @@
+/*
+ * Vencord, a modification for Discord's desktop app
+ * Copyright (c) 2022 Vendicated and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import "./style.css";
+
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
+import { definePluginSettings } from "@api/Settings";
+import { CodeBlock } from "@components/CodeBlock";
+import ErrorBoundary from "@components/ErrorBoundary";
+import { HeadingSecondary } from "@components/Heading";
+import { Margins } from "@components/margins";
+import { Devs } from "@utils/constants";
+import { copyWithToast, getCurrentGuild, getIntlMessage } from "@utils/discord";
+import { isTruthy } from "@utils/guards";
+import definePlugin, { IconComponent, OptionType } from "@utils/types";
+import { Message } from "@vencord/discord-types";
+import { GuildRoleStore, Menu, Modal, openModal, UserProfileStore } from "@webpack/common";
+import { MouseEventHandler } from "react";
+
+const CopyRawIcon: IconComponent = ({ height = 20, width = 20, className }) => {
+    return (
+        <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <path d="M12.9297 3.25007C12.7343 3.05261 12.4154 3.05226 12.2196 3.24928L11.5746 3.89824C11.3811 4.09297 11.3808 4.40733 11.5739 4.60245L16.5685 9.64824C16.7614 9.84309 16.7614 10.1569 16.5685 10.3517L11.5739 15.3975C11.3808 15.5927 11.3811 15.907 11.5746 16.1017L12.2196 16.7507C12.4154 16.9477 12.7343 16.9474 12.9297 16.7499L19.2604 10.3517C19.4532 10.1568 19.4532 9.84314 19.2604 9.64832L12.9297 3.25007Z" />
+            <path d="M8.42616 4.60245C8.6193 4.40733 8.61898 4.09297 8.42545 3.89824L7.78047 3.24928C7.58466 3.05226 7.26578 3.05261 7.07041 3.25007L0.739669 9.64832C0.5469 9.84314 0.546901 10.1568 0.739669 10.3517L7.07041 16.7499C7.26578 16.9474 7.58465 16.9477 7.78047 16.7507L8.42545 16.1017C8.61898 15.907 8.6193 15.5927 8.42616 15.3975L3.43155 10.3517C3.23869 10.1569 3.23869 9.84309 3.43155 9.64824L8.42616 4.60245Z" />
+        </svg>
+    );
+};
+
+// We can't use structuredClone because some objects may contain methods, which cause a DataCloneError.
+function cloneObject<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+function sortObject<T>(obj: T): T {
+    if (!settings.store.sortKeys) return obj;
+
+    if (Array.isArray(obj)) {
+        return obj.map(sortObject) as T;
+    }
+
+    if (obj !== null && typeof obj === "object") {
+        return Object.fromEntries(
+            Object.entries(obj)
+                .sort(([k1], [k2]) => k1.localeCompare(k2))
+                .map(([key, value]) => [key, sortObject(value)])
+        ) as T;
+    }
+
+    return obj;
+}
+
+const deleteProperties = (obj: object, keys: string[]) => keys.forEach(key => delete obj[key]);
+
+function redactUser(data: object) {
+    if (settings.store.stripSensitiveData) {
+        deleteProperties(data, [
+            "email",
+            "phone",
+            "storeCountry",
+            "personalConnectionId"
+        ]);
+    }
+
+    return data;
+}
+
+function cleanMessage(msg: Message) {
+    msg = cloneObject(msg);
+    redactUser(msg.author);
+
+    // message logger added properties
+    deleteProperties(msg, ["editHistory", "deleted", "firstEditTimestamp"]);
+    msg.attachments?.forEach(a => delete (a as any).deleted);
+
+    return msg;
+}
+
+function openViewRawModal(data: object, type: string, msgContent?: string) {
+    const json = JSON.stringify(sortObject(data), null, 4);
+
+    openModal(props => (
+        <ErrorBoundary>
+            <Modal
+                {...props}
+                title={`Raw ${type} Data`}
+                size="xl"
+                actions={[
+                    {
+                        text: `Copy ${type} Data`,
+                        variant: "secondary",
+                        onClick: () => copyWithToast(json, `${type} data copied to clipboard!`)
+                    },
+                    msgContent && {
+                        text: "Copy Raw Content",
+                        variant: "secondary",
+                        onClick: () => copyWithToast(msgContent, "Content copied to clipboard!")
+                    }
+                ].filter(isTruthy)}
+            >
+                {!!msgContent && (
+                    <>
+                        <HeadingSecondary>Message Content</HeadingSecondary>
+                        <CodeBlock className="vc-viewRaw-codeBlock" content={msgContent} lang="" />
+                        <HeadingSecondary className={Margins.top16}>Message Data</HeadingSecondary>
+                    </>
+                )}
+                <CodeBlock className="vc-viewRaw-codeBlock" content={json} lang="json" />
+            </Modal>
+        </ErrorBoundary >
+    ));
+}
+
+const openViewRawModalMessage = (msg: Message) => openViewRawModal(cleanMessage(msg), "Message", msg.content);
+
+const settings = definePluginSettings({
+    clickMethod: {
+        description: "Change the button to view the raw content/data of any message.",
+        type: OptionType.SELECT,
+        options: [
+            { label: "Left Click to view the raw content.", value: "Left", default: true },
+            { label: "Right click to view the raw content.", value: "Right" }
+        ]
+    },
+    messageContextMenu: {
+        description: "Show in message context menu",
+        type: OptionType.BOOLEAN,
+        default: false
+    },
+    sortKeys: {
+        description: "Alphabetically sort the keys of the raw data.",
+        type: OptionType.BOOLEAN,
+        default: true
+    },
+    stripSensitiveData: {
+        description: "Remove sensitive data from the raw data, such as your email and phone number.",
+        type: OptionType.BOOLEAN,
+        default: true
+    }
+});
+
+function MakeContextCallback(name: "Guild" | "Role" | "User" | "Channel" | "Message" | "Profile", getData?: (props: any) => any): NavContextMenuPatchCallback {
+    return (children, props) => {
+        const value = getData ? getData(props) : props[name.toLowerCase()];
+        if (!value) return;
+        if (props.label === getIntlMessage("CHANNEL_ACTIONS_MENU_LABEL")) return; // random shit like notification settings
+        const isMessage = name === "Message";
+        if (isMessage && !settings.store.messageContextMenu) return;
+
+        // typescript parser goes crazy if this is inline
+        const id = `vc-view-${name.toLowerCase()}-raw`;
+        const action = isMessage
+            ? () => openViewRawModalMessage(value)
+            : name === "User"
+                ? () => openViewRawModal(redactUser(cloneObject(value)), name)
+                : () => openViewRawModal(value, name);
+
+        const devContainer = findGroupChildrenByChildId(`devmode-copy-id-${value.id}`, children);
+
+        (devContainer ?? children).splice(-1, 0,
+            <Menu.MenuItem
+                id={id}
+                label="View Raw"
+                action={action}
+                icon={CopyRawIcon}
+                leadingAccessory={{ type: "icon", icon: CopyRawIcon }}
+            />
+        );
+    };
+}
+
+const devContextCallback: NavContextMenuPatchCallback = (children, { id }: { id: string; }) => {
+    const guild = getCurrentGuild();
+    if (!guild) return;
+
+    const role = GuildRoleStore.getRole(guild.id, id);
+    if (!role) return;
+
+    children.push(
+        <Menu.MenuItem
+            id={"vc-view-role-raw"}
+            label="View Raw"
+            action={() => openViewRawModal(role, "Role")}
+            icon={CopyRawIcon}
+            leadingAccessory={{ type: "icon", icon: CopyRawIcon }}
+        />
+    );
+};
+
+export default definePlugin({
+    name: "ViewRaw",
+    description: "Copy and view the raw content/data of any message, channel or guild",
+    tags: ["Chat", "Developers"],
+    authors: [Devs.KingFish, Devs.Ven, Devs.rad, Devs.ImLvna],
+    settings,
+
+    contextMenus: {
+        "guild-context": MakeContextCallback("Guild"),
+        "guild-settings-role-context": MakeContextCallback("Role"),
+        "channel-context": MakeContextCallback("Channel"),
+        "thread-context": MakeContextCallback("Channel"),
+        "gdm-context": MakeContextCallback("Channel"),
+        "user-context": MakeContextCallback("User"),
+        "dev-context": devContextCallback,
+        "message": MakeContextCallback("Message"),
+        "user-profile-overflow-menu": MakeContextCallback("Profile", props => UserProfileStore.getGuildMemberProfile(props.user?.id, props.guildId) ?? UserProfileStore.getUserProfile(props.user?.id))
+    },
+
+    messagePopoverButton: {
+        icon: CopyRawIcon,
+        render(msg) {
+            const handleClick = () => {
+                if (settings.store.clickMethod === "Right") {
+                    copyWithToast(msg.content);
+                } else {
+                    openViewRawModalMessage(msg);
+                }
+            };
+
+            const handleContextMenu: MouseEventHandler<HTMLDivElement> = e => {
+                if (settings.store.clickMethod === "Left") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    copyWithToast(msg.content);
+                } else {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openViewRawModalMessage(msg);
+                }
+            };
+
+            const label = settings.store.clickMethod === "Right"
+                ? "Copy Raw (Left Click) / View Raw (Right Click)"
+                : "View Raw (Left Click) / Copy Raw (Right Click)";
+
+            return {
+                label,
+                icon: CopyRawIcon,
+                onClick: handleClick,
+                onContextMenu: handleContextMenu
+            };
+        }
+    }
+});
