@@ -39,6 +39,7 @@ import { Button, ChannelStore, ConfirmModal, Forms, GuildMemberStore, openModal,
 import { JSX } from "react";
 
 import gitHash from "~git-hash";
+import gitRemote from "~git-remote";
 import plugins, { PluginMeta } from "~plugins";
 
 import SettingsPlugin from "./settings";
