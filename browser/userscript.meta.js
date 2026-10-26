@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name            Vencord
-// @description     A Discord client mod - Web version
+// @name            ZenCord
+// @description     A peaceful, lightweight Discord client mod - Web version
 // @version         %version%
-// @author          Vendicated (https://github.com/Vendicated)
-// @namespace       https://github.com/Vendicated/Vencord
-// @supportURL      https://github.com/Vendicated/Vencord
-// @icon            https://raw.githubusercontent.com/Vendicated/Vencord/refs/heads/main/browser/icon.png
+// @author          ZenCord Team (https://github.com/turki-basha/ZenCord)
+// @namespace       https://github.com/turki-basha/ZenCord
+// @supportURL      https://github.com/turki-basha/ZenCord
+// @icon            https://raw.githubusercontent.com/turki-basha/ZenCord/refs/heads/main/browser/icon.png
 // @license         GPL-3.0
 // @match           *://*.discord.com/*
 // @grant           GM_xmlhttpRequest
