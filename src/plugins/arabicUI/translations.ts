@@ -60,7 +60,12 @@ export const translations: Record<string, string> = {
     "Save your ZenCord settings to the cloud so you can easily keep them the same on all your devices":
         "احفظ إعدادات زن كورد سحابياً للمزامنة السهلة بين جميع أجهزتك",
     "You can import and export your ZenCord settings as a JSON file. This allows you to easily transfer your settings to another device, or recover your settings after reinstalling ZenCord or Discord.":
-        "يمكنك استيراد وتصدير إعداداتك كملف JSON لنقلها بسهولة إلى جهاز آخر أو استعادتها لاحقاً."
+        "يمكنك استيراد وتصدير إعداداتك كملف JSON لنقلها بسهولة إلى جهاز آخر أو استعادتها لاحقاً.",
+    "Fake Deafen": "ديفن وهمي (Fake Deafen)",
+    "Fake Mute": "ميوت وهمي (Fake Mute)",
+    "Fake Video": "كاميرا وهمية (Fake Video)",
+    "Automatically fake mute whenever Fake Deafen is enabled": "تفعيل الميوت الوهمي تلقائياً عند تفعيل الديفن الوهمي",
+    "Show a quick popup toast notification when toggling fake states": "إظهار إشعار سريع عند تفعيل أو تعطيل الحالة الوهمية"
 };
 
 export const pluginNameTranslations: Record<string, { name: string; desc: string }> = {
@@ -68,6 +73,10 @@ export const pluginNameTranslations: Record<string, { name: string; desc: string
     "ArabicUI": {
         name: "الواجهة العربية (Arabic UI)",
         desc: "تعريب واجهة وقوائم وإعدادات زن كورد بالكامل مع أسماء الإضافات وشروحاتها وخط عربي فخم"
+    },
+    "FakeDeafen": {
+        name: "فيك ديفن وميوت وهمي (Fake Deafen)",
+        desc: "إظهار علامة الديفن أو الميوت للأعضاء بالروم الصوتي بينما تسمع كل شيء وتتحدث بحرية تامة وبكل سرية"
     },
     "Translate": {
         name: "مترجم الرسائل (Translate)",
