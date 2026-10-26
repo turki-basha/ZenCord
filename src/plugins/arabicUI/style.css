@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+.vc-arabic-active,
+.vc-arabic-active .vc-settings-tab,
+.vc-arabic-active .vc-settings-card,
+.vc-arabic-active [data-tab-id*="vencord"] {
+    font-family: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+.vc-arabic-active [data-tab-id*="vencord"] {
+    font-weight: 600;
+}
+
+.vc-arabic-active .vc-settings-quick-action-text {
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 0.95em;
+}
