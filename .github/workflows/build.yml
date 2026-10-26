@@ -1,4 +1,5 @@
-name: Build DevBuild
+name: Build ZenCord
+
 on:
     push:
         branches:
@@ -10,6 +11,10 @@ on:
             - scripts/build/**
             - package.json
             - pnpm-lock.yaml
+
+permissions:
+    contents: write
+
 env:
     FORCE_COLOR: true
 
@@ -18,12 +23,14 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@v4
 
-            - uses: pnpm/action-setup@v6 # Install pnpm using packageManager key in package.json
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 11.9.0
 
             - name: Use Node.js 24
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v4
               with:
                   node-version: 24
                   cache: "pnpm"
@@ -34,47 +41,26 @@ jobs:
             - name: Build web
               run: pnpm buildWebStandalone
 
-            - name: Build
+            - name: Build desktop
               run: pnpm build --standalone
 
             - name: Generate plugin list
               run: pnpm generatePluginJson dist/plugins.json dist/plugin-readmes.json
 
-            - name: Clean up obsolete files
+            - name: Clean up unnecessary files
               run: |
                   rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
-            - name: Get some values needed for the release
+            - name: Get commit hash
               id: release_values
               run: |
                   echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-            - name: Upload DevBuild as release
-              if: github.repository == 'Vendicated/Vencord'
+            - name: Publish latest release for auto-updater
+              if: github.repository == 'turki-basha/ZenCord'
               run: |
-                  gh release upload devbuild --clobber dist/*
-                  gh release edit devbuild --title "DevBuild $RELEASE_TAG"
+                  gh release delete latest --yes || true
+                  gh release create latest dist/* --title "ZenCord $RELEASE_TAG" --notes "Latest automated build of ZenCord ($RELEASE_TAG)"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}
-
-            - name: Upload DevBuild to builds repo
-              if: github.repository == 'Vendicated/Vencord'
-              run: |
-                  git config --global user.name "$USERNAME"
-                  git config --global user.email actions@github.com
-
-                  git clone https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git upload
-                  cd upload
-
-                  GLOBIGNORE=.git:.gitignore:README.md:LICENSE
-                  rm -rf *
-                  cp -r ../dist/* .
-
-                  git add -A
-                  git commit -m "Builds for https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
-                  git push --force https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git
-              env:
-                  API_TOKEN: ${{ secrets.BUILDS_TOKEN }}
-                  GH_REPO: Vencord/builds
-                  USERNAME: GitHub-Actions
