@@ -5,22 +5,22 @@
       {
         "type": "developer",
         "tooltip": "ZenCord Developer",
-        "badge": "https://cdn.discordapp.com/emojis/1562267648857997356.webp?size=240"
+        "badge": "https://cdn.discordapp.com/emojis/1564698785551097986.webp?size=96"
       },
       {
         "type": "donor",
-        "tooltip": "ZenCord Supporter ($5)",
-        "badge": "https://cdn.discordapp.com/emojis/1026533070955872337.png"
+        "tooltip": "ZenCord Supporter",
+        "badge": "https://cdn.discordapp.com/emojis/1564696511953248398.webp?size=96"
       },
       {
         "type": "bot",
         "tooltip": "ZenCord Official Bot",
-        "badge": "https://cdn.discordapp.com/emojis/1039992459209490513.png"
+        "badge": "https://cdn.discordapp.com/emojis/1564687539556585492.webp?size=96"
       },
       {
         "type": "vip",
         "tooltip": "ZenCord VIP",
-        "badge": "https://cdn.discordapp.com/emojis/1238120638020063377.png"
+        "badge": "https://cdn.discordapp.com/emojis/1564695885605109942.webp?size=96"
       }
     ]
   }

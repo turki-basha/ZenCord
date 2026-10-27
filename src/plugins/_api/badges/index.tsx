@@ -36,7 +36,7 @@ import {
     ZenBadgesDatabase
 } from "./zenBadges";
 
-const CONTRIBUTOR_BADGE = "https://cdn.discordapp.com/emojis/1562267648857997356.webp?size=240";
+const CONTRIBUTOR_BADGE = "https://cdn.discordapp.com/emojis/1564698785551097986.webp?size=96";
 
 const ContributorBadge: ProfileBadge = {
     id: "vencord_contributor_badge",

@@ -16,17 +16,17 @@ import { ContextMenuApi, Forms, Menu, Modal, openModal } from "@webpack/common";
  * يمكن للموقع عبر قاعدة البيانات تمرير أي رابط صورة أو GIF مخصص، أو الاكتفاء بتحديد النوع (type).
  */
 export const ZEN_BADGE_ICONS = {
-    // 1. شارة المتبرع (ZenCord Supporter)
-    DONOR: "https://cdn.discordapp.com/emojis/1026533070955872337.png",
+    // 1. شارة المتبرع / الداعم (ZenCord Supporter)
+    DONOR: "https://cdn.discordapp.com/emojis/1564696511953248398.webp?size=96",
 
     // 2. شارة المبرمجين (خاصة بك وبالمبرمجين فقط)
-    DEVELOPER: "https://cdn.discordapp.com/emojis/1562267648857997356.webp?size=240",
+    DEVELOPER: "https://cdn.discordapp.com/emojis/1564698785551097986.webp?size=96",
 
     // 3. شارة بوتات زن كورد (ZenCord Official Bot)
-    BOT: "https://cdn.discordapp.com/emojis/1039992459209490513.png",
+    BOT: "https://cdn.discordapp.com/emojis/1564687539556585492.webp?size=96",
 
     // 4. شارة VIP (ZenCord VIP Member)
-    VIP: "https://cdn.discordapp.com/emojis/1238120638020063377.png"
+    VIP: "https://cdn.discordapp.com/emojis/1564695885605109942.webp?size=96"
 };
 
 /**
