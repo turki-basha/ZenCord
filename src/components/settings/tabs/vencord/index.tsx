@@ -32,8 +32,8 @@ import { gitRemote } from "@shared/vencordUserAgent";
 import { IS_WINDOWS } from "@utils/constants";
 import { Margins } from "@utils/margins";
 import { isPluginDev } from "@utils/misc";
-import { promptToRestart } from "@utils/promptToRestart";
 import { relaunch } from "@utils/native";
+import { promptToRestart } from "@utils/promptToRestart";
 import { Forms, React, UserStore } from "@webpack/common";
 
 import { MacOSVibrancySettings } from "./MacVibrancySettings";

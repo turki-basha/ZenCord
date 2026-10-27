@@ -4,7 +4,7 @@
 .vc-arabic-active .vc-settings-tab,
 .vc-arabic-active .vc-settings-card,
 .vc-arabic-active [data-tab-id*="vencord"] {
-    font-family: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-family: Cairo, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
 }
 
 .vc-arabic-active [data-tab-id*="vencord"] {
@@ -12,6 +12,6 @@
 }
 
 .vc-arabic-active .vc-settings-quick-action-text {
-    font-family: 'Cairo', sans-serif !important;
+    font-family: Cairo, sans-serif !important;
     font-size: 0.95em;
 }

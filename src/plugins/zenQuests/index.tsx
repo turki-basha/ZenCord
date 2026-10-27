@@ -1,6 +1,6 @@
 /*
- * ZenCord, a modification for Discord
- * Copyright (c) 2026 ZenCord Team & Contributors
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
