@@ -23,3 +23,9 @@ src/userplugins
 
 ExtensionCache/
 /settings
+
+# Archives & Temporary artifacts
+*.zip
+*.tmp
+*.bak
+ZenCordPayload.zip

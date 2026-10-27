@@ -2,7 +2,7 @@
     "name": "zencord",
     "private": "true",
     "version": "1.0.0",
-    "description": "A peaceful, lightweight Discord client modification",
+    "description": "High-performance, modular, and privacy-centric Discord client modification",
     "homepage": "https://zencord-theta.vercel.app/",
     "bugs": {
         "url": "https://github.com/turki-basha/ZenCord/issues"
