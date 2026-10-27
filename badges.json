@@ -1,0 +1,27 @@
+{
+  "_comment": "قاعدة بيانات شارات ZenCord - يتم جلبها ديناميكياً بواسطة ZenCord من موقعك أو من هذا الملف",
+  "_schema_example": {
+    "123456789012345678": [
+      {
+        "type": "developer",
+        "tooltip": "ZenCord Developer",
+        "badge": "https://cdn.discordapp.com/emojis/1562267648857997356.webp?size=240"
+      },
+      {
+        "type": "donor",
+        "tooltip": "ZenCord Supporter ($5)",
+        "badge": "https://cdn.discordapp.com/emojis/1026533070955872337.png"
+      },
+      {
+        "type": "bot",
+        "tooltip": "ZenCord Official Bot",
+        "badge": "https://cdn.discordapp.com/emojis/1039992459209490513.png"
+      },
+      {
+        "type": "vip",
+        "tooltip": "ZenCord VIP",
+        "badge": "https://cdn.discordapp.com/emojis/1238120638020063377.png"
+      }
+    ]
+  }
+}

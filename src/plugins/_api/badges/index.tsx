@@ -31,6 +31,11 @@ import { shouldShowContributorBadge } from "@utils/misc";
 import definePlugin from "@utils/types";
 import { ContextMenuApi, Forms, Menu, Modal, openModal, showToast, UserStore } from "@webpack/common";
 
+import {
+    createZenBadgeFromDb,
+    ZenBadgesDatabase
+} from "./zenBadges";
+
 const CONTRIBUTOR_BADGE = "https://cdn.discordapp.com/emojis/1562267648857997356.webp?size=240";
 
 const ContributorBadge: ProfileBadge = {
@@ -42,15 +47,52 @@ const ContributorBadge: ProfileBadge = {
     onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId))
 };
 
-let DonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
+let DonorBadges = {} as ZenBadgesDatabase;
+
+export const ZENCORD_API_BADGES_URL = "https://api.zencord.app/badges";
+export const ZENCORD_GITHUB_FALLBACK_URL = "https://raw.githubusercontent.com/turki-basha/ZenCord/main/badges.json";
+export const VENCORD_BADGES_URL = "https://badges.vencord.dev/badges.json";
 
 async function loadBadges(noCache = false) {
     const init = {} as RequestInit;
     if (noCache)
         init.cache = "no-cache";
 
-    DonorBadges = await fetch("https://badges.vencord.dev/badges.json", init)
-        .then(r => r.json());
+    const merged: ZenBadgesDatabase = {};
+
+    try {
+        const [apiRes, fallbackRes, venRes] = await Promise.allSettled([
+            fetch(ZENCORD_API_BADGES_URL, init).then(r => r.ok ? r.json() : null),
+            fetch(ZENCORD_GITHUB_FALLBACK_URL, init).then(r => r.ok ? r.json() : null),
+            fetch(VENCORD_BADGES_URL, init).then(r => r.ok ? r.json() : null)
+        ]);
+
+        if (venRes.status === "fulfilled" && venRes.value && typeof venRes.value === "object") {
+            Object.assign(merged, venRes.value);
+        }
+
+        // Apply GitHub fallback if present
+        if (fallbackRes.status === "fulfilled" && fallbackRes.value && typeof fallbackRes.value === "object") {
+            for (const [userId, badges] of Object.entries(fallbackRes.value as Record<string, any>)) {
+                if (Array.isArray(badges)) {
+                    merged[userId] = [...(merged[userId] || []), ...badges];
+                }
+            }
+        }
+
+        // Apply Website Database API (highest priority)
+        if (apiRes.status === "fulfilled" && apiRes.value && typeof apiRes.value === "object") {
+            for (const [userId, badges] of Object.entries(apiRes.value as Record<string, any>)) {
+                if (Array.isArray(badges)) {
+                    merged[userId] = [...(merged[userId] || []), ...badges];
+                }
+            }
+        }
+    } catch (e) {
+        new Logger("BadgeAPI#loadBadges").error("Failed to load badges", e);
+    }
+
+    DonorBadges = merged;
 }
 
 let intervalId: any;
@@ -177,69 +219,6 @@ export default definePlugin({
     },
 
     getDonorBadges(userId: string) {
-        return DonorBadges[userId]?.map((badge, idx) => ({
-            id: `vencord_donor_badge_${idx}`,
-            iconSrc: badge.badge,
-            description: badge.tooltip,
-            position: BadgePosition.START,
-            props: {
-                style: {
-                    borderRadius: "50%",
-                    transform: "scale(0.9)" // The image is a bit too big compared to default badges
-                }
-            },
-            onContextMenu(event, badge) {
-                ContextMenuApi.openContextMenu(event, () => <BadgeContextMenu badge={badge} />);
-            },
-            onClick() {
-                openModal(props => (
-                    <ErrorBoundary noop onError={() => {
-                        props.onClose();
-                        VencordNative.native.openExternal("https://github.com/sponsors/Vendicated");
-                    }}>
-                        <Modal
-                            {...props}
-                            title={
-                                <Forms.FormTitle
-                                    tag="h2"
-                                    style={{
-                                        width: "100%",
-                                        textAlign: "center",
-                                        margin: 0
-                                    }}
-                                >
-                                    <Flex justifyContent="center" alignItems="center" gap="0.5em">
-                                        <Heart />
-                                        Vencord Donor
-                                    </Flex>
-                                </Forms.FormTitle>
-                            }
-                        >
-                            <div>
-                                <Flex>
-                                    <img
-                                        role="presentation"
-                                        src="https://cdn.discordapp.com/emojis/1026533070955872337.png"
-                                        alt=""
-                                        style={{ margin: "auto" }}
-                                    />
-                                    <img
-                                        role="presentation"
-                                        src="https://cdn.discordapp.com/emojis/1026533090627174460.png"
-                                        alt=""
-                                        style={{ margin: "auto" }}
-                                    />
-                                </Flex>
-                                <div style={{ padding: "1em" }}>
-                                    <Forms.FormText>
-                                        This Badge is a special perk for ZenCord contributors and supporters.
-                                    </Forms.FormText>
-                                </div>
-                            </div>
-                        </Modal>
-                    </ErrorBoundary>
-                ));
-            },
-        } satisfies ProfileBadge));
+        return DonorBadges[userId]?.map((badge, idx) => createZenBadgeFromDb(badge, idx, userId));
     }
 });
