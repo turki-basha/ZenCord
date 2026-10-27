@@ -468,31 +468,31 @@ export function getQuestCompletionState(quest: Quest, options: QuestButtonTextOp
 
     if (activeEntry?.status === "running") {
         const text = immediate
-            ? "Completing..."
-            : `Completing ${options.prepositional ? `in ${formattedTime}` : `(${formattedTime})`}`;
+            ? "⚡ Completing..."
+            : `⚡ Completing ${options.prepositional ? `in ${formattedTime}` : `(${formattedTime})`}`;
 
         return [text, QuestCompletionState.Completing];
     }
 
     if (activeEntry?.status === "queued") {
-        return [`Queued (${getQueuedAutoCompletePosition(quest.id) ?? "?"})`, QuestCompletionState.Queued];
+        return [`⏳ Queued (${getQueuedAutoCompletePosition(quest.id) ?? "?"})`, QuestCompletionState.Queued];
     }
 
     if (enrolledAt) {
         if (isQuestQueuedForResume(quest.id)) {
-            return ["Resuming...", QuestCompletionState.Queued];
+            return ["⏳ Resuming...", QuestCompletionState.Queued];
         }
 
         const meaningfulProgress = progress >= 1;
 
         return [
-            immediate ? "Complete Now" : `${meaningfulProgress ? "Resume" : "Complete"} (${formatQuestTime(timeRemaining)})`,
+            immediate ? "⚡ Complete Now" : `${meaningfulProgress ? "⚡ Resume" : "⚡ Auto-Complete"} (${formatQuestTime(timeRemaining)})`,
             QuestCompletionState.Accepted,
         ];
     }
 
     return [
-        immediate ? "Complete Now" : `Complete (${formatQuestTime(target)})`,
+        immediate ? "⚡ Complete Now" : `⚡ Auto-Complete (${formatQuestTime(target)})`,
         QuestCompletionState.Unenrolled,
     ];
 }

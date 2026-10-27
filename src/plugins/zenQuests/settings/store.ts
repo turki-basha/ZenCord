@@ -15,21 +15,22 @@ import { SettingsSearch } from "@plugins/zenQuests/components/settingsSearch";
 import { defaultAcknowledgedNotices, defaultAllowChangingDangerousSettings, defaultAutoCompleteQuestsSimultaneously, defaultAutoCompleteQuestTypes, defaultClaimedSubsort, defaultCompleteVideoQuestsQuicker, defaultDisableAccountPanelPromo, defaultDisableAccountPanelQuestProgress, defaultDisableFriendsListPromo, defaultDisableMembersListPromo, defaultDisableOrbsAndQuestsBadges, defaultDisableQuestsEverything, defaultDisableRelocationNotices, defaultDisableSponsoredBanner, defaultExpiredSubsort, defaultHiddenQuestStatuses, defaultHideNonAutoCompletableQuests, defaultIgnoredQuestIDs, defaultIgnoredSubsort, defaultIsOnQuestsPage, defaultLastQuestPageFilters, defaultLastQuestPageSort, defaultLeftClickAction, defaultMakeMobileVideoQuestsDesktopCompatible, defaultMiddleClickAction, defaultNewExcludedQuestAlertSound, defaultNewExcludedQuestAlertVolume, defaultNewQuestAlertSound, defaultNewQuestAlertVolume, defaultNotifyOnNewExcludedQuests, defaultNotifyOnNewQuests, defaultNotifyOnQuestComplete, defaultPreventVideoQuestsPausing, defaultQuestButtonBadgeColor, defaultQuestButtonBadgeCount, defaultQuestButtonDisplay, defaultQuestButtonIncludedTypes, defaultQuestButtonIndicator, defaultQuestCompletedAlertSound, defaultQuestCompletedAlertVolume, defaultQuestFetchInterval, defaultQuestOrder, defaultQuestTileClaimedColorSetting, defaultQuestTileExpiredColorSetting, defaultQuestTileGradient, defaultQuestTileIgnoredColorSetting, defaultQuestTilePreload, defaultQuestTileUnclaimedColorSetting, defaultRememberQuestPageFilters, defaultRememberQuestPageSort, defaultResumeInterruptedQuests, defaultResumeQuestIDs, defaultRightClickAction, defaultUnclaimedSubsort, type QuestButtonAction, type QuestButtonDisplayMode, type QuestButtonIncludedTypes, type QuestButtonIndicatorMode, type QuestOrderStatus } from "@plugins/zenQuests/settings/def";
 import { OptionType } from "@utils/types";
 
-const MIGRATION_TARGET = 1;
+const MIGRATION_TARGET = 2;
 const CURRENT_SETTINGS = PlainSettings.plugins.ZenQuests;
 
 if (CURRENT_SETTINGS) {
     let migrationVersion = CURRENT_SETTINGS.migrationVersion ?? 0;
 
-    // 0 -> 1: Reset Settings
-    if (migrationVersion === 0) {
-        PlainSettings.plugins.ZenQuests = { enabled: CURRENT_SETTINGS.enabled, migrationVersion: 1 };
-        migrationVersion = 1;
+    if (migrationVersion < 2) {
+        PlainSettings.plugins.ZenQuests = { ...CURRENT_SETTINGS, enabled: false, migrationVersion: 2 };
+        migrationVersion = 2;
     }
 
     if (migrationVersion !== CURRENT_SETTINGS.migrationVersion) {
         SettingsStore.markAsChanged();
     }
+} else {
+    PlainSettings.plugins.ZenQuests = { enabled: false, migrationVersion: MIGRATION_TARGET };
 }
 
 export const settings = definePluginSettings({

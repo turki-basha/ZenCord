@@ -202,3 +202,41 @@ div[id^="quest-tile-"] div[class^="confetti__"] {
 .questify-quest-button-container {
     position: relative;
 }
+
+/* ZenQuests Custom Modern Button Styling */
+.zq-action-btn,
+button.zq-action-btn {
+    background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    border: 1px solid rgb(255 255 255 / 15%) !important;
+    box-shadow: 0 4px 12px rgb(99 102 241 / 35%) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 20%) !important;
+}
+
+.zq-action-btn:hover,
+button.zq-action-btn:hover {
+    background: linear-gradient(135deg, #0ea5e9 0%, #818cf8 100%) !important;
+    box-shadow: 0 6px 18px rgb(99 102 241 / 55%) !important;
+    transform: translateY(-1.5px) !important;
+}
+
+.zq-action-btn:active,
+button.zq-action-btn:active {
+    transform: translateY(0.5px) !important;
+    box-shadow: 0 2px 8px rgb(99 102 241 / 30%) !important;
+}
+
+/* ZenQuests Card Refinements */
+.questify-quest-item-restyle {
+    border-radius: 12px !important;
+    border: 1px solid rgb(99 102 241 / 20%) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.questify-quest-item-restyle:hover {
+    border-color: rgb(99 102 241 / 45%) !important;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 35%) !important;
+}

@@ -5,7 +5,7 @@
  */
 
 import type { ModalOptions, ModalProps, RenderModalProps } from "@vencord/discord-types";
-import { Modal, openModal, useEffect, useState } from "@webpack/common";
+import { Modal, useEffect, useState } from "@webpack/common";
 import type { ComponentType, JSX } from "react";
 
 import { getQuestifySettings } from "./access";
@@ -216,24 +216,5 @@ function OneTimeNoticeModal({ notice, ...modalProps }: RenderModalProps & { noti
 }
 
 export function showPendingQuestifyNotice(): void {
-    for (const notice of oneTimeNotices) {
-        if (getQuestifySettings().acknowledgedNotices[notice.id]) {
-            continue;
-        }
-
-        if (!notice.condition()) {
-            if (notice.autoAcknowledgeCondition?.()) {
-                acknowledgeNotice(notice.id);
-            }
-
-            continue;
-        }
-
-        const modalOptions: QuestifyModalOptions = {
-            dismissable: isNoticeDismissable(notice),
-        };
-
-        openModal(modalProps => <OneTimeNoticeModal {...modalProps} notice={notice} />, modalOptions);
-        return;
-    }
+    // Disabled in ZenCord: ZenQuests runs seamlessly without intrusive warning popups
 }

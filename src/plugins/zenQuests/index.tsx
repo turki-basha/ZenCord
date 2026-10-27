@@ -89,6 +89,7 @@ function enrolledIncompleteButton(args: { quest: Quest, size: string; }): JSX.El
                 variant="secondary"
                 disabled={false}
                 fullWidth={true}
+                className="zq-action-btn"
                 {...props}
             />
         </ErrorBoundary>
@@ -104,6 +105,7 @@ export default definePlugin({
     description: "Automate Discord quests in the background, auto-claim rewards, and add Auto-Complete buttons directly to quest cards",
     authors: [Devs.ZenCord],
     tags: ["Utility", "Activity"],
+    enabledByDefault: false,
     dependencies: ["ServerListAPI"],
     startAt: StartAt.Init, // Needed in order to beat Read All Messages to inserting above the server list.
     managedStyle,
