@@ -44,8 +44,8 @@ function VesktopSection() {
     return (
         <Flex className={Margins.bottom20} flexDirection="column" gap="1em">
             <Card variant="info">
-                <HeadingSecondary>Vesktop & Vencord</HeadingSecondary>
-                <Paragraph>Vesktop and Vencord are two separate things. This updater is for Vencord.</Paragraph>
+                <HeadingSecondary>Vesktop & ZenCord</HeadingSecondary>
+                <Paragraph>Vesktop and ZenCord are two separate things. This updater is for ZenCord.</Paragraph>
                 <Paragraph className={Margins.top8}>
                     You receive separate popups for Vesktop updates. You can also manually update by installing the <Link href="https://vesktop.dev/install">latest version</Link>.
                 </Paragraph>
@@ -84,14 +84,14 @@ function Updater() {
             <div className="vc-settings-switches">
                 <FormSwitch
                     title="Automatically update"
-                    description="Automatically update Vencord without confirmation prompt"
+                    description="Automatically update ZenCord without confirmation prompt"
                     value={settings.autoUpdate}
                     onChange={(v: boolean) => settings.autoUpdate = v}
                     hideBorder
                 />
                 <FormSwitch
                     title="Get notified when an automatic update completes"
-                    description="Show a notification when Vencord automatically updates"
+                    description="Show a notification when ZenCord automatically updates"
                     value={settings.autoUpdateNotification}
                     onChange={(v: boolean) => settings.autoUpdateNotification = v}
                     disabled={!settings.autoUpdate}
