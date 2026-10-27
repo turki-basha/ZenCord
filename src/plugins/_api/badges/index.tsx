@@ -49,7 +49,7 @@ const ContributorBadge: ProfileBadge = {
 
 let DonorBadges = {} as ZenBadgesDatabase;
 
-export const ZENCORD_API_BADGES_URL = "https://api.zencord.app/badges";
+export const ZENCORD_API_BADGES_URL = "https://zencord.site/api/badges";
 export const ZENCORD_GITHUB_FALLBACK_URL = "https://raw.githubusercontent.com/turki-basha/ZenCord/main/badges.json";
 export const VENCORD_BADGES_URL = "https://badges.vencord.dev/badges.json";
 
