@@ -15,11 +15,5 @@ export const isDonor = (userId: string) => !!(
 );
 
 export function DonateButtonComponent() {
-    return (
-        <DonateButton
-            look={Button.Looks.FILLED}
-            color={Button.Colors.WHITE}
-            style={{ marginTop: "1em" }}
-        />
-    );
+    return null;
 }

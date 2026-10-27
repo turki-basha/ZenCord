@@ -25,16 +25,5 @@ export default function DonateButton({
     color = Button.Colors.TRANSPARENT,
     ...props
 }: Partial<ButtonProps>) {
-    return (
-        <Button
-            {...props}
-            look={look}
-            color={color}
-            onClick={() => VencordNative.native.openExternal("https://github.com/sponsors/Vendicated")}
-            className="vc-donate-button"
-        >
-            <Heart />
-            Donate
-        </Button>
-    );
+    return null;
 }
