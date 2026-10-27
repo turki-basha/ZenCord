@@ -1,0 +1,13 @@
+/*
+ * ZenCord ZenQuests Plugin Styles
+ * Hides intrusive quest popups, relocation notices, and promotional cards across Discord
+ */
+
+.vc-zenquests-clean-ui [class*="questPromotion_"],
+.vc-zenquests-clean-ui [class*="questsCard_"],
+.vc-zenquests-clean-ui [class*="questBar_"],
+.vc-zenquests-clean-ui [class*="questBarPreview_"],
+.vc-zenquests-clean-ui [class*="questNotice_"],
+.vc-zenquests-clean-ui [class*="questsHomeBanner_"] {
+    display: none !important;
+}

@@ -7,7 +7,8 @@
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { isPluginEnabled, isSettingDisabled, isSettingHidden, plugins } from "@api/PluginManager";
 import { Settings, useSettings } from "@api/Settings";
-import { openPluginModal, openSettingsTabModal, PluginsTab, ThemesTab } from "@components/settings";
+import { openPluginModal, openSettingsTabModal, PluginsTab, ThemesTab, VencordTab } from "@components/settings";
+import { relaunch } from "@utils/native";
 import { useAwaiter } from "@utils/react";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
 import { OptionType, Plugin } from "@utils/types";
@@ -302,16 +303,40 @@ export function renderPopout(onClose: () => void) {
             navId="vc-toolbox"
             onClose={onClose}
         >
+            <Menu.MenuGroup label="ZenCord">
+                <Menu.MenuItem
+                    id="zencord-settings"
+                    label="ZenCord Settings"
+                    action={() => openSettingsTabModal(VencordTab!)}
+                />
+                {!IS_WEB && (
+                    <Menu.MenuItem
+                        id="quickcss-editor"
+                        label="ZenCord QuickCSS"
+                        action={() => VencordNative.quickCss.openEditor()}
+                    />
+                )}
+                {!IS_WEB && (
+                    <Menu.MenuItem
+                        id="relaunch-discord"
+                        label="Restart Discord"
+                        action={relaunch}
+                    />
+                )}
+            </Menu.MenuGroup>
+
+            <Menu.MenuSeparator />
+
+            {buildPluginMenu()}
+            {buildThemeMenu()}
+
             <Menu.MenuItem
                 id="notifications"
-                label="Open Notification Log"
+                label="Notification Log"
                 action={openNotificationLogModal}
             />
 
-            {buildThemeMenu()}
-            {buildPluginMenu()}
-
             {buildCustomPluginEntries()}
-        </Menu.Menu >
+        </Menu.Menu>
     );
 }

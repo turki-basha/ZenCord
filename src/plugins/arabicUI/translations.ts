@@ -55,6 +55,9 @@ export const translations: Record<string, string> = {
     "Up to date": "الإصدار محدث",
     "Update Available": "يوجد تحديث متاح",
     "Update Now": "تحديث الآن",
+    "ZenCord Quick Access": "الوصول السريع لـ ZenCord",
+    "ZenCord QuickCSS": "محرر الـ QuickCSS",
+    "Restart Discord": "إعادة تشغيل ديسكورد",
 
     // Descriptions & Hints
     "Save your ZenCord settings to the cloud so you can easily keep them the same on all your devices":
@@ -192,7 +195,7 @@ export const pluginNameTranslations: Record<string, { name: string; desc: string
     },
     "VolumeBooster": {
         name: "مضخم ومقوي الصوت (Volume Booster)",
-        desc: "رفع صوت أي شخص في المحادثة الصوتية حتى 200% لتوضيح الأصوات الضعيفة"
+        desc: "رفع صوت أي شخص أو بث في المحادثة الصوتية حتى 500% لتوضيح وتضخيم الأصوات الضعيفة"
     },
     "YoutubeAdblock": {
         name: "مانع إعلانات يوتيوب (YouTube Adblock)",
@@ -808,8 +811,8 @@ export const pluginNameTranslations: Record<string, { name: string; desc: string
         desc: "نطق صوتي بأسماء من ينضم أو يغادر الروم الصوتي عبر المساعد الصوتي"
     },
     "VencordToolbox": {
-        name: "صندوق أدوات زن كورد (ZenCord Toolbox)",
-        desc: "إضافة زر قائمة منسدلة سريع في الشريط العلوي للوصول لجميع الإضافات والأدوات"
+        name: "زر الوصول السريع (ZenCord Quick Access)",
+        desc: "إضافة أيقونة فخمة في الشريط العلوي تفتح قائمة سريعة لإعدادات زن كورد ومحرر الـ CSS وإعادة التشغيل"
     },
     "WebContextMenus": {
         name: "قوائم ديسكورد الأصلية للويب (Web Context Menus)",
@@ -834,6 +837,10 @@ export const pluginNameTranslations: Record<string, { name: string; desc: string
     "XSOverlay": {
         name: "إشعارات الواقع الافتراضي (XSOverlay)",
         desc: "إرسال تنبيهات ورسائل ديسكورد إلى نظارة الواقع الافتراضي VR عبر XSOverlay"
+    },
+    "ZenQuests": {
+        name: "المهام التلقائية الفخمة (ZenQuests)",
+        desc: "إكمال مهام ديسكورد تلقائياً في الخلفية وقبول المكافآت مع تنظيف الواجهة من إعلانات وبانرات المهام المزعجة"
     }
 };
 
