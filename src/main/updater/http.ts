@@ -46,30 +46,42 @@ async function calculateGitChanges() {
     const isOutdated = await fetchUpdates();
     if (!isOutdated) return [];
 
-    const data = await githubGet(`/compare/${gitHash}...HEAD`);
+    try {
+        const data = await githubGet(`/compare/${gitHash}...HEAD`);
+        if (data && Array.isArray(data.commits) && data.commits.length > 0) {
+            return data.commits.map((c: any) => ({
+                hash: c.sha ? c.sha.slice(0, 7) : "update",
+                author: c.author?.login ?? c.commit?.author?.name ?? "ZenCord",
+                message: (c.commit?.message || "ZenCord Update").split("\n")[0]
+            }));
+        }
+    } catch { }
 
-    return data.commits.map((c: any) => ({
-        // github api only sends the long sha
-        hash: c.sha.slice(0, 7),
-        author: c.author?.login ?? c.commit?.author?.name ?? "Unknown Author",
-        message: c.commit.message.split("\n")[0]
-    }));
+    return [{
+        hash: "update",
+        author: "ZenCord Team",
+        message: "New ZenCord update available"
+    }];
 }
 
 async function fetchUpdates() {
+    PendingUpdates = [];
     const data = await githubGet("/releases/latest");
+    if (!data) return false;
 
-    const hash = data.name.slice(data.name.lastIndexOf(" ") + 1);
-    if (hash === gitHash)
+    const hash = data.name ? data.name.slice(data.name.lastIndexOf(" ") + 1) : "";
+    if (hash && hash === gitHash)
         return false;
 
-    data.assets.forEach(({ name, browser_download_url }) => {
-        if (VENCORD_FILES.some(s => name.startsWith(s))) {
-            PendingUpdates.push([name, browser_download_url]);
-        }
-    });
+    if (Array.isArray(data.assets)) {
+        data.assets.forEach(({ name, browser_download_url }: any) => {
+            if (VENCORD_FILES.some(s => name.startsWith(s))) {
+                PendingUpdates.push([name, browser_download_url]);
+            }
+        });
+    }
 
-    return true;
+    return PendingUpdates.length > 0;
 }
 
 async function applyUpdates() {
