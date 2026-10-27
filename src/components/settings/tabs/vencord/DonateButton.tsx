@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import DonateButton from "@components/settings/DonateButton";
 import BadgeAPI from "@plugins/_api/badges";
 import { DONOR_ROLE_ID, VENCORD_GUILD_ID } from "@utils/constants";
-import { Button, GuildMemberStore } from "@webpack/common";
+import { GuildMemberStore } from "@webpack/common";
 
 export const isDonor = (userId: string) => !!(
     (BadgeAPI.getDonorBadges(userId)?.length ?? 0) > 0
