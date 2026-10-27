@@ -23,7 +23,6 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { Heart } from "@components/Heart";
 import { CopyIcon, LinkIcon } from "@components/Icons";
-import DonateButton from "@components/settings/DonateButton";
 import { openContributorModal } from "@components/settings/tabs";
 import { Devs } from "@utils/constants";
 import { copyWithToast } from "@utils/discord";
@@ -234,17 +233,9 @@ export default definePlugin({
                                 </Flex>
                                 <div style={{ padding: "1em" }}>
                                     <Forms.FormText>
-                                        This Badge is a special perk for Vencord Donors
-                                    </Forms.FormText>
-                                    <Forms.FormText className={Margins.top20}>
-                                        Please consider supporting the development of Vencord by becoming a donor. It would mean a lot!!
+                                        This Badge is a special perk for ZenCord contributors and supporters.
                                     </Forms.FormText>
                                 </div>
-                            </div>
-                            <div>
-                                <Flex justifyContent="center" style={{ width: "100%" }}>
-                                    <DonateButton />
-                                </Flex>
                             </div>
                         </Modal>
                     </ErrorBoundary>

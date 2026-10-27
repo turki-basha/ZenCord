@@ -7,6 +7,7 @@
 import "./style.css";
 
 import { definePluginSettings } from "@api/Settings";
+import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 
 import { pluginNameTranslations, translations } from "./translations";
@@ -101,7 +102,7 @@ function revertTranslations(root: Node) {
 export default definePlugin({
     name: "ArabicUI",
     description: "تحويل واجهة وقوائم وإعدادات زن كورد إلى اللغة العربية مع تحسين مظهر الخط | Translates ZenCord UI & Settings into Arabic with enhanced Arabic typography",
-    authors: [{ name: "ZenCord Team", id: 0n }],
+    authors: [Devs.ZenCord],
     settings,
 
     start() {

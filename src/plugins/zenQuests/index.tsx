@@ -7,6 +7,7 @@
 import "./styles.css";
 
 import { definePluginSettings } from "@api/Settings";
+import { Devs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy, findByPropsLazy } from "@webpack";
@@ -107,7 +108,7 @@ async function claimQuestReward(quest: any) {
         }
         logger.info(`Claimed reward for quest: ${questName}`);
         if (settings.store.showNotifications) {
-            showToast(`🎉 ZenQuests: Claimed reward for ${questName}!`);
+            showToast({ text: `🎉 ZenQuests: Claimed reward for ${questName}!`, variant: "success" });
         }
     } catch (err) {
         logger.warn(`Failed to claim reward for ${questName}:`, err);
@@ -212,8 +213,8 @@ export async function processQuests() {
 export default definePlugin({
     name: "ZenQuests",
     description: "Automate Discord quests in the background, auto-claim rewards, and remove intrusive quest promotions",
-    authors: [{ name: "ZenCord Team", id: 0n }],
-    tags: ["Utility", "Gaming"],
+    authors: [Devs.ZenCord],
+    tags: ["Utility", "Activity"],
     enabledByDefault: true,
 
     settings,
@@ -221,7 +222,7 @@ export default definePlugin({
     toolboxActions: {
         "⚡ Complete Active Quests": () => {
             processQuests();
-            showToast("ZenQuests: Checking and completing active quests...");
+            showToast({ text: "ZenQuests: Checking and completing active quests..." });
         }
     },
 

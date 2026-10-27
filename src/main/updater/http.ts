@@ -73,6 +73,15 @@ async function fetchUpdates() {
     if (hash && hash === gitHash)
         return false;
 
+    if (hash && gitHash) {
+        try {
+            const compare = await githubGet(`/compare/${hash}...${gitHash}`);
+            if (compare && (compare.status === "ahead" || compare.status === "identical")) {
+                return false;
+            }
+        } catch { }
+    }
+
     if (Array.isArray(data.assets)) {
         data.assets.forEach(({ name, browser_download_url }: any) => {
             if (VENCORD_FILES.some(s => name.startsWith(s))) {

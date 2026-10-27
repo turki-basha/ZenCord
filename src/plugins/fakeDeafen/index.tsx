@@ -6,6 +6,7 @@
 
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
 import { definePluginSettings } from "@api/Settings";
+import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { Menu, React, showToast } from "@webpack/common";
 
@@ -53,7 +54,7 @@ function handleToggle(key: VoiceStateKey): void {
 export default definePlugin({
     name: "FakeDeafen",
     description: "Pretend to be deafened or muted in voice channels while secretly hearing everything and speaking freely",
-    authors: [{ name: "ZenCord Team", id: 0n }],
+    authors: [Devs.ZenCord],
     tags: ["Voice", "Privacy", "Utility"],
 
     settings,
