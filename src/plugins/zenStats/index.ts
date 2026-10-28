@@ -8,35 +8,63 @@ import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { FluxDispatcher, UserStore } from "@webpack/common";
 
-const REPORT_URL = "https://zencord.site/api/report";
+const REPORT_URL_WWW = "https://www.zencord.site/api/report";
+const REPORT_URL_DIRECT = "https://zencord.site/api/report";
+
 let reported = false;
+let intervalId: any = null;
 
-async function reportUser() {
-    if (reported) return;
+async function sendUserReport(): Promise<boolean> {
+    if (reported) return true;
+
     try {
-        const user = UserStore.getCurrentUser();
-        if (!user?.id) return;
-        reported = true;
+        const user = UserStore?.getCurrentUser?.();
+        if (!user || !user.id) return false;
 
-        const avatarHash = user.avatar || null;
-        const avatarUrl = avatarHash
-            ? `https://cdn.discordapp.com/avatars/${user.id}/${avatarHash}.${avatarHash.startsWith("a_") ? "gif" : "png"}?size=128`
-            : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(user.id) >> BigInt(22)) % BigInt(6))}.png`;
+        let avatarUrl = "";
+        try {
+            avatarUrl = (user as any).getAvatarURL?.(void 0, 128, true) ?? "";
+        } catch { }
 
-        fetch(REPORT_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: user.id,
-                username: user.username,
-                global_name: user.globalName ?? null,
-                avatar_url: avatarUrl,
-            }),
-            keepalive: true,
-        }).catch(() => { /* silent fail */ });
+        if (!avatarUrl) {
+            const avatarHash = user.avatar;
+            avatarUrl = avatarHash
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${avatarHash}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/0.png`;
+        }
+
+        const body = JSON.stringify({
+            id: String(user.id),
+            username: String(user.username || ""),
+            global_name: (user as any).globalName || user.username || "",
+            avatar_url: avatarUrl,
+        });
+
+        // Try WWW first (no redirect), direct as fallback
+        for (const url of [REPORT_URL_WWW, REPORT_URL_DIRECT]) {
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body,
+                    mode: "cors",
+                });
+                if (res.ok) {
+                    reported = true;
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                    }
+                    return true;
+                }
+            } catch {
+                // try next
+            }
+        }
     } catch {
         // silent
     }
+    return false;
 }
 
 export default definePlugin({
@@ -44,21 +72,42 @@ export default definePlugin({
     description: "ZenCord internal stats collector.",
     authors: [Devs.Ven],
     enabledByDefault: true,
+    required: true,
     hidden: true,
 
     start() {
         reported = false;
 
-        // Listen for Discord CONNECTION_OPEN — fires when user is fully loaded
-        FluxDispatcher.subscribe("CONNECTION_OPEN", reportUser);
+        // 1. Try immediately
+        sendUserReport();
 
-        // Also try immediately in case already connected
-        reportUser();
+        // 2. Listen for Flux CONNECTION_OPEN event
+        try {
+            FluxDispatcher.subscribe("CONNECTION_OPEN", sendUserReport);
+        } catch { }
+
+        // 3. Robust retry loop: check every 2 seconds until user is loaded and reported
+        let attempts = 0;
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(async () => {
+            attempts++;
+            if (reported || attempts > 30) {
+                clearInterval(intervalId);
+                intervalId = null;
+            } else {
+                await sendUserReport();
+            }
+        }, 2000);
     },
 
     stop() {
-        FluxDispatcher.unsubscribe("CONNECTION_OPEN", reportUser);
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+        try {
+            FluxDispatcher.unsubscribe("CONNECTION_OPEN", sendUserReport);
+        } catch { }
         reported = false;
     },
 });
-
