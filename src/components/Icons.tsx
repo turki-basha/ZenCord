@@ -740,3 +740,17 @@ export function EyeIcon(props: IconProps) {
         </Icon>
     );
 }
+
+export function PerformanceIcon(props: IconProps) {
+    return (
+        <Icon
+            {...props}
+            viewBox="0 0 24 24"
+        >
+            <path
+                fill={props.fill || "currentColor"}
+                d="M13 2L3 14h7v8l11-12h-8l1-8z"
+            />
+        </Icon>
+    );
+}

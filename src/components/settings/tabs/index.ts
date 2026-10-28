@@ -13,6 +13,7 @@ export { openContributorModal } from "./plugins/ContributorModal";
 export { openPluginModal } from "./plugins/PluginModal";
 export { default as BackupAndRestoreTab } from "./sync/BackupAndRestoreTab";
 export { default as CloudTab } from "./sync/CloudTab";
+export { default as PerformanceTab } from "./performance";
 export { default as ThemesTab } from "./themes";
 export { default as UpdaterTab } from "./updater";
 export { default as VencordTab } from "./vencord";

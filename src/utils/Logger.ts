@@ -67,6 +67,7 @@ export class Logger {
     }
 
     public debug(...args: any[]) {
+        if (!IS_DEV) return;
         this._log("debug", "#eebebe", args);
     }
 }
