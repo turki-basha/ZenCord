@@ -8,14 +8,14 @@ import { fetchAndAlertQuests } from "@plugins/zenQuests/utils/fetching";
 import { QL } from "@plugins/zenQuests/utils/logging";
 import type { Quest } from "@plugins/zenQuests/utils/types";
 
-import { getCurrentUserId, getQuestifySettings } from "./access";
+import { getCurrentUserId, getZenQuestsSettings } from "./access";
 
 let autoFetchInterval: null | ReturnType<typeof setInterval> = null;
 const minimumAutoFetchIntervalValue = 30 * 60; // 30 minutes
 const maximumAutoFetchIntervalValue = 12 * 60 * 60; // 12 hours
 
 export function autoFetchCompatible(): boolean {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
     const {
         newExcludedQuestAlertSound,
         newQuestAlertSound,
@@ -55,7 +55,7 @@ export function startAutoFetchingQuests(force: boolean = false): void {
         stopAutoFetchingQuests();
     }
 
-    const { questFetchInterval } = getQuestifySettings();
+    const { questFetchInterval } = getZenQuestsSettings();
     const interval = Math.min(Math.max(questFetchInterval, minimumAutoFetchIntervalValue), maximumAutoFetchIntervalValue);
     autoFetchInterval = setInterval(() => { void fetchAndAlertQuests("AUTO_FETCH"); }, interval * 1000);
     QL.info("START_AUTO_FETCHING_QUESTS", { autoFetchIntervalID: autoFetchInterval, questFetchInterval, questFetchIntervalClamped: interval });
@@ -70,7 +70,7 @@ export function stopAutoFetchingQuests(): void {
 }
 
 export function resetQuestsToResume(quest?: Quest, userId?: string): void {
-    const { resumeQuestIDs } = getQuestifySettings();
+    const { resumeQuestIDs } = getZenQuestsSettings();
     const key = getCurrentUserId(userId);
 
     if (!key) {

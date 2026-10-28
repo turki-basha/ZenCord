@@ -14,10 +14,10 @@ import type { JSX } from "react";
 
 import { disguiseHomeButton, QuestButton, showQuestButton } from "./components/questButton";
 import { QuestTileContextMenu } from "./components/questTileContextMenu";
-import { getQuestifySettings } from "./settings/access";
+import { getZenQuestsSettings } from "./settings/access";
 import { resetQuestsToResume, startAutoFetchingQuests, stopAutoFetchingQuests } from "./settings/fetching";
 import { validateIgnoredQuests } from "./settings/ignoredQuests";
-import { showPendingQuestifyNotice } from "./settings/notices";
+import { showPendingZenQuestsNotice } from "./settings/notices";
 import { rerenderQuests, useQuestRerender } from "./settings/rerender";
 import { disposeRestartTracking, initializeRestartTracking, promptToRestartIfDirty, setRestartDirty } from "./settings/restartTracking";
 import { settings } from "./settings/store";
@@ -39,7 +39,7 @@ const notifiedCompletedQuests = new Set<string>();
 export const enabledOnStartup = PlainSettings.plugins.ZenQuests?.enabled;
 
 function setOnQuestsPage(force?: boolean): void {
-    getQuestifySettings().isOnQuestsPage = force ?? (window.location.pathname === QUEST_PAGE);
+    getZenQuestsSettings().isOnQuestsPage = force ?? (window.location.pathname === QUEST_PAGE);
 }
 
 function startPerAccountTasks(source: string): void {
@@ -154,7 +154,7 @@ export default definePlugin({
         {
             find: "could not play audio",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything && !Settings.plugins.AudioPlayerAPI?.enabled,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && !Settings.plugins.AudioPlayerAPI?.enabled,
             replacement: [
                 {
                     // Enables external audio sources for playing audio.
@@ -196,7 +196,7 @@ export default definePlugin({
             // Prevents the DMs Quests tab from counting as part of the
             // DM button highlight logic while the Quest button is visible.
             find: "GLOBAL_DISCOVERY),",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && showQuestButton(getQuestifySettings().questButtonDisplay, 1, true),
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && showQuestButton(getZenQuestsSettings().questButtonDisplay, 1, true),
             replacement: {
                 match: /(pathname:(\i)}.{0,400}?return )/,
                 replace: "$1$self.disguiseHomeButton($2)?false:"
@@ -205,27 +205,27 @@ export default definePlugin({
         {
             // Hides the Quest icon on members list nameplates.
             find: '("ActivityStatus"),',
-            predicate: () => getQuestifySettings().disableQuestsEverything || getQuestifySettings().disableMembersListPromo,
+            predicate: () => getZenQuestsSettings().disableQuestsEverything || getZenQuestsSettings().disableMembersListPromo,
             replacement: {
                 match: /,hasQuest:(?=\i=!1)/,
-                replace: ",questifyInvalid1:"
+                replace: ",zenQuestsInvalid1:"
             }
         },
         {
             // Hides the Friends List "Active Now" promotion.
             find: "`application-stream-",
-            predicate: () => getQuestifySettings().disableQuestsEverything || getQuestifySettings().disableFriendsListPromo,
+            predicate: () => getZenQuestsSettings().disableQuestsEverything || getZenQuestsSettings().disableFriendsListPromo,
             replacement: [
                 {
                     match: /(?<=let{party:\i,onChannelContextMenu:\i,)quest:(\i)/,
-                    replace: "questifyInvalid2:$1=null"
+                    replace: "zenQuestsInvalid2:$1=null"
                 }
             ]
         },
         {
             // Hides Quests tab in the Discovery page.
             find: "GLOBAL_DISCOVERY_SIDEBAR},",
-            predicate: () => getQuestifySettings().disableQuestsEverything || getQuestifySettings().disableRelocationNotices,
+            predicate: () => getZenQuestsSettings().disableQuestsEverything || getZenQuestsSettings().disableRelocationNotices,
             replacement: [
                 {
                     match: /(GLOBAL_DISCOVERY_TABS).map/,
@@ -236,7 +236,7 @@ export default definePlugin({
         {
             // Hides Quests tab in the DMs tab list.
             find: '.QUEST_HOME)},"quests")',
-            predicate: () => getQuestifySettings().disableQuestsEverything,
+            predicate: () => getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     match: /(?<="family-center"\)(?:&&undefined)?:null,)/,
@@ -247,7 +247,7 @@ export default definePlugin({
         {
             // Hides the sponsored banner on the Quests page.
             find: "QUEST_HOME)},[]),",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().disableSponsoredBanner,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && getZenQuestsSettings().disableSponsoredBanner,
             replacement: {
                 match: /(?<=,{questHomeHero:(\i),isLoading:(\i),confirmedEmpty:(\i)}=.{0,300}?ORBS_BALANCE_MENU}\)},\[\]\);)/,
                 replace: "$1=null;$2=false;$3=true;"
@@ -257,7 +257,7 @@ export default definePlugin({
             // Hides the Quest & Orbs badges on user profiles.
             find: ".MODAL]:26",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().disableOrbsAndQuestsBadges,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && getZenQuestsSettings().disableOrbsAndQuestsBadges,
             replacement: [
                 {
                     match: /(,{badges:\i)(?=,overflowCount:\i,displayProfile:\i)/,
@@ -268,7 +268,7 @@ export default definePlugin({
         {
             // Overrides the account panel Quest popup and progress display.
             find: "collapsed-with-rewards\":\"collapsed-without-rewards",
-            predicate: () => getQuestifySettings().disableAccountPanelPromo || !getQuestifySettings().disableAccountPanelQuestProgress,
+            predicate: () => getZenQuestsSettings().disableAccountPanelPromo || !getZenQuestsSettings().disableAccountPanelQuestProgress,
             replacement: {
                 match: /(?<=function\(\)\{)(let (\i)=\(0,\i\.\i\)\(\),\i=\(0,\i\.\i\)\(.{0,55}?\);)(?=switch\(\2\.type\)\{case (\i\.\i\.QUEST):)/,
                 replace: "void $self.useQuestRerender();$1$2=$self.getQuestPanelOverride($2,$3);if(null==$2)return null;"
@@ -278,7 +278,7 @@ export default definePlugin({
             // Prevents fetching Quests.
             find: 'type:"QUESTS_FETCH_CURRENT_QUESTS_BEGIN"',
             group: true,
-            predicate: () => getQuestifySettings().disableQuestsEverything,
+            predicate: () => getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     // QUESTS_FETCH_CURRENT_QUESTS_BEGIN
@@ -295,16 +295,16 @@ export default definePlugin({
         {
             // Fixes the progress tracking for Quests.
             find: ",{progressTextAnimation:",
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: {
                 match: /(let{percentComplete:[^}]+}=)(\i)/,
-                replace: "const questifyProgress=$self.getQuestPanelPercentComplete({...$2,quest:$2.children?.props?.quest});$1Object.assign({},$2,questifyProgress??{})"
+                replace: "const zenQuestsProgress=$self.getQuestPanelPercentComplete({...$2,quest:$2.children?.props?.quest});$1Object.assign({},$2,zenQuestsProgress??{})"
             }
         },
         {
             // Overrides the title and subtitle to provide more useful information for Quests being completed.
             find: '"progress-title"',
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: {
                 match: /(?<={quest:(\i).{0,250}?return.{0,150}?,percentComplete:\i.{0,280}?"progress-title",children.{0,115}?children:)(\i.{0,50}"progress-subtitle",isTextTransition:!0,children.{0,115}?children:)/,
                 replace: "$self.normalizeQuestName($1)??$2$self.getQuestPanelSubtitleText($1)??"
@@ -313,7 +313,7 @@ export default definePlugin({
         {
             // Formats the Orbs balance in the default balance counter on the Quests page with locale string formatting.
             find: '("BalanceCounter")',
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     match: /(`\${(\i).toFixed\(0\)}`.length)/,
@@ -328,7 +328,7 @@ export default definePlugin({
         {
             // Formats the Orbs balance in the balance popout on the Quests page with locale string formatting.
             find: 'location:"BalanceWidgetMenu"',
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     match: /(?<=children:)(\i\?\?0)/,
@@ -340,7 +340,7 @@ export default definePlugin({
             // Removes stack traces from Quest auto-complete network actions and marks both patches as healthy.
             find: "NetworkActionNames.QUEST_VIDEO_PROGRESS,",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
             replacement: [
                 {
                     match: /(async function \i\(\i,\i\)\{await \i\.\i\.post\(\{url:\i\.\i\.QUESTS_VIDEO_PROGRESS.{0,250}?stack_trace:)Error\(\)\.stack\?\?""/,
@@ -355,16 +355,16 @@ export default definePlugin({
         {
             // Prevent Video Quests from pausing on lost focus.
             find: "[QV] | Pausing video | playerState:",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().preventVideoQuestsPausing,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && getZenQuestsSettings().preventVideoQuestsPausing,
             replacement: {
                 match: /(?<=setCaptionEnabled\),)({focused:)(\i)/,
-                replace: "$2=true,$1questifyFocused"
+                replace: "$2=true,$1zenQuestsFocused"
             }
         },
         {
             // Prevent Video Quests from pausing on lost focus.
             find: ",listenForHlsErrors:!1",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().preventVideoQuestsPausing,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && getZenQuestsSettings().preventVideoQuestsPausing,
             replacement: {
                 match: /(?<=pauseOnLostVisibility:)!\i/,
                 replace: "false",
@@ -373,10 +373,10 @@ export default definePlugin({
         {
             find: "QUEST_HOME)},[]),",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
-                    // Subscribes the Quest page sort/filter state to Questify rerenders.
+                    // Subscribes the Quest page sort/filter state to ZenQuests rerenders.
                     match: /(\{ref:\i,\.\.\.\i\}=\i,\i=\i\.useRef\(null\),)(?=\[\i,\i\]=)/,
                     replace: "$1questRerenderTrigger=$self.useQuestRerender(),"
                 },
@@ -400,7 +400,7 @@ export default definePlugin({
         {
             find: "config.taskConfigV2.tasks).length)return",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
             replacement: [
                 {
                     // Overwrite button props for UNENROLLED Quests.
@@ -417,16 +417,16 @@ export default definePlugin({
         {
             // Overwrite button props for Quest bar.
             find: "collapsed-with-rewards\":\"collapsed-without-rewards",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && hasEnabledAutoCompleteQuestTypes(),
             replacement: {
                 match: /(?<=SELECT&&!\i&&!\i,(\i)=null;)(return )(\i\?\i=\(0,\i.\i\)\(\i,{quest:(\i))/,
-                replace: "const questifyButton=$self.enrolledIncompleteButton({quest:$4,size:\"sm\"});$2questifyButton?$1=questifyButton:$3"
+                replace: "const zenQuestsButton=$self.enrolledIncompleteButton({quest:$4,size:\"sm\"});$2zenQuestsButton?$1=zenQuestsButton:$3"
             }
         },
         {
-            // Keeps Questify completion progress visible when Discord marks the native Quest bar dismissed.
+            // Keeps ZenQuests completion progress visible when Discord marks the native Quest bar dismissed.
             find: "prevIsQuestAccepted:",
-            predicate: () => !getQuestifySettings().disableQuestsEverything && !getQuestifySettings().disableAccountPanelQuestProgress,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything && !getZenQuestsSettings().disableAccountPanelQuestProgress,
             replacement: {
                 match: /(?<=isLoading:\i}=\(0,\i\.\i\)\(\),\i=\i\.useContext\(\i\.\i\),\i=\i\|\|\i&&)(\i)/,
                 replace: "($1||$self.shouldForceQuestPanelVisible(arguments[0].quest))"
@@ -435,7 +435,7 @@ export default definePlugin({
         {
             find: "questNameHeadingId",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     // Prefer the auto-complete CTA over the console platform selector.
@@ -464,7 +464,7 @@ export default definePlugin({
             // their share URLs copyable from the embed context menu.
             find: "NOT_SHAREABLE}function",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: {
                 match: /(?<=return )(?=\i.sharePolicy!==\i.\i.NOT_SHAREABLE)/,
                 replace: "true||"
@@ -473,10 +473,10 @@ export default definePlugin({
         {
             find: 'STEP_2_CLICKED_INTERNAL,"quest_embed_card_footer',
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
-                    // Subscribes each Quest message embed to Questify's manual rerender trigger.
+                    // Subscribes each Quest message embed to ZenQuests's manual rerender trigger.
                     match: /(?<=function \i\(\i\){)(?=let\{quest:\i,location:\i,questContentPosition:\i,sourceQuestContent:)/,
                     replace: "void $self.useQuestRerender();"
                 },
@@ -486,7 +486,7 @@ export default definePlugin({
                     replace: "Object.assign({},$1,$self.getQuestEmbedProgress($2)??{})"
                 },
                 {
-                    // Adds Questify tile classes and inline CSS variables.
+                    // Adds ZenQuests tile classes and inline CSS variables.
                     match: /(?<=className:)(\i\(\)\(\i.\i,\i.\i\)(?=,onMouseEnter:\i))/,
                     replace: "$self.getQuestTileClasses($1,arguments[0].quest),style:$self.getQuestTileStyle(arguments[0].quest)"
                 }
@@ -495,15 +495,15 @@ export default definePlugin({
         {
             find: "questNameHeadingId",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
-                    // Subscribes each Quest tile to Questify's manual rerender trigger.
+                    // Subscribes each Quest tile to ZenQuests's manual rerender trigger.
                     match: /(?=return\(0,\i\.\i\)\("article",\{id:)/,
                     replace: "void $self.useQuestRerender();"
                 },
                 {
-                    // Adds Questify tile classes and inline CSS variables.
+                    // Adds ZenQuests tile classes and inline CSS variables.
                     match: /(?<=className:)(\i\(\)\(\i\.\i,\i\))(?=,onMouseEnter)/,
                     replace: "$self.getQuestTileClasses($1,arguments[0].quest),style:$self.getQuestTileStyle(arguments[0].quest)"
                 },
@@ -525,52 +525,52 @@ export default definePlugin({
             ]
         },
         {
-            // Adds the Questify sort option to Discord's Quest sort enum.
+            // Adds the ZenQuests sort option to Discord's Quest sort enum.
             find: "EXPIRING_SOON=\"expiring_soon\"",
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: {
                 match: /(?<=\(\((\i)=\{\}\))(?=\.SUGGESTED="suggested",)/,
-                replace: ".QUESTIFY=\"questify\",$1"
+                replace: ".ZENQUESTS=\"zenquests\",$1"
             }
         },
         {
-            // Labels the injected Questify sort option in the dropdown.
+            // Labels the injected ZenQuests sort option in the dropdown.
             find: "has no rewards configured`",
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: {
                 match: /(?=case (\i\.\i)\.SUGGESTED)/,
-                replace: "case $1.QUESTIFY:return\"Questify\";"
+                replace: "case $1.ZENQUESTS:return\"ZenQuests\";"
             },
         },
         {
             find: "CLAIMED=\"claimed\",",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
-                    // Applies Questify filtering and sorting before Discord's Quest list hooks.
+                    // Applies ZenQuests filtering and sorting before Discord's Quest list hooks.
                     match: /,(\i)=new Map\((\i)\.map/,
-                    replace: ";const questRerenderTrigger=$self.useQuestRerender();const questifySorted=$self.sortQuests($2,arguments[1]?.sortMethod!==\"questify\");const questifyListChanged=questifySorted!==$2;$2=questifySorted;let $1=new Map($2.map"
+                    replace: ";const questRerenderTrigger=$self.useQuestRerender();const zenQuestsSorted=$self.sortQuests($2,arguments[1]?.sortMethod!==\"zenquests\");const zenQuestsListChanged=zenQuestsSorted!==$2;$2=zenQuestsSorted;let $1=new Map($2.map"
                 },
                 {
-                    // Bypasses Discord's memo cache when Questify changes the list.
+                    // Bypasses Discord's memo cache when ZenQuests changes the list.
                     match: /(?<=if\()(?=\i\.current\.length>0&&\i\.current===)/,
-                    replace: "!questifyListChanged&&"
+                    replace: "!zenQuestsListChanged&&"
                 },
                 {
-                    // Bypasses the claimed Quest cache when Questify changes the list.
+                    // Bypasses the claimed Quest cache when ZenQuests changes the list.
                     match: /(?<=if\()(?=\i\.current\.length>0&&\i\.current\.length===)/,
-                    replace: "!questifyListChanged&&"
+                    replace: "!zenQuestsListChanged&&"
                 },
                 {
-                    // If we already applied Questify's sort, skip further sorting.
+                    // If we already applied ZenQuests's sort, skip further sorting.
                     match: /(?<=\{sortMethod:(\i).{0,800}?return )((\i).sort)/,
-                    replace: "$1===\"questify\"?$3:$2"
+                    replace: "$1===\"zenquests\"?$3:$2"
                 },
                 {
-                    // Recomputes Discord's Quest list memo when Questify settings or rerenders change.
+                    // Recomputes Discord's Quest list memo when ZenQuests settings or rerenders change.
                     match: /(?=]\)\),\i=\(\i=\i.useMemo\(\(\)=>\i.filter)/,
-                    replace: ",questRerenderTrigger,questifySorted"
+                    replace: ",questRerenderTrigger,zenQuestsSorted"
                 }
             ]
         },
@@ -578,11 +578,11 @@ export default definePlugin({
             // Sorts the "Claimed Quests" tabs.
             find: ".ALL)}):(",
             group: true,
-            predicate: () => !getQuestifySettings().disableQuestsEverything,
+            predicate: () => !getZenQuestsSettings().disableQuestsEverything,
             replacement: [
                 {
                     match: /(return \i&&0===\i.length.{0,150}?children:)\[\.\.\.(\i).{0,100}?claimedAt\?\?""\)\)/,
-                    replace: "const questifySorted=$self.sortQuests($2);$1questifySorted"
+                    replace: "const zenQuestsSorted=$self.sortQuests($2);$1zenQuestsSorted"
                 },
             ]
         },
@@ -645,14 +645,14 @@ export default definePlugin({
             if (completedRecently && !claimedAt && !notifiedCompletedQuests.has(userStatus!.questId)) {
                 notifiedCompletedQuests.add(userStatus!.questId);
 
-                if (getQuestifySettings().notifyOnQuestComplete) {
+                if (getZenQuestsSettings().notifyOnQuestComplete) {
                     notifyQuestCompletion(QuestStore.getQuest(userStatus!.questId));
                 }
 
-                if (getQuestifySettings().questCompletedAlertSound) {
+                if (getZenQuestsSettings().questCompletedAlertSound) {
                     AudioPlayer(
-                        getQuestifySettings().questCompletedAlertSound,
-                        Math.max(0, Math.min(100, getQuestifySettings().questCompletedAlertVolume)) / 100
+                        getZenQuestsSettings().questCompletedAlertSound,
+                        Math.max(0, Math.min(100, getZenQuestsSettings().questCompletedAlertVolume)) / 100
                     ).play();
                 }
             }
@@ -668,7 +668,7 @@ export default definePlugin({
         },
 
         LOGIN_SUCCESS(): void {
-            if (!isSwitchingAccount || getQuestifySettings().disableQuestsEverything) {
+            if (!isSwitchingAccount || getZenQuestsSettings().disableQuestsEverything) {
                 return;
             } else {
                 isSwitchingAccount = false;
@@ -699,7 +699,7 @@ export default definePlugin({
         "quests-entry": QuestTileContextMenu,
     },
 
-    renderQuestifyButton: ErrorBoundary.wrap(QuestButton, { noop: true }),
+    renderZenQuestsButton: ErrorBoundary.wrap(QuestButton, { noop: true }),
 
     start() {
         if (!enabledOnStartup && PlainSettings.plugins.ZenQuests?.enabled) {
@@ -709,16 +709,16 @@ export default definePlugin({
         initializeRestartTracking(settings);
 
         if (enabledOnStartup) {
-            addServerListElement(ServerListRenderPosition.Above, this.renderQuestifyButton);
+            addServerListElement(ServerListRenderPosition.Above, this.renderZenQuestsButton);
         }
 
         onceReady.then(() => {
-            showPendingQuestifyNotice();
+            showPendingZenQuestsNotice();
 
-            if (!getQuestifySettings().disableQuestsEverything) {
+            if (!getZenQuestsSettings().disableQuestsEverything) {
                 startPerAccountTasks("PLUGIN_START");
             } else {
-                removeServerListElement(ServerListRenderPosition.Above, this.renderQuestifyButton);
+                removeServerListElement(ServerListRenderPosition.Above, this.renderZenQuestsButton);
             }
         });
     },
@@ -727,7 +727,7 @@ export default definePlugin({
         const pluginEnabled = Settings.plugins.ZenQuests?.enabled;
 
         disposeRestartTracking();
-        removeServerListElement(ServerListRenderPosition.Above, this.renderQuestifyButton);
+        removeServerListElement(ServerListRenderPosition.Above, this.renderZenQuestsButton);
         stopPerAccountTasks("PLUGIN_STOP", pluginEnabled);
 
         if (!pluginEnabled) {

@@ -8,12 +8,12 @@ import type { QuestIncludedTypes } from "@plugins/zenQuests/utils/filtering";
 import { countIncludedUnclaimedQuests, getQuestStatus, QuestStatus } from "@plugins/zenQuests/utils/questState";
 import { type Quest, QuestStore } from "@plugins/zenQuests/utils/types";
 
-import { getQuestifySettings } from "./access";
+import { getZenQuestsSettings } from "./access";
 import { ignoredQuestIDsKey } from "./def";
 import { rerenderQuests } from "./rerender";
 
 function validateQuestBadgeCount(): void {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
     const questButtonIncludedTypes = settings.questButtonIncludedTypes as QuestIncludedTypes;
     const quests = Array.from(QuestStore.quests.values());
     const ignoredQuestIds = getIgnoredQuestIDs();
@@ -23,13 +23,13 @@ function validateQuestBadgeCount(): void {
 }
 
 export function getIgnoredQuestIDs(): string[] {
-    const { ignoredQuestIDs } = getQuestifySettings();
+    const { ignoredQuestIDs } = getZenQuestsSettings();
     const ignoredQuestIDsForKey = Array.from(ignoredQuestIDs[ignoredQuestIDsKey] ?? []);
     return ignoredQuestIDsForKey;
 }
 
 function setIgnoredQuestIDs(questIDs: string[]): void {
-    getQuestifySettings().ignoredQuestIDs[ignoredQuestIDsKey] = questIDs;
+    getZenQuestsSettings().ignoredQuestIDs[ignoredQuestIDsKey] = questIDs;
 }
 
 export function validateIgnoredQuests(qs?: Quest[]): void {

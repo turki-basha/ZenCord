@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { defaultClaimedSubsort, defaultExpiredSubsort, defaultIgnoredSubsort, defaultQuestOrder, defaultUnclaimedSubsort, type QuestOrderStatus, type QuestSubsort, type QuestTileColorSetting, type QuestTileGradient } from "@plugins/zenQuests/settings/def";
 import { getIgnoredQuestIDs } from "@plugins/zenQuests/settings/ignoredQuests";
 
@@ -83,7 +83,7 @@ function getGradientClass(gradient: QuestTileGradient): string | null {
 }
 
 export function getQuestTileClasses(originalClasses: string, quest: Quest & { dummyColor?: QuestTileColorSetting; }, gradientOverride?: QuestTileGradient): string {
-    const questTiles = useQuestifySettings([
+    const questTiles = useZenQuestsSettings([
         "disableQuestsEverything",
         "ignoredQuestIDs",
         "questTileUnclaimedColor",
@@ -126,7 +126,7 @@ export function getQuestTileClasses(originalClasses: string, quest: Quest & { du
 }
 
 export function getQuestTileStyle(quest: (Quest & { dummyColor?: QuestTileColorSetting; }) | null): Record<string, string> {
-    const questTiles = useQuestifySettings([
+    const questTiles = useZenQuestsSettings([
         "disableQuestsEverything",
         "ignoredQuestIDs",
         "questTileUnclaimedColor",
@@ -161,12 +161,12 @@ export function getQuestTileStyle(quest: (Quest & { dummyColor?: QuestTileColorS
         return `rgb(${value.r}, ${value.g}, ${value.b})`;
     }
 
-    style["--questify-color"] = toRGB(rgb);
-    style["--questify-quest-name"] = toRGB(questNameColor);
-    style["--questify-reward-title"] = toRGB(rewardTitleColor);
-    style["--questify-reward-description"] = toRGB(rewardDescriptionColor);
-    style["--questify-button-normal"] = toRGB(buttonNormalColor);
-    style["--questify-button-hover"] = toRGB(buttonHoverColor);
+    style["--zenquests-color"] = toRGB(rgb);
+    style["--zenquests-quest-name"] = toRGB(questNameColor);
+    style["--zenquests-reward-title"] = toRGB(rewardTitleColor);
+    style["--zenquests-reward-description"] = toRGB(rewardDescriptionColor);
+    style["--zenquests-button-normal"] = toRGB(buttonNormalColor);
+    style["--zenquests-button-hover"] = toRGB(buttonHoverColor);
 
     return style;
 }
@@ -242,7 +242,7 @@ export function hasInjectedDesktopVideoCompatibility(quest?: Quest | string | nu
 }
 
 export function sortQuests(quests: Quest[], skip?: boolean): Quest[] {
-    const questSorting = useQuestifySettings([
+    const questSorting = useZenQuestsSettings([
         "disableQuestsEverything",
         "ignoredQuestIDs",
         "makeMobileVideoQuestsDesktopCompatible",
@@ -327,19 +327,19 @@ export function sortQuests(quests: Quest[], skip?: boolean): Quest[] {
 }
 
 export function shouldPreloadQuestAssets(): boolean {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
 
     return !settings.disableQuestsEverything && settings.questTilePreload;
 }
 
 export function getLastSortChoice(): string | null {
-    const { rememberQuestPageSort, lastQuestPageSort } = getQuestifySettings();
+    const { rememberQuestPageSort, lastQuestPageSort } = getZenQuestsSettings();
 
-    return rememberQuestPageSort ? lastQuestPageSort : "questify";
+    return rememberQuestPageSort ? lastQuestPageSort : "zenquests";
 }
 
 export function setLastSortChoice(sort: string): void {
-    getQuestifySettings().lastQuestPageSort = sort || "questify";
+    getZenQuestsSettings().lastQuestPageSort = sort || "zenquests";
 }
 
 function getFilterChoiceKey({ group, filter }: { group: string; filter: string; }): string {
@@ -347,7 +347,7 @@ function getFilterChoiceKey({ group, filter }: { group: string; filter: string; 
 }
 
 export function getLastFilterChoices(): { group: string, filter: string; }[] | null {
-    const { rememberQuestPageFilters, lastQuestPageFilters } = getQuestifySettings();
+    const { rememberQuestPageFilters, lastQuestPageFilters } = getZenQuestsSettings();
 
     return rememberQuestPageFilters
         ? Object.values(lastQuestPageFilters).map(item => JSON.parse(JSON.stringify(item)))
@@ -356,7 +356,7 @@ export function getLastFilterChoices(): { group: string, filter: string; }[] | n
 
 export function setLastFilterChoices(filters: { group: string, filter: string; }[] | null): void {
     if (!filters?.length) {
-        getQuestifySettings().lastQuestPageFilters = {};
+        getZenQuestsSettings().lastQuestPageFilters = {};
 
         return;
     }
@@ -365,7 +365,7 @@ export function setLastFilterChoices(filters: { group: string, filter: string; }
         return;
     }
 
-    getQuestifySettings().lastQuestPageFilters = JSON.parse(JSON.stringify(filters)).reduce((acc, item) => {
+    getZenQuestsSettings().lastQuestPageFilters = JSON.parse(JSON.stringify(filters)).reduce((acc, item) => {
         acc[getFilterChoiceKey(item)] = item;
 
         return acc;

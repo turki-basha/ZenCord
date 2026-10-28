@@ -6,7 +6,7 @@
 
 import { plugins } from "@api/PluginManager";
 import { ErrorBoundary } from "@components/index";
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import type { QuestButtonAction, QuestButtonDisplayMode, QuestButtonIndicatorMode } from "@plugins/zenQuests/settings/def";
 import { getIgnoredQuestIDs, ignoreAllQuests, resetIgnoredQuests } from "@plugins/zenQuests/settings/ignoredQuests";
 import { rerenderQuests } from "@plugins/zenQuests/settings/rerender";
@@ -18,7 +18,7 @@ import { findComponentByCodeLazy } from "@webpack";
 import { ContextMenuApi, Menu, NavigationRouter, useState } from "@webpack/common";
 import type { CSSProperties, JSX, MouseEvent } from "react";
 
-import { openQuestifySettingsModal } from "./settingsModal";
+import { openZenQuestsSettingsModal } from "./settingsModal";
 
 const GuildlessServerListItemComponent = findComponentByCodeLazy("tooltip:", "lowerBadgeSize:");
 const ServerListItemPillComponent = findComponentByCodeLazy("=!1,hovered:", "=!1,unread:", "=!1,disabled:");
@@ -141,7 +141,7 @@ export function showQuestButton(displayMode: QuestButtonDisplayMode, badgeCount:
 }
 
 export function disguiseHomeButton(pathname: string): boolean {
-    const buttonSettings = useQuestifySettings(["questButtonDisplay", "questButtonBadgeCount", "isOnQuestsPage"]);
+    const buttonSettings = useZenQuestsSettings(["questButtonDisplay", "questButtonBadgeCount", "isOnQuestsPage"]);
 
     if (!showQuestButton(buttonSettings.questButtonDisplay, buttonSettings.questButtonBadgeCount, buttonSettings.isOnQuestsPage)) {
         return false;
@@ -192,7 +192,7 @@ function getQuestButtonLowerBadgeProps(
 
 export function QuestButtonContextMenu({ dummy = false }: { dummy?: boolean; }): JSX.Element {
     const navId = q(dummy ? "dummy-quest-button-context-menu" : "quest-button-context-menu");
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
     const markAllIgnoredDisabled = dummy || settings.questButtonBadgeCount <= 0;
     const resetIgnoredDisabled = dummy || getIgnoredQuestIDs().length <= 0;
     const noneAutoCompletable = getQueueableAutoCompleteQuests().length <= 0;
@@ -273,7 +273,7 @@ export function QuestButton(): JSX.Element {
         questButtonMiddleClickAction,
         questButtonRightClickAction,
         questButtonIndicator,
-    } = useQuestifySettings([
+    } = useZenQuestsSettings([
         "isOnQuestsPage",
         "questButtonBadgeColor",
         "questButtonDisplay",
@@ -321,7 +321,7 @@ export function QuestButton(): JSX.Element {
         }
 
         if (action === "plugin-settings") {
-            openQuestifySettingsModal(plugins.ZenQuests);
+            openZenQuestsSettingsModal(plugins.ZenQuests);
 
             return;
         }

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { ignoredQuestIDsKey } from "@plugins/zenQuests/settings/def";
 
 import { getActiveAutoCompletes, getAutoCompleteQuestTarget, getQuestAutoCompleteEntry, hasEnabledAutoCompleteQuestTask } from "./completion";
@@ -155,7 +155,7 @@ export function getQuestStoredProgress(quest: Quest, task: QuestTask): number | 
 }
 
 function getCurrentIgnoredQuestIds(): string[] {
-    return Array.from(getQuestifySettings().ignoredQuestIDs[ignoredQuestIDsKey] ?? []);
+    return Array.from(getZenQuestsSettings().ignoredQuestIDs[ignoredQuestIDsKey] ?? []);
 }
 
 function getAutoCompleteShowcaseQuest(): Quest | null {
@@ -219,7 +219,7 @@ function getMostRecentlyCompletedUnclaimedQuest(): Quest | null {
 }
 
 export function getQuestPanelOverride(creative: QuestPanelCreative, questType: number): QuestPanelCreative | null {
-    const panelState = useQuestifySettings(["disableQuestsEverything", "disableAccountPanelPromo", "disableAccountPanelQuestProgress"]);
+    const panelState = useZenQuestsSettings(["disableQuestsEverything", "disableAccountPanelPromo", "disableAccountPanelQuestProgress"]);
 
     if (panelState.disableQuestsEverything) {
         return null;
@@ -243,7 +243,7 @@ export function getQuestPanelOverride(creative: QuestPanelCreative, questType: n
 }
 
 export function shouldForceQuestPanelVisible(quest: Quest | null): boolean {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
 
     if (!quest || settings.disableQuestsEverything || settings.disableAccountPanelQuestProgress) {
         return false;
@@ -328,7 +328,7 @@ export function getQuestStatus(
 }
 
 export function isQuestHidden(quest: Quest, ignoredQuestIds: ReadonlyArray<string>): boolean {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
 
     if (settings.disableQuestsEverything) {
         return false;

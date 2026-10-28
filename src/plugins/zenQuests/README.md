@@ -1,4 +1,4 @@
-# Questify
+# ZenQuests
 
 Enhance specific Quest features, disable annoyances, or completely remove Quests.
 
@@ -15,7 +15,7 @@ Modify how Quests behave, hide Quest-related UI, or disable Quest functionality 
 - Completely disable Quest functionality.
   - Hides the Quests page and Quest elements across Discord.
   - Prevents Discord from fetching Quest data.
-  - Disables Questify's enhancements.
+  - Disables ZenQuests's enhancements.
   - Does not remove Orbs from the shop due to their deep coupling as a secondary currency.
 - Disable specific Quest UI:
   - Sponsored Banner
@@ -27,7 +27,7 @@ Modify how Quests behave, hide Quest-related UI, or disable Quest functionality 
   - Quest & Orbs Badges
 - Dangerous settings are gated behind a warning and confirmation.
   - Discord has warned users for modifying how Quests are completed.
-  - Questify cannot realistically hide this behavior from Discord.
+  - ZenQuests cannot realistically hide this behavior from Discord.
 - Optional dangerous behavior:
   - Accelerate Video Quest auto-completion by using Discord's progress leeway and elapsed enrollment time.
   - Make some mobile-only Video Quests completable on desktop.
@@ -93,7 +93,7 @@ Configure notifications, sounds, and periodic fetching for Quest updates.
 - New excluded Quests detected:
   - Show a notification when matching excluded Quests are detected.
   - Play a sound when matching excluded Quests are detected.
-  - Questify fetches their Quest configs, applies your included reward and Quest type filters, and logs the resolved excluded Quest data to the console.
+  - ZenQuests fetches their Quest configs, applies your included reward and Quest type filters, and logs the resolved excluded Quest data to the console.
 - Sounds:
   - Choose from Discord's bundled sounds.
   - Use the preview button in settings to test a sound and its volume.
@@ -123,7 +123,7 @@ Customize how Quest tiles appear on the Quests page.
 
 ### Reorder Quests
 
-Add a Questify sort option to the Quests page and control how Quest groups are ordered.
+Add a ZenQuests sort option to the Quests page and control how Quest groups are ordered.
 
 - Status order:
   - Unclaimed
@@ -138,12 +138,12 @@ Add a Questify sort option to the Quests page and control how Quest groups are o
 - Quest page memory:
   - Remember the selected Quest page sort.
   - Remember selected Quest page filters.
-  - If sort memory is disabled, the Quests page opens with the Questify sort option.
+  - If sort memory is disabled, the Quests page opens with the ZenQuests sort option.
   - If filter memory is disabled, the Quests page opens without task or reward filters.
 
 ### Quest Tile Context Menu
 
-Questify adds extra actions to Quest tile context menus:
+ZenQuests adds extra actions to Quest tile context menus:
 
 - Mark as Ignored
 - Unmark as Ignored

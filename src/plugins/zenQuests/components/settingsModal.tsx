@@ -10,7 +10,7 @@ import { setSettingsModalOpen } from "@plugins/zenQuests/state";
 import { openModal } from "@utils/modal";
 import type { Plugin } from "@utils/types";
 
-export function openQuestifySettingsModal(plugin: Plugin): void {
+export function openZenQuestsSettingsModal(plugin: Plugin): void {
     setSettingsModalOpen(true);
 
     openModal(

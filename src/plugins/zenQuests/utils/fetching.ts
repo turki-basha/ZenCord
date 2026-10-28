@@ -5,7 +5,7 @@
  */
 
 import { showNotification } from "@api/Notifications";
-import { getQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { getIgnoredQuestIDs } from "@plugins/zenQuests/settings/ignoredQuests";
 import { sleep } from "@utils/misc";
 import type { PluginNative } from "@utils/types";
@@ -21,7 +21,7 @@ import { type Quest, QuestStore } from "./types";
 import { QUEST_PAGE } from "./ui";
 
 export const AuthorizedAppsStore = findStoreLazy("AuthorizedAppsStore");
-const QuestifyNative = VencordNative?.pluginHelpers?.ZenQuests as PluginNative<typeof import("../native")> | undefined;
+const ZenQuestsNative = VencordNative?.pluginHelpers?.ZenQuests as PluginNative<typeof import("../native")> | undefined;
 
 export function snakeToCamel(obj: any): any {
     if (Array.isArray(obj)) {
@@ -82,8 +82,8 @@ async function fetchExcludedQuestConfigs(questIds: string[]): Promise<Quest[]> {
 }
 
 export function canOpenDevToolsWindow(): boolean {
-    return typeof QuestifyNative?.canOpenDevTools === "function"
-        && typeof QuestifyNative?.openDevTools === "function";
+    return typeof ZenQuestsNative?.canOpenDevTools === "function"
+        && typeof ZenQuestsNative?.openDevTools === "function";
 }
 
 export async function openDevToolsWindow(): Promise<boolean> {
@@ -91,7 +91,7 @@ export async function openDevToolsWindow(): Promise<boolean> {
         return false;
     }
 
-    const native = QuestifyNative!;
+    const native = ZenQuestsNative!;
 
     return await native.canOpenDevTools()
         ? native.openDevTools()
@@ -139,7 +139,7 @@ function notifyNewQuests(quests: Quest[], excluded: boolean): void {
 }
 
 export async function fetchAndAlertQuests(source: string): Promise<Quest[] | null> {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
     const alertSound = settings.newQuestAlertSound;
     const alertVolume = settings.newQuestAlertVolume;
     const excludedAlertSound = settings.newExcludedQuestAlertSound;

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { defaultQuestTileClaimedColorSetting, defaultQuestTileExpiredColorSetting, defaultQuestTileIgnoredColorSetting, defaultQuestTileUnclaimedColorSetting, type QuestTileColorSetting, type QuestTileGradient } from "@plugins/zenQuests/settings/def";
 import { rerenderQuests } from "@plugins/zenQuests/settings/rerender";
 import { getQuestTileClasses, getQuestTileStyle } from "@plugins/zenQuests/utils/questTiles";
@@ -143,7 +143,7 @@ function DummyQuestPreview({
 }
 
 export function QuestTilesSetting(): JSX.Element {
-    const questTiles = useQuestifySettings([
+    const questTiles = useZenQuestsSettings([
         "disableQuestsEverything",
         "questTileUnclaimedColor",
         "questTileClaimedColor",
@@ -160,7 +160,7 @@ export function QuestTilesSetting(): JSX.Element {
 
     function updateColor(key: QuestTileColorKey, nextColor: QuestTileColorSetting): void {
         setPreviewColorKey(key);
-        getQuestifySettings()[key] = nextColor;
+        getZenQuestsSettings()[key] = nextColor;
     }
 
     function updateColorValue(key: QuestTileColorKey, setting: QuestTileColorSetting, value: number | null): void {
@@ -182,14 +182,14 @@ export function QuestTilesSetting(): JSX.Element {
     function updateGradient(value: string | string[] | null): void {
         if (typeof value !== "string") return;
 
-        getQuestifySettings().questTileGradient = value as QuestTileGradient;
+        getZenQuestsSettings().questTileGradient = value as QuestTileGradient;
     }
 
     function updatePreload(value: string | string[] | null): void {
         if (typeof value !== "string") return;
 
         const preload = value === "true";
-        getQuestifySettings().questTilePreload = preload;
+        getZenQuestsSettings().questTilePreload = preload;
         rerenderQuests();
     }
 

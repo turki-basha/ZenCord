@@ -49,7 +49,7 @@ export const settings = definePluginSettings({
     settingsSearch: {
         type: OptionType.COMPONENT,
         component: ErrorBoundary.wrap(SettingsSearch) as any,
-        description: "Search Questify settings.",
+        description: "Search ZenQuests settings.",
     },
     questFeatures: {
         type: OptionType.COMPONENT,

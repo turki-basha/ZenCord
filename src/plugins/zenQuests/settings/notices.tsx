@@ -8,16 +8,16 @@ import type { ModalOptions, ModalProps, RenderModalProps } from "@vencord/discor
 import { Modal, useEffect, useState } from "@webpack/common";
 import type { ComponentType, JSX } from "react";
 
-import { getQuestifySettings } from "./access";
+import { getZenQuestsSettings } from "./access";
 import { resetDangerousSettings } from "./dangerous";
 import { promptToRestartIfDirty } from "./restartTracking";
 
 type NoticeActionVariant = "primary" | "secondary" | "critical-primary" | "critical-secondary" | "active" | "overlay-primary" | "overlay-secondary" | "expressive";
 
-type QuestifyModalOptions = ModalOptions & { dismissable?: boolean; };
-type QuestifyModalProps = ModalProps & { dismissable?: boolean; };
+type ZenQuestsModalOptions = ModalOptions & { dismissable?: boolean; };
+type ZenQuestsModalProps = ModalProps & { dismissable?: boolean; };
 
-const QuestifyModal = Modal as ComponentType<QuestifyModalProps>;
+const ZenQuestsModal = Modal as ComponentType<ZenQuestsModalProps>;
 
 interface NoticeActionStep {
     text: string;
@@ -44,8 +44,8 @@ interface OneTimeNotice {
 const oneTimeNotices = [
     {
         id: "quest-ban-warning-2026-08-07",
-        title: "Questify Notice - August 7th, 2026",
-        renderBody: () => <div className="questify-startup-notice-body">
+        title: "ZenQuests Notice - August 7th, 2026",
+        renderBody: () => <div className="zenquests-startup-notice-body">
             <p>
                 Discord has implemented a Quest Ban system which will temporarily or permanently limit your access to completing Quests and claiming their rewards if you are found to be completing them through unofficial means. Modifying the completion of Quests is against their <a href="https://discord.com/safety/platform-manipulation-policy-explainer" target="_blank" rel="noreferrer">Terms of Service</a>.
             </p>
@@ -59,18 +59,18 @@ const oneTimeNotices = [
             </p>
         </div>,
         condition: () => {
-            const settings = getQuestifySettings();
+            const settings = getZenQuestsSettings();
 
             return settings.enabled && settings.allowChangingDangerousSettings;
         },
-        autoAcknowledgeCondition: () => !getQuestifySettings().allowChangingDangerousSettings,
+        autoAcknowledgeCondition: () => !getZenQuestsSettings().allowChangingDangerousSettings,
         actions: [
             {
-                text: "Keep Using Dangerous Questify Settings",
+                text: "Keep Using Dangerous ZenQuests Settings",
                 variant: "critical-primary",
             },
             {
-                text: "Disable Dangerous Questify Settings",
+                text: "Disable Dangerous ZenQuests Settings",
                 variant: "primary",
                 run: resetDangerousSettings,
                 promptForRestart: true,
@@ -79,9 +79,9 @@ const oneTimeNotices = [
     },
     {
         id: "quest-ban-warning-2026-08-26",
-        title: "Questify Notice - August 26th, 2026",
+        title: "ZenQuests Notice - August 26th, 2026",
         dismissable: false,
-        renderBody: () => <div className="questify-startup-notice-body">
+        renderBody: () => <div className="zenquests-startup-notice-body">
             <p>
                 Discord has begun punishing users of scripts and plugins that modify the completion of Quests. Modifying the completion of Quests is against their <a href="https://discord.com/safety/platform-manipulation-policy-explainer" target="_blank" rel="noreferrer">Terms of Service</a>.
             </p>
@@ -95,14 +95,14 @@ const oneTimeNotices = [
             </p>
         </div>,
         condition: () => {
-            const settings = getQuestifySettings();
+            const settings = getZenQuestsSettings();
 
             return settings.enabled && settings.allowChangingDangerousSettings;
         },
-        autoAcknowledgeCondition: () => !getQuestifySettings().allowChangingDangerousSettings,
+        autoAcknowledgeCondition: () => !getZenQuestsSettings().allowChangingDangerousSettings,
         actions: [
             {
-                text: "Keep Using Dangerous Questify Settings",
+                text: "Keep Using Dangerous ZenQuests Settings",
                 variant: "critical-primary",
                 disabledFor: 10,
                 confirmation: {
@@ -112,7 +112,7 @@ const oneTimeNotices = [
                 },
             },
             {
-                text: "Disable Dangerous Questify Settings",
+                text: "Disable Dangerous ZenQuests Settings",
                 variant: "primary",
                 run: resetDangerousSettings,
                 promptForRestart: true,
@@ -122,7 +122,7 @@ const oneTimeNotices = [
 ] as const satisfies readonly OneTimeNotice[];
 
 function acknowledgeNotice(id: string): void {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
 
     settings.acknowledgedNotices = {
         ...settings.acknowledgedNotices,
@@ -136,8 +136,8 @@ function runNoticeAction(notice: OneTimeNotice, action: NoticeAction, onClose: (
     onClose();
 
     setTimeout(() => {
-        if (!action.promptForRestart || !promptToRestartIfDirty({ onDecline: showPendingQuestifyNotice })) {
-            showPendingQuestifyNotice();
+        if (!action.promptForRestart || !promptToRestartIfDirty({ onDecline: showPendingZenQuestsNotice })) {
+            showPendingZenQuestsNotice();
         }
     }, 0);
 }
@@ -195,7 +195,7 @@ function OneTimeNoticeModal({ notice, ...modalProps }: RenderModalProps & { noti
     }
 
     return (
-        <QuestifyModal
+        <ZenQuestsModal
             {...modalProps}
             dismissable={isNoticeDismissable(notice)}
             role="alertdialog"
@@ -211,10 +211,10 @@ function OneTimeNoticeModal({ notice, ...modalProps }: RenderModalProps & { noti
             }))}
         >
             {notice.renderBody()}
-        </QuestifyModal>
+        </ZenQuestsModal>
     );
 }
 
-export function showPendingQuestifyNotice(): void {
+export function showPendingZenQuestsNotice(): void {
     // Disabled in ZenCord: ZenQuests runs seamlessly without intrusive warning popups
 }

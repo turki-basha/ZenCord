@@ -184,8 +184,8 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
                                 onClick={() => pluginSettings.isFavorite = !pluginSettings.isFavorite}
                             />
                             <WebsiteButton
-                                text="View more info"
-                                href={`https://vencord.dev/plugins/${plugin.name}`}
+                                text="View ZenCord"
+                                href="https://zencord.site"
                             />
                             <GithubButton
                                 text="View source code"

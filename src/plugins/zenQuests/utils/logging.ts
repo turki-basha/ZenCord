@@ -12,7 +12,7 @@ import { normalizeQuestName } from "./filtering";
 import type { Quest } from "./types";
 import { QUEST_PAGE } from "./ui";
 
-const LOG = new Logger("Questify");
+const LOG = new Logger("ZenQuests");
 
 export function getFormattedNow(): string {
     return new Date().toLocaleString(undefined, {
@@ -26,12 +26,12 @@ export function getFormattedNow(): string {
     }).replace(",", "");
 }
 
-function getQuestifyLogPrefix(source: string): string {
+function getZenQuestsLogPrefix(source: string): string {
     return `[${getFormattedNow()}] [${source}]\n`;
 }
 
-function emitQuestifyLog(level: string, source: string, ...args: unknown[]): void {
-    const prefix = args.length ? getQuestifyLogPrefix(source) : getQuestifyLogPrefix(source).trim();
+function emitZenQuestsLog(level: string, source: string, ...args: unknown[]): void {
+    const prefix = args.length ? getZenQuestsLogPrefix(source) : getZenQuestsLogPrefix(source).trim();
 
     switch (level) {
         case "debug":
@@ -58,11 +58,11 @@ function emitQuestifyLog(level: string, source: string, ...args: unknown[]): voi
 }
 
 export const QL = {
-    log(source: string, ...args: unknown[]): void { emitQuestifyLog("log", source, ...args); },
-    info(source: string, ...args: unknown[]): void { emitQuestifyLog("info", source, ...args); },
-    warn(source: string, ...args: unknown[]): void { emitQuestifyLog("warn", source, ...args); },
-    error(source: string, ...args: unknown[]): void { emitQuestifyLog("error", source, ...args); },
-    debug(source: string, ...args: unknown[]): void { emitQuestifyLog("debug", source, ...args); },
+    log(source: string, ...args: unknown[]): void { emitZenQuestsLog("log", source, ...args); },
+    info(source: string, ...args: unknown[]): void { emitZenQuestsLog("info", source, ...args); },
+    warn(source: string, ...args: unknown[]): void { emitZenQuestsLog("warn", source, ...args); },
+    error(source: string, ...args: unknown[]): void { emitZenQuestsLog("error", source, ...args); },
+    debug(source: string, ...args: unknown[]): void { emitZenQuestsLog("debug", source, ...args); },
 };
 
 export function notifyQuestCompletion(quest?: Quest): void {

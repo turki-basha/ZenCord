@@ -33,8 +33,8 @@ export function SettingsSearch(): JSX.Element {
         <div className={q("settings-search")}>
             <TextInput
                 type="search"
-                aria-label="Search Questify Settings"
-                placeholder="Search Questify Settings..."
+                aria-label="Search ZenQuests Settings"
+                placeholder="Search ZenQuests Settings..."
                 value={inputValue}
                 onChange={setInputValue}
             />

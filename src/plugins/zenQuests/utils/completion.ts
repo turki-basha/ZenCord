@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getCurrentUserId, getQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getCurrentUserId, getZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { autoCompleteQuestTaskTypes, isDesktopCompatible } from "@plugins/zenQuests/settings/def";
 import { resetQuestsToResume } from "@plugins/zenQuests/settings/fetching";
 import { getIgnoredQuestIDs } from "@plugins/zenQuests/settings/ignoredQuests";
@@ -140,7 +140,7 @@ export function makeEnrollmentData(args: QuestButtonAnalyticsArgs): QuestEnrollm
     };
 }
 
-const QuestifyNative = VencordNative?.pluginHelpers?.ZenQuests as PluginNative<typeof import("../native")> | undefined;
+const ZenQuestsNative = VencordNative?.pluginHelpers?.ZenQuests as PluginNative<typeof import("../native")> | undefined;
 
 const videoQuestLeeway = 24;
 const resumeExpiryMs = 60 * 60 * 1000;
@@ -257,7 +257,7 @@ function showBrokenAutoCompleteToast(): void {
 }
 
 export function hasEnabledAutoCompleteQuestTypes(): boolean {
-    return autoCompleteQuestTaskTypes.some(questType => getQuestifySettings().autoCompleteQuestTypes[questType]);
+    return autoCompleteQuestTaskTypes.some(questType => getZenQuestsSettings().autoCompleteQuestTypes[questType]);
 }
 
 function isAutoCompleteRuntimeReady(notify: boolean = false): boolean {
@@ -290,7 +290,7 @@ export function getAutoCompleteQuestTarget(task: QuestTask): AutoCompleteQuestTa
 
     return {
         raw,
-        adjusted: Math.max(0, raw - (isVideoQuestTask(task.type) && getQuestifySettings().completeVideoQuestsQuicker ? videoQuestLeeway : 0)),
+        adjusted: Math.max(0, raw - (isVideoQuestTask(task.type) && getZenQuestsSettings().completeVideoQuestsQuicker ? videoQuestLeeway : 0)),
     };
 }
 
@@ -334,7 +334,7 @@ function getEffectiveAutoCompleteTaskType(task: QuestTask, quest: Quest): QuestT
 function isAutoCompleteQuestTaskEnabled(quest: Quest, task: QuestTask): boolean {
     const taskType = getEffectiveAutoCompleteTaskType(task, quest);
     const compatible = isDesktopCompatible(taskType);
-    const enabled = getQuestifySettings().autoCompleteQuestTypes[taskType] === true;
+    const enabled = getZenQuestsSettings().autoCompleteQuestTypes[taskType] === true;
 
     return compatible && enabled && getQuestAutoCompleteKind(task) != null;
 }
@@ -367,12 +367,12 @@ function updateResumeState(questIDs: string[] = getResumeQuestIds()): void {
         return;
     }
 
-    if (!getQuestifySettings().resumeInterruptedQuests || questIDs.length === 0) {
-        delete getQuestifySettings().resumeQuestIDs[userId];
+    if (!getZenQuestsSettings().resumeInterruptedQuests || questIDs.length === 0) {
+        delete getZenQuestsSettings().resumeQuestIDs[userId];
         return;
     }
 
-    getQuestifySettings().resumeQuestIDs[userId] = {
+    getZenQuestsSettings().resumeQuestIDs[userId] = {
         timestamp: Date.now(),
         questIDs,
     };
@@ -425,12 +425,12 @@ function formatQuestTime(seconds: number, prepositional: boolean = false): strin
 }
 
 function isQuestQueuedForResume(questId: string): boolean {
-    if (!getQuestifySettings().resumeInterruptedQuests) {
+    if (!getZenQuestsSettings().resumeInterruptedQuests) {
         return false;
     }
 
     const userId = getCurrentUserId();
-    const resumeState = userId ? getQuestifySettings().resumeQuestIDs[userId] : null;
+    const resumeState = userId ? getZenQuestsSettings().resumeQuestIDs[userId] : null;
 
     return Boolean(resumeState && !isResumeStateExpired(resumeState.timestamp) && resumeState.questIDs.includes(questId));
 }
@@ -458,7 +458,7 @@ export function getQuestCompletionState(quest: Quest, options: QuestButtonTextOp
     const target = getAutoCompleteQuestTarget(task).adjusted;
     const enrolledAt = quest.userStatus?.enrolledAt ? new Date(quest.userStatus.enrolledAt) : null;
     const storedProgress = activeEntry?.progress ?? getQuestStoredProgress(quest, task) ?? 0;
-    const elapsedProgress = !activeEntry && enrolledAt && isVideoQuestTask(task.type) && getQuestifySettings().completeVideoQuestsQuicker
+    const elapsedProgress = !activeEntry && enrolledAt && isVideoQuestTask(task.type) && getZenQuestsSettings().completeVideoQuestsQuicker
         ? Math.max(0, (Date.now() - enrolledAt.getTime()) / 1000)
         : 0;
     const progress = Math.min(target, Math.max(storedProgress, elapsedProgress));
@@ -745,7 +745,7 @@ function getQuestExpiryTime(quest: Quest): number {
 }
 
 export function getQueueableAutoCompleteQuests(): Quest[] {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
     const includedTypes = settings.questButtonIncludedTypes as QuestIncludedTypes;
 
     return Array.from(QuestStore.quests.values())
@@ -972,7 +972,7 @@ async function runVideoQuest(quest: Quest, entry: AutoCompleteEntry, target: Aut
     const completionTarget = target.adjusted;
     const enrolledAt = new Date(quest.userStatus.enrolledAt);
     const initialStoredProgress = getQuestStoredProgress(quest, entry.task) ?? 0;
-    const initialProgress = getQuestifySettings().completeVideoQuestsQuicker
+    const initialProgress = getZenQuestsSettings().completeVideoQuestsQuicker
         ? clampFloat(Math.max(1, (Date.now() - enrolledAt.getTime()) / 1000))
         : Math.max(0, initialStoredProgress);
     let displayedProgress = clampFloat(Math.min(completionTarget, initialProgress));
@@ -1090,7 +1090,7 @@ async function runAchievementQuest(quest: Quest, entry: AutoCompleteEntry, targe
         return false;
     }
 
-    if (!QuestifyNative?.complete) {
+    if (!ZenQuestsNative?.complete) {
         QL.error("AUTO_COMPLETE_ACHIEVEMENT_NATIVE_MISSING", { questId: quest.id, questName: entry.questName });
         return false;
     }
@@ -1124,7 +1124,7 @@ async function runAchievementQuest(quest: Quest, entry: AutoCompleteEntry, targe
         return false;
     }
 
-    const result = await QuestifyNative.complete(appId, authCode, target.adjusted, quest.id, await getActivityReferrer(appId));
+    const result = await ZenQuestsNative.complete(appId, authCode, target.adjusted, quest.id, await getActivityReferrer(appId));
     await RestAPI.get({ url: "/oauth2/tokens" });
     const success = result.success === true;
 
@@ -1208,14 +1208,14 @@ async function runEntry(quest: Quest, entry: AutoCompleteEntry): Promise<void> {
         resetQuestsToResume(quest);
         updateResumeState();
 
-        if (!getQuestifySettings().autoCompleteQuestsSimultaneously && !suppressQueueDrain) {
+        if (!getZenQuestsSettings().autoCompleteQuestsSimultaneously && !suppressQueueDrain) {
             runNextQueuedQuest();
         }
     }
 }
 
 function runNextQueuedQuest(): void {
-    if (suppressQueueDrain || getQuestifySettings().autoCompleteQuestsSimultaneously || hasRunningQueuedAutoComplete()) {
+    if (suppressQueueDrain || getZenQuestsSettings().autoCompleteQuestsSimultaneously || hasRunningQueuedAutoComplete()) {
         return;
     }
 
@@ -1273,7 +1273,7 @@ export function processQuestForAutoComplete(quest: Quest, options: AutoCompleteS
 
     activeAutoCompletes.set(quest.id, entry);
 
-    if (getQuestifySettings().autoCompleteQuestsSimultaneously) {
+    if (getZenQuestsSettings().autoCompleteQuestsSimultaneously) {
         void runEntry(quest, entry);
     } else {
         updateResumeState();
@@ -1284,7 +1284,7 @@ export function processQuestForAutoComplete(quest: Quest, options: AutoCompleteS
         questId: quest.id,
         questName,
         source,
-        mode: getQuestifySettings().autoCompleteQuestsSimultaneously ? "simultaneous" : "queue",
+        mode: getZenQuestsSettings().autoCompleteQuestsSimultaneously ? "simultaneous" : "queue",
         taskType: entry.task.type,
     });
 
@@ -1302,7 +1302,7 @@ export function stopQueueAllAutoCompleteQuests(): void {
 export async function queueAllAutoCompleteQuests(): Promise<number> {
     if (
         queueAllAutoCompleteQuestsAbortController !== null ||
-        getQuestifySettings().autoCompleteQuestsSimultaneously ||
+        getZenQuestsSettings().autoCompleteQuestsSimultaneously ||
         isQuestEnrollmentRateLimited()
     ) {
         return 0;
@@ -1416,7 +1416,7 @@ export function stopQuestAutoComplete(questOrId: Quest | string, options: AutoCo
 
     updateResumeState(resumeQuestIds);
 
-    if (!getQuestifySettings().autoCompleteQuestsSimultaneously && !suppressQueueDrain) {
+    if (!getZenQuestsSettings().autoCompleteQuestsSimultaneously && !suppressQueueDrain) {
         runNextQueuedQuest();
     }
 
@@ -1463,19 +1463,19 @@ export function stopAutoCompletesForRunningGames(gameIds: string[]): boolean {
 }
 
 export function resumeInterruptedAutoCompletes(): void {
-    if (!getQuestifySettings().resumeInterruptedQuests) {
+    if (!getZenQuestsSettings().resumeInterruptedQuests) {
         return;
     }
 
     const userId = getCurrentUserId();
-    const resumeState = userId ? getQuestifySettings().resumeQuestIDs[userId] : null;
+    const resumeState = userId ? getZenQuestsSettings().resumeQuestIDs[userId] : null;
 
     if (!userId || !resumeState?.questIDs.length) {
         return;
     }
 
     if (isResumeStateExpired(resumeState.timestamp)) {
-        delete getQuestifySettings().resumeQuestIDs[userId];
+        delete getZenQuestsSettings().resumeQuestIDs[userId];
         QL.info("AUTO_COMPLETE_RESUME_EXPIRED", { userId, timestamp: resumeState.timestamp, maxAge: resumeExpiryMs });
         return;
     }

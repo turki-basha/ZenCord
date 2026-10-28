@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings } from "./access";
+import { getZenQuestsSettings } from "./access";
 import { defaultAllowChangingDangerousSettings, defaultAutoCompleteQuestsSimultaneously, defaultAutoCompleteQuestTypes, defaultCompleteVideoQuestsQuicker, defaultHideNonAutoCompletableQuests, defaultMakeMobileVideoQuestsDesktopCompatible, defaultPreventVideoQuestsPausing, defaultResumeInterruptedQuests } from "./def";
 import { validateIgnoredQuests } from "./ignoredQuests";
 
 export function resetDangerousSettings(): void {
-    const settings = getQuestifySettings();
+    const settings = getZenQuestsSettings();
 
     settings.allowChangingDangerousSettings = defaultAllowChangingDangerousSettings;
     settings.autoCompleteQuestsSimultaneously = defaultAutoCompleteQuestsSimultaneously;

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { type QuestButtonAction, type QuestButtonDisplayMode, type QuestButtonIncludedTypes, type QuestButtonIndicatorMode } from "@plugins/zenQuests/settings/def";
 import { startAutoFetchingQuests } from "@plugins/zenQuests/settings/fetching";
 import { validateIgnoredQuests } from "@plugins/zenQuests/settings/ignoredQuests";
@@ -77,7 +77,7 @@ const questButtonRewardTypeManaOptions = toManaOptions(questButtonRewardTypeOpti
 const questButtonQuestTypeManaOptions = toManaOptions(questButtonQuestTypeOptions);
 
 export function QuestButtonSetting(): JSX.Element {
-    const questButton = useQuestifySettings([
+    const questButton = useZenQuestsSettings([
         "disableQuestsEverything",
         "questButtonDisplay",
         "questButtonIncludedTypes",
@@ -103,36 +103,36 @@ export function QuestButtonSetting(): JSX.Element {
     function updateQuestButtonDisplay(value: string | string[] | null) {
         if (typeof value !== "string") return;
 
-        getQuestifySettings().questButtonDisplay = value as QuestButtonDisplayMode;
+        getZenQuestsSettings().questButtonDisplay = value as QuestButtonDisplayMode;
         startAutoFetchingQuests(true);
     }
 
     function updateQuestButtonIndicator(value: string | string[] | null) {
         if (typeof value !== "string") return;
 
-        getQuestifySettings().questButtonIndicator = value as QuestButtonIndicatorMode;
+        getZenQuestsSettings().questButtonIndicator = value as QuestButtonIndicatorMode;
         startAutoFetchingQuests(true);
     }
 
     function updateQuestButtonAction(key: "questButtonLeftClickAction" | "questButtonMiddleClickAction" | "questButtonRightClickAction", value: string | string[] | null) {
         if (typeof value !== "string") return;
 
-        getQuestifySettings()[key] = value as QuestButtonAction;
+        getZenQuestsSettings()[key] = value as QuestButtonAction;
     }
 
     function updateBadgeColor(value: number | null) {
-        getQuestifySettings().questButtonBadgeColor = value;
+        getZenQuestsSettings().questButtonBadgeColor = value;
     }
 
     function updateIncludedTypes(options: readonly QuestButtonIncludedTypeOption[], value: string | string[] | null) {
         const selectedValues = new Set(Array.isArray(value) ? value : value ? [value] : []);
-        const nextIncludedTypes = { ...getQuestifySettings().questButtonIncludedTypes };
+        const nextIncludedTypes = { ...getZenQuestsSettings().questButtonIncludedTypes };
 
         for (const option of options) {
             nextIncludedTypes[option.value] = selectedValues.has(String(option.value));
         }
 
-        getQuestifySettings().questButtonIncludedTypes = nextIncludedTypes;
+        getZenQuestsSettings().questButtonIncludedTypes = nextIncludedTypes;
         validateIgnoredQuests();
     }
 

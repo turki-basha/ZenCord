@@ -15,9 +15,9 @@
     pointer-events: none;
 }
 
-/* Fix Questify button text clipping. */
-.questify-quest-item-restyle button [class*="buttonChildren"],
-.questify-quest-item-restyle button span {
+/* Fix ZenQuests button text clipping. */
+.zenquests-quest-item-restyle button [class*="buttonChildren"],
+.zenquests-quest-item-restyle button span {
     overflow: visible;
 }
 
@@ -28,92 +28,92 @@
 
 /* Notices */
 
-.questify-startup-notice-body {
+.zenquests-startup-notice-body {
     line-height: normal;
 }
 
 /* Quest tile preview */
 
-.questify-dummy-quest-preview {
+.zenquests-dummy-quest-preview {
     cursor: default;
     margin-top: 12px;
     user-select: none;
 }
 
-.questify-dummy-quest {
+.zenquests-dummy-quest {
     margin-top: 8px;
 }
 
 /* Background of Quest tile. */
-.questify-quest-item-restyle > :where(div) {
-    background-color: var(--questify-color) !important;
+.zenquests-quest-item-restyle > :where(div) {
+    background-color: var(--zenquests-color) !important;
 }
 
 /* Normal button text + SVG button text color. */
-.questify-quest-item-restyle > :nth-child(2) button > *,
-.questify-quest-item-restyle > :nth-child(2) button > * > * > span {
-    color: var(--questify-quest-name);
+.zenquests-quest-item-restyle > :nth-child(2) button > *,
+.zenquests-quest-item-restyle > :nth-child(2) button > * > * > span {
+    color: var(--zenquests-quest-name);
 }
 
 /* Watch again button SVG color. */
-.questify-quest-item-restyle > :nth-child(2) button > div > div > svg path {
-    fill: var(--questify-quest-name);
+.zenquests-quest-item-restyle > :nth-child(2) button > div > div > svg path {
+    fill: var(--zenquests-quest-name);
 }
 
 /* Allows glowing reward previews which aren't confined to their own square video frame to overflow. */
-.questify-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] {
+.zenquests-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] {
     overflow: visible;
 }
 
 /* Quest name color. */
-.questify-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > [class*="eyebrow"] {
-    color: var(--questify-quest-name) !important;
+.zenquests-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > [class*="eyebrow"] {
+    color: var(--zenquests-quest-name) !important;
 }
 
 /* Reward title + Orbs reward title text color. */
-.questify-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-md"],
-.questify-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-md"] > span {
-    color: var(--questify-reward-title) !important;
+.zenquests-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-md"],
+.zenquests-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-md"] > span {
+    color: var(--zenquests-reward-title) !important;
 }
 
 /* Quest description text color. */
-.questify-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-sm"] {
-    color: var(--questify-reward-description) !important;
+.zenquests-quest-item-restyle > div > div[class*="rewardDescriptionContainer"] > div[class*="textContainer"] > div[class*="text-sm"] {
+    color: var(--zenquests-reward-description) !important;
 }
 
-.questify-quest-item-restyle [class*="placeholderElement"] {
+.zenquests-quest-item-restyle [class*="placeholderElement"] {
     background-color: transparent;
 }
 
 /* Promoted by XYZ text color. */
-.questify-quest-item-restyle > div[class*="container"] > div[class*="positionContentOverBackground"] > div[class*="contents"] > div[class*="bottomRow"] > div[class*="text-sm"] {
-    color: var(--questify-reward-description) !important;
+.zenquests-quest-item-restyle > div[class*="container"] > div[class*="positionContentOverBackground"] > div[class*="contents"] > div[class*="bottomRow"] > div[class*="text-sm"] {
+    color: var(--zenquests-reward-description) !important;
 }
 
-.questify-quest-item-contrast-logo > div[class*="container"] > div[class*="positionContentOverBackground"] > div[class*="contents"] > div[class*="partnerBranding"] > img {
+.zenquests-quest-item-contrast-logo > div[class*="container"] > div[class*="positionContentOverBackground"] > div[class*="contents"] > div[class*="partnerBranding"] > img {
     filter: drop-shadow(0 0 10px rgb(0 0 0 / 80%));
 }
 
-.questify-quest-item-intense-gradient > :nth-child(1) [class*="overlay"] {
+.zenquests-quest-item-intense-gradient > :nth-child(1) [class*="overlay"] {
     background: linear-gradient(to top,
-            var(--questify-color) 0,
-            hsl(from var(--questify-color) h s l / 100%) 20.5%,
-            hsl(from var(--questify-color) h s l / 99.5%) 23.33%,
-            hsl(from var(--questify-color) h s l / 98%) 26.66%,
-            hsl(from var(--questify-color) h s l / 97%) 30%,
-            hsl(from var(--questify-color) h s l / 90%) 40%,
-            hsl(from var(--questify-color) h s l / 77%) 50%,
-            hsl(from var(--questify-color) h s l / 0%) 100%);
+            var(--zenquests-color) 0,
+            hsl(from var(--zenquests-color) h s l / 100%) 20.5%,
+            hsl(from var(--zenquests-color) h s l / 99.5%) 23.33%,
+            hsl(from var(--zenquests-color) h s l / 98%) 26.66%,
+            hsl(from var(--zenquests-color) h s l / 97%) 30%,
+            hsl(from var(--zenquests-color) h s l / 90%) 40%,
+            hsl(from var(--zenquests-color) h s l / 77%) 50%,
+            hsl(from var(--zenquests-color) h s l / 0%) 100%);
 }
 
-.questify-quest-item-default-gradient > :nth-child(1) [class*="overlay"] {
+.zenquests-quest-item-default-gradient > :nth-child(1) [class*="overlay"] {
     background: linear-gradient(to top,
-            var(--questify-color) 0,
-            hsl(from var(--questify-color) h s l / 95%) 20.31%,
-            hsl(from var(--questify-color) h s l / 0%) 100%);
+            var(--zenquests-color) 0,
+            hsl(from var(--zenquests-color) h s l / 95%) 20.31%,
+            hsl(from var(--zenquests-color) h s l / 0%) 100%);
 }
 
-.questify-quest-item-black-gradient > :nth-child(1) [class*="overlay"] {
+.zenquests-quest-item-black-gradient > :nth-child(1) [class*="overlay"] {
     background: linear-gradient(to top,
             hsl(0deg 0% 0% / 80%) 10%,
             hsl(0deg 0% 0% / 65%) 20%,
@@ -122,30 +122,30 @@
             hsl(0deg 0% 0% / 0%) 90%);
 }
 
-.questify-quest-item-hide-gradient > :nth-child(1) [class*="overlay"] {
+.zenquests-quest-item-hide-gradient > :nth-child(1) [class*="overlay"] {
     display: none;
 }
 
-.questify-quest-item-restyle > :nth-child(2) [class*="textOverflowBlur"] {
-    background: linear-gradient(transparent 50%, var(--questify-color) 100%);
+.zenquests-quest-item-restyle > :nth-child(2) [class*="textOverflowBlur"] {
+    background: linear-gradient(transparent 50%, var(--zenquests-color) 100%);
     filter: brightness(0.9);
 }
 
-.questify-quest-item-restyle > :nth-child(2) > div button {
-    background-color: var(--questify-button-normal) !important;
+.zenquests-quest-item-restyle > :nth-child(2) > div button {
+    background-color: var(--zenquests-button-normal) !important;
 }
 
-.questify-quest-item-restyle > :nth-child(2) > div button:not([disabled]):hover {
-    background-color: var(--questify-button-hover) !important;
+.zenquests-quest-item-restyle > :nth-child(2) > div button:not([disabled]):hover {
+    background-color: var(--zenquests-button-hover) !important;
     transition: background-color 0.2s ease-in-out;
 }
 
-.questify-quest-item-restyle > :nth-child(1) [class*="container"] {
+.zenquests-quest-item-restyle > :nth-child(1) [class*="container"] {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
-.questify-quest-item-restyle > :nth-child(2) [class*="container"] {
+.zenquests-quest-item-restyle > :nth-child(2) [class*="container"] {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
@@ -156,14 +156,14 @@ div[id^="quest-tile-"] div[class^="confetti__"] {
 
 /* Quest Button */
 
-#questify-dummy-quest-button {
+#zenquests-dummy-quest-button {
     margin-right: -12px;
     margin-left: 5px;
     border-left: 5px solid var(--text-strong);
     border-radius: 4px;
 }
 
-.questify-quest-button-pill {
+.zenquests-quest-button-pill {
     position: absolute;
     top: 0;
     left: 0;
@@ -171,26 +171,26 @@ div[id^="quest-tile-"] div[class^="confetti__"] {
     pointer-events: none;
 }
 
-.questify-quest-button-pill > [class*="item"] {
+.zenquests-quest-button-pill > [class*="item"] {
     will-change: transform;
     max-height: 8px;
     min-height: 8px;
     transition: max-height 0.2s ease-in-out;
 }
 
-.questify-quest-button-pill.hovered > [class*="item"] {
+.zenquests-quest-button-pill.hovered > [class*="item"] {
     max-height: 20px;
 }
 
-.questify-quest-button-pill.selected > [class*="item"] {
+.zenquests-quest-button-pill.selected > [class*="item"] {
     max-height: 40px;
 }
 
-.questify-quest-button-server-list-button-container {
+.zenquests-quest-button-server-list-button-container {
     position: relative;
 }
 
-.questify-quest-button-icon-container {
+.zenquests-quest-button-icon-container {
     pointer-events: none;
     display: flex;
     align-items: center;
@@ -199,7 +199,7 @@ div[id^="quest-tile-"] div[class^="confetti__"] {
     height: 100%;
 }
 
-.questify-quest-button-container {
+.zenquests-quest-button-container {
     position: relative;
 }
 
@@ -230,13 +230,13 @@ button.zq-action-btn:active {
 }
 
 /* ZenQuests Card Refinements */
-.questify-quest-item-restyle {
+.zenquests-quest-item-restyle {
     border-radius: 12px !important;
     border: 1px solid rgb(99 102 241 / 20%) !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.questify-quest-item-restyle:hover {
+.zenquests-quest-item-restyle:hover {
     border-color: rgb(99 102 241 / 45%) !important;
     box-shadow: 0 8px 24px rgb(0 0 0 / 35%) !important;
 }

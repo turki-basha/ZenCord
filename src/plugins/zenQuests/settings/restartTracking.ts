@@ -77,7 +77,7 @@ export function promptToRestartIfDirty({ onDecline }: RestartPromptOptions = {})
 
     Alerts.show({
         title: "Restart Required",
-        body: "A change you've made to Questify's settings requires a restart.",
+        body: "A change you've made to ZenQuests's settings requires a restart.",
         confirmText: "Restart",
         cancelText: "Later",
         onConfirm: () => {

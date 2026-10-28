@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { defaultQuestOrder, type QuestOrderStatus, type QuestSubsort } from "@plugins/zenQuests/settings/def";
 import { validateIgnoredQuests } from "@plugins/zenQuests/settings/ignoredQuests";
 import { rerenderQuests } from "@plugins/zenQuests/settings/rerender";
@@ -86,7 +86,7 @@ function sanitizeQuestOrder(order: unknown): QuestOrderStatus[] {
 }
 
 export function ReorderQuestsSetting(): JSX.Element {
-    const reorderQuests = useQuestifySettings([
+    const reorderQuests = useZenQuestsSettings([
         "disableQuestsEverything",
         "questOrder",
         "hiddenQuestStatuses",
@@ -108,7 +108,7 @@ export function ReorderQuestsSetting(): JSX.Element {
 
         if (value === "hidden") {
             hiddenStatuses.add(status);
-            getQuestifySettings().hiddenQuestStatuses = Array.from(hiddenStatuses);
+            getZenQuestsSettings().hiddenQuestStatuses = Array.from(hiddenStatuses);
             validateIgnoredQuests();
             return;
         }
@@ -123,26 +123,26 @@ export function ReorderQuestsSetting(): JSX.Element {
         nextOrder[previousIndex] = nextOrder[index];
         nextOrder[index] = status;
         hiddenStatuses.delete(status);
-        getQuestifySettings().questOrder = nextOrder;
-        getQuestifySettings().hiddenQuestStatuses = Array.from(hiddenStatuses);
+        getZenQuestsSettings().questOrder = nextOrder;
+        getZenQuestsSettings().hiddenQuestStatuses = Array.from(hiddenStatuses);
         validateIgnoredQuests();
     }
 
     function updateSubsort(key: "unclaimedSubsort" | "claimedSubsort" | "ignoredSubsort" | "expiredSubsort", value: string | string[] | null): void {
         if (typeof value !== "string") return;
 
-        getQuestifySettings()[key] = value;
+        getZenQuestsSettings()[key] = value;
         rerenderQuests();
     }
 
     function updateRememberSetting(key: "rememberQuestPageSort" | "rememberQuestPageFilters", checked: boolean): void {
-        getQuestifySettings()[key] = checked;
+        getZenQuestsSettings()[key] = checked;
     }
 
     return (
         <SettingsCard>
             <SettingsHeader> Reorder Quests </SettingsHeader>
-            <SettingsDescription> Sort Quests by their status when the Questify sort option is selected on the Quests page. Hidden statuses are filtered out with any sort option. </SettingsDescription>
+            <SettingsDescription> Sort Quests by their status when the ZenQuests sort option is selected on the Quests page. Hidden statuses are filtered out with any sort option. </SettingsDescription>
             <SettingsSubheader> Status Order </SettingsSubheader>
             <SettingsRow>
                 {questStatusOptions.map(({ label, value: status }) => (
@@ -242,7 +242,7 @@ export function ReorderQuestsSetting(): JSX.Element {
                 bottomSpacing="5"
                 tooltip={{
                     position: "top",
-                    text: "When disabled, the Quests page opens with the Questify sort option each time."
+                    text: "When disabled, the Quests page opens with the ZenQuests sort option each time."
                 }}
             />
             <SettingsSubtleSwitch

@@ -15,7 +15,7 @@ export interface RGB {
 }
 
 export const QUEST_PAGE = "/quest-home";
-export const q = classNameFactory("questify-");
+export const q = classNameFactory("zenquests-");
 export const leftClick = 0;
 export const middleClick = 1;
 export const rightClick = 2;

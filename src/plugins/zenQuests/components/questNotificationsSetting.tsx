@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getQuestifySettings, useQuestifySettings } from "@plugins/zenQuests/settings/access";
+import { getZenQuestsSettings, useZenQuestsSettings } from "@plugins/zenQuests/settings/access";
 import { startAutoFetchingQuests } from "@plugins/zenQuests/settings/fetching";
 import { AudioPlayer, formatSoundName, getDefaultSounds } from "@plugins/zenQuests/utils/audio";
 import { q } from "@plugins/zenQuests/utils/ui";
@@ -130,7 +130,7 @@ function QuestNotificationSoundSelect({
 }
 
 export function QuestNotificationsSetting(): JSX.Element {
-    const questNotifications = useQuestifySettings([
+    const questNotifications = useZenQuestsSettings([
         "newExcludedQuestAlertSound",
         "newExcludedQuestAlertVolume",
         "newQuestAlertSound",
@@ -193,7 +193,7 @@ export function QuestNotificationsSetting(): JSX.Element {
         if (value != null && typeof value !== "string") return;
 
         const interval = value == null ? 0 : Number(value);
-        getQuestifySettings().questFetchInterval = interval;
+        getZenQuestsSettings().questFetchInterval = interval;
         startAutoFetchingQuests(true);
     }
 
@@ -206,7 +206,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                 checked={questNotifications.notifyOnQuestComplete}
                 disabled={disabled}
                 label="Show a notification when a Quest is completed:"
-                onChange={checked => { getQuestifySettings().notifyOnQuestComplete = checked; }}
+                onChange={checked => { getZenQuestsSettings().notifyOnQuestComplete = checked; }}
                 bottomSpacing="5"
             />
             <SettingsRow>
@@ -218,7 +218,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                         value={questNotifications.questCompletedAlertSound}
                         playingSound={playingSound}
                         onPreview={sound => previewSound(sound, questNotifications.questCompletedAlertVolume)}
-                        onChange={value => { getQuestifySettings().questCompletedAlertSound = value; }}
+                        onChange={value => { getZenQuestsSettings().questCompletedAlertSound = value; }}
                     />
                 </SettingsRowItem>
                 <SettingsRowItem className="volume-slider-row-item">
@@ -227,7 +227,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                         className="inline-volume-slider"
                         disabled={disabled}
                         value={questNotifications.questCompletedAlertVolume}
-                        onChange={value => { getQuestifySettings().questCompletedAlertVolume = value; }}
+                        onChange={value => { getZenQuestsSettings().questCompletedAlertVolume = value; }}
                     />
                 </SettingsRowItem>
             </SettingsRow>
@@ -238,7 +238,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                 label="Show a notification when new Quests are detected:"
                 bottomSpacing="5"
                 onChange={checked => {
-                    getQuestifySettings().notifyOnNewQuests = checked;
+                    getZenQuestsSettings().notifyOnNewQuests = checked;
                     startAutoFetchingQuests(true);
                 }}
             />
@@ -252,7 +252,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                         playingSound={playingSound}
                         onPreview={sound => previewSound(sound, questNotifications.newQuestAlertVolume)}
                         onChange={value => {
-                            getQuestifySettings().newQuestAlertSound = value;
+                            getZenQuestsSettings().newQuestAlertSound = value;
                             startAutoFetchingQuests(true);
                         }}
                     />
@@ -263,7 +263,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                         className="inline-volume-slider"
                         disabled={disabled}
                         value={questNotifications.newQuestAlertVolume}
-                        onChange={value => { getQuestifySettings().newQuestAlertVolume = value; }}
+                        onChange={value => { getZenQuestsSettings().newQuestAlertVolume = value; }}
                     />
                 </SettingsRowItem>
             </SettingsRow>
@@ -274,13 +274,13 @@ export function QuestNotificationsSetting(): JSX.Element {
                 label="Show a notification when new excluded Quests are detected:"
                 bottomSpacing="5"
                 onChange={checked => {
-                    getQuestifySettings().notifyOnNewExcludedQuests = checked;
+                    getZenQuestsSettings().notifyOnNewExcludedQuests = checked;
                     startAutoFetchingQuests(true);
                 }}
                 tooltip={{
                     position: "top",
                     text: "Some Quests are excluded from your available Quests list due to region or platform restrictions."
-                        + "\n\nWhen enabled, Questify will fetch their Quest configs, apply your included Quest and reward type filters, print the resolved excluded Quest data to console, and show a separate notification for matching excluded Quests."
+                        + "\n\nWhen enabled, ZenQuests will fetch their Quest configs, apply your included Quest and reward type filters, print the resolved excluded Quest data to console, and show a separate notification for matching excluded Quests."
                 }}
             />
             <SettingsRow>
@@ -293,13 +293,13 @@ export function QuestNotificationsSetting(): JSX.Element {
                         playingSound={playingSound}
                         onPreview={sound => previewSound(sound, questNotifications.newExcludedQuestAlertVolume)}
                         onChange={value => {
-                            getQuestifySettings().newExcludedQuestAlertSound = value;
+                            getZenQuestsSettings().newExcludedQuestAlertSound = value;
                             startAutoFetchingQuests(true);
                         }}
                         tooltip={{
                             position: "top",
                             text: "Some Quests are excluded from your available Quests list due to region or platform restrictions."
-                                + "\n\nWhen a sound is selected, Questify will fetch their Quest configs, apply your included Quest and reward type filters, print the resolved excluded Quest data to console, and play this sound for matching excluded Quests."
+                                + "\n\nWhen a sound is selected, ZenQuests will fetch their Quest configs, apply your included Quest and reward type filters, print the resolved excluded Quest data to console, and play this sound for matching excluded Quests."
                         }}
                     />
                 </SettingsRowItem>
@@ -309,7 +309,7 @@ export function QuestNotificationsSetting(): JSX.Element {
                         className="inline-volume-slider"
                         disabled={disabled}
                         value={questNotifications.newExcludedQuestAlertVolume}
-                        onChange={value => { getQuestifySettings().newExcludedQuestAlertVolume = value; }}
+                        onChange={value => { getZenQuestsSettings().newExcludedQuestAlertVolume = value; }}
                     />
                 </SettingsRowItem>
             </SettingsRow>
