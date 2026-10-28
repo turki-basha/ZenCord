@@ -47,9 +47,20 @@ async function calculateGitChanges() {
     if (!isOutdated) return [];
 
     try {
-        const data = await githubGet(`/compare/${gitHash}...HEAD`);
-        if (data && Array.isArray(data.commits) && data.commits.length > 0) {
-            return data.commits.map((c: any) => ({
+        const data = await githubGet("/releases/latest");
+        let hash = "";
+        if (data?.name) {
+            const match = data.name.match(/\b([0-9a-f]{7,40})\b/i);
+            if (match) hash = match[1];
+        }
+        if (!hash && data?.target_commitish) {
+            hash = data.target_commitish.slice(0, 7);
+        }
+
+        const compareTarget = hash || "HEAD";
+        const compareData = await githubGet(`/compare/${gitHash}...${compareTarget}`);
+        if (compareData && Array.isArray(compareData.commits) && compareData.commits.length > 0) {
+            return compareData.commits.map((c: any) => ({
                 hash: c.sha ? c.sha.slice(0, 7) : "update",
                 author: c.author?.login ?? c.commit?.author?.name ?? "ZenCord",
                 message: (c.commit?.message || "ZenCord Update").split("\n")[0]
@@ -69,17 +80,35 @@ async function fetchUpdates() {
     const data = await githubGet("/releases/latest");
     if (!data) return false;
 
-    const hash = data.name ? data.name.slice(data.name.lastIndexOf(" ") + 1) : "";
-    if (hash && hash === gitHash)
-        return false;
+    // Try extracting commit hash from release name (e.g. "ZenCord 82431fb") or target_commitish
+    let hash = "";
+    if (data.name) {
+        const match = data.name.match(/\b([0-9a-f]{7,40})\b/i);
+        if (match) hash = match[1];
+    }
+    if (!hash && data.target_commitish) {
+        hash = data.target_commitish.slice(0, 7);
+    }
 
+    // If we have both hashes, check if we're identical or ahead
     if (hash && gitHash) {
+        if (
+            hash.toLowerCase() === gitHash.toLowerCase() ||
+            gitHash.toLowerCase().startsWith(hash.toLowerCase()) ||
+            hash.toLowerCase().startsWith(gitHash.toLowerCase())
+        ) {
+            return false;
+        }
+
         try {
             const compare = await githubGet(`/compare/${hash}...${gitHash}`);
             if (compare && (compare.status === "ahead" || compare.status === "identical")) {
                 return false;
             }
         } catch { }
+    } else if (!hash) {
+        // If the release has no discernible hash, do not report phantom update
+        return false;
     }
 
     if (Array.isArray(data.assets)) {

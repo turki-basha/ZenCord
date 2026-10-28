@@ -104,6 +104,7 @@ async function loadBadges(noCache = false) {
     }
 
     DonorBadges = merged;
+    new Logger("BadgeAPI#loadBadges").info(`Loaded ${Object.keys(merged).length} users with custom badges from ZenCord API`);
 }
 
 let intervalId: any;
@@ -182,7 +183,7 @@ export default definePlugin({
     toolboxActions: {
         async "Refetch Badges"() {
             await loadBadges(true);
-            showToast({ text: "Successfully refetched badges!", variant: "success" });
+            showToast({ text: `Successfully refetched badges! (${Object.keys(DonorBadges).length} users loaded)`, variant: "success" });
         }
     },
 

@@ -59,18 +59,13 @@ jobs:
                   C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /out:dist\ZenCordInstaller.exe /win32icon:ZenCord.ico /resource:banner.png /resource:ZenCord.ico /resource:ZenCordPayload.zip /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll scripts\ZenCordGuiInstaller.cs
                   Remove-Item ZenCordPayload.zip -Force
 
-            - name: Get commit hash
-              id: release_values
-              shell: bash
-              run: |
-                  echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
             - name: Publish latest release with installer
               if: github.repository == 'turki-basha/ZenCord'
               shell: bash
               run: |
+                  RELEASE_TAG="$(git rev-parse --short HEAD)"
+                  echo "Publishing latest release for commit: ${RELEASE_TAG}"
                   gh release delete latest --yes || true
-                  gh release create latest dist/* --title "ZenCord $RELEASE_TAG" --notes "Latest automated build of ZenCord ($RELEASE_TAG) including ZenCordInstaller.exe for Windows."
+                  gh release create latest dist/* --title "ZenCord ${RELEASE_TAG}" --notes "Latest automated build of ZenCord (${RELEASE_TAG}) including ZenCordInstaller.exe for Windows."
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASE_TAG: ${{ env.release_tag }}
