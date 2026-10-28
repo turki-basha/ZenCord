@@ -19,96 +19,7 @@ env:
   FORCE_COLOR: true
 
 jobs:
-  build-linux-installer:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
-      - name: Clone and Customize Installer
-        run: |
-          git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
-          cd installer-src
-          # Point ReleaseUrl to ZenCord releases
-          sed -i 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
-          sed -i 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
-          sed -i 's|"Vencord"|"ZenCord"|g' patcher.go
-          sed -i 's|Vencord|ZenCord|g' constants.go
-          sed -i 's|Vencord|ZenCord|g' cli.go
-
-      - name: Build Linux CLI Installer
-        run: |
-          cd installer-src
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -tags "cli static" -ldflags "-s -w" -o ../ZenCordInstallerCli-linux
-          chmod +x ../ZenCordInstallerCli-linux
-
-      - name: Build Linux GUI / AppImage Package
-        run: |
-          cd installer-src
-          sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xorg-dev libasound2-dev || true
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags "static" -ldflags "-s -w" -o ../ZenCordInstaller-linux.AppImage || cp ../ZenCordInstallerCli-linux ../ZenCordInstaller-linux.AppImage
-          chmod +x ../ZenCordInstaller-linux.AppImage
-
-      - name: Upload Linux Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-installers
-          path: |
-            ZenCordInstallerCli-linux
-            ZenCordInstaller-linux.AppImage
-
-  build-mac-installer:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
-      - name: Clone and Customize Installer
-        run: |
-          git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
-          cd installer-src
-          sed -i '' 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
-          sed -i '' 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
-          sed -i '' 's|"Vencord"|"ZenCord"|g' patcher.go
-          sed -i '' 's|Vencord|ZenCord|g' constants.go
-          sed -i '' 's|Vencord|ZenCord|g' cli.go
-
-      - name: Build macOS Universal CLI (Apple Silicon + Intel)
-        run: |
-          cd installer-src
-          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -tags "cli static" -ldflags "-s -w" -o installer-amd64
-          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -tags "cli static" -ldflags "-s -w" -o installer-arm64
-          lipo -create installer-amd64 installer-arm64 -output ../ZenCordInstallerCli-darwin
-          chmod +x ../ZenCordInstallerCli-darwin
-
-      - name: Build macOS GUI DMG
-        run: |
-          cd installer-src
-          mkdir -p build/ZenCordInstaller.app/Contents/MacOS
-          mkdir -p build/ZenCordInstaller.app/Contents/Resources
-          cp -R macos/VencordInstaller.app/* build/ZenCordInstaller.app/ || true
-          cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/ZenCordInstaller
-          cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/VencordInstaller || true
-          hdiutil create -volname "ZenCord Installer" -srcfolder build/ZenCordInstaller.app -ov -format UDZO ../ZenCordInstaller.dmg
-
-      - name: Upload macOS Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-installers
-          path: |
-            ZenCordInstallerCli-darwin
-            ZenCordInstaller.dmg
-
   Build:
-    needs: [build-linux-installer, build-mac-installer]
     runs-on: windows-latest
 
     steps:
@@ -141,33 +52,22 @@ jobs:
         run: |
           rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
-      - name: Download Linux Installers
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-installers
-          path: dist
-
-      - name: Download macOS Installers
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-installers
-          path: dist
-
-      - name: Preserve Fixed Windows GUI Installer (ZenCordInstaller.exe)
+      - name: Preserve Fixed Cross-Platform Installers (Windows, macOS, Linux)
         shell: bash
         run: |
-          # Keep ZenCordInstaller.exe permanently static so its SHA256 hash NEVER changes.
-          gh release download latest -p "ZenCordInstaller.exe" -D dist/ || echo "Previous installer downloaded or already present"
+          # Keep all installers permanently static so their SHA256 hashes NEVER change.
+          # This allows Windows SmartScreen, macOS Gatekeeper, and Linux package checksums to accumulate permanent reputation.
+          gh release download latest -p "ZenCordInstaller*" -D dist/ || echo "Previous installers downloaded or already present"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish latest release with all cross-platform installers
+      - name: Publish latest release with all fixed installers
         if: github.repository == 'turki-basha/ZenCord'
         shell: bash
         run: |
           RELEASE_TAG="$(git rev-parse --short HEAD)"
           echo "Publishing latest release for commit: ${RELEASE_TAG}"
           gh release delete latest --yes || true
-          gh release create latest dist/* --title "ZenCord ${RELEASE_TAG}" --notes "Official automated release of ZenCord (${RELEASE_TAG}) with Windows, macOS, and Linux installers."
+          gh release create latest dist/* --title "ZenCord ${RELEASE_TAG}" --notes "Official automated build of ZenCord (${RELEASE_TAG}) with static Windows, macOS, and Linux installers."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
