@@ -21,38 +21,23 @@ import "./fixDiscordBadgePadding.css";
 import { _getBadges, BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Badges";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
-import { Heart } from "@components/Heart";
 import { CopyIcon, LinkIcon } from "@components/Icons";
-import { openContributorModal } from "@components/settings/tabs";
 import { Devs } from "@utils/constants";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import { shouldShowContributorBadge } from "@utils/misc";
 import definePlugin from "@utils/types";
-import { ContextMenuApi, Forms, Menu, Modal, openModal, showToast, UserStore } from "@webpack/common";
+import { ContextMenuApi, Forms, Menu, Modal, openModal, showToast } from "@webpack/common";
 
 import {
     createZenBadgeFromDb,
     ZenBadgesDatabase
 } from "./zenBadges";
 
-const CONTRIBUTOR_BADGE = "https://cdn.discordapp.com/emojis/1564698785551097986.webp?size=96";
-
-const ContributorBadge: ProfileBadge = {
-    id: "vencord_contributor_badge",
-    description: "Vencord Contributor",
-    iconSrc: CONTRIBUTOR_BADGE,
-    position: BadgePosition.START,
-    shouldShow: ({ userId }) => shouldShowContributorBadge(userId),
-    onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId))
-};
-
 let DonorBadges = {} as ZenBadgesDatabase;
 
 export const ZENCORD_API_BADGES_URL = "https://www.zencord.site/api/badges";
 export const ZENCORD_API_DIRECT_URL = "https://zencord.site/api/badges";
 export const ZENCORD_GITHUB_FALLBACK_URL = "https://raw.githubusercontent.com/turki-basha/ZenCord/main/badges.json";
-export const VENCORD_BADGES_URL = "https://badges.vencord.dev/badges.json";
 
 async function loadBadges(noCache = false) {
     const init = {} as RequestInit;
@@ -62,16 +47,11 @@ async function loadBadges(noCache = false) {
     const merged: ZenBadgesDatabase = {};
 
     try {
-        const [apiWwwRes, apiDirectRes, fallbackRes, venRes] = await Promise.allSettled([
+        const [apiWwwRes, apiDirectRes, fallbackRes] = await Promise.allSettled([
             fetch(ZENCORD_API_BADGES_URL, init).then(r => r.ok ? r.json() : null),
             fetch(ZENCORD_API_DIRECT_URL, init).then(r => r.ok ? r.json() : null),
-            fetch(ZENCORD_GITHUB_FALLBACK_URL, init).then(r => r.ok ? r.json() : null),
-            fetch(VENCORD_BADGES_URL, init).then(r => r.ok ? r.json() : null)
+            fetch(ZENCORD_GITHUB_FALLBACK_URL, init).then(r => r.ok ? r.json() : null)
         ]);
-
-        if (venRes.status === "fulfilled" && venRes.value && typeof venRes.value === "object") {
-            Object.assign(merged, venRes.value);
-        }
 
         // Apply GitHub fallback if present
         if (fallbackRes.status === "fulfilled" && fallbackRes.value && typeof fallbackRes.value === "object") {
@@ -100,11 +80,11 @@ async function loadBadges(noCache = false) {
             }
         }
     } catch (e) {
-        new Logger("BadgeAPI#loadBadges").error("Failed to load badges", e);
+        new Logger("BadgeAPI#loadBadges").error("Failed to load ZenCord badges", e);
     }
 
     DonorBadges = merged;
-    new Logger("BadgeAPI#loadBadges").info(`Loaded ${Object.keys(merged).length} users with custom badges from ZenCord API`);
+    new Logger("BadgeAPI#loadBadges").info(`Loaded ${Object.keys(merged).length} users with ZenCord badges exclusively`);
 }
 
 let intervalId: any;
@@ -186,8 +166,6 @@ export default definePlugin({
             showToast({ text: `Successfully refetched badges! (${Object.keys(DonorBadges).length} users loaded)`, variant: "success" });
         }
     },
-
-    userProfileBadge: ContributorBadge,
 
     async start() {
         await loadBadges();
