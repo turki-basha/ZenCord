@@ -52,14 +52,14 @@ jobs:
               run: |
                   rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
-            - name: Build Windows GUI Installer (ZenCordInstaller.exe)
-              shell: pwsh
+            - name: Preserve Fixed Windows GUI Installer (ZenCordInstaller.exe)
+              shell: bash
               run: |
-                  Compress-Archive -Path dist\* -DestinationPath ZenCordPayload.zip -Force
-                  C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /optimize+ /platform:x64 /filealign:512 /debug- /out:dist\ZenCordInstaller.exe /win32icon:ZenCord.ico /win32manifest:scripts\app.manifest /resource:banner.png /resource:ZenCord.ico /resource:ZenCordPayload.zip /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll scripts\AssemblyInfo.cs scripts\ZenCordGuiInstaller.cs
-                  Remove-Item ZenCordPayload.zip -Force
-                  $cert = New-SelfSignedCertificate -Type CodeSigning -Subject "CN=ZenCord Open Source Project, O=ZenCord Team" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5) -HashAlgorithm SHA256
-                  Set-AuthenticodeSignature -FilePath "dist\ZenCordInstaller.exe" -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
+                  # Keep ZenCordInstaller.exe permanently static so its SHA256 hash NEVER changes.
+                  # This allows Microsoft Defender SmartScreen to accumulate positive reputation and eliminate warning dialogs.
+                  gh release download latest -p "ZenCordInstaller.exe" -D dist/ || echo "Previous installer downloaded or already present"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Publish latest release with installer
               if: github.repository == 'turki-basha/ZenCord'
