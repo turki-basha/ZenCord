@@ -635,7 +635,7 @@ namespace ZenCordInstaller
             int deletedFolders = 0;
             int unpatchedCount = 0;
 
-            // 1. Terminate Discord processes
+            // 1. Terminate Discord processes gracefully
             string[] procs = { "Discord", "DiscordPTB", "DiscordCanary", "DiscordDevelopment" };
             foreach (var name in procs)
             {
@@ -643,8 +643,16 @@ namespace ZenCordInstaller
                 {
                     foreach (var p in Process.GetProcessesByName(name))
                     {
-                        p.Kill();
-                        p.WaitForExit(2000);
+                        try
+                        {
+                            p.CloseMainWindow();
+                            if (!p.WaitForExit(1500))
+                            {
+                                p.Kill();
+                                p.WaitForExit(2000);
+                            }
+                        }
+                        catch { }
                     }
                 }
                 catch { }
