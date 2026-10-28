@@ -156,8 +156,10 @@ export function createZenBadgeFromDb(entry: ZenBadgeDbEntry, index: number, user
 
     return {
         id: `zencord_db_badge_${userId}_${index}`,
+        key: `zencord_${userId}_${index}`,
         description: tooltip,
         iconSrc,
+        icon: iconSrc,
         position: BadgePosition.START,
         props: {
             style: {
@@ -169,5 +171,5 @@ export function createZenBadgeFromDb(entry: ZenBadgeDbEntry, index: number, user
             ContextMenuApi.openContextMenu(event, () => <ZenBadgeContextMenu badge={badge} />);
         },
         onClick: () => openBadgeModal(defaultTitle, defaultSubtitle, iconSrc, defaultDescription)
-    };
+    } as ProfileBadge;
 }

@@ -49,7 +49,8 @@ const ContributorBadge: ProfileBadge = {
 
 let DonorBadges = {} as ZenBadgesDatabase;
 
-export const ZENCORD_API_BADGES_URL = "https://zencord.site/api/badges";
+export const ZENCORD_API_BADGES_URL = "https://www.zencord.site/api/badges";
+export const ZENCORD_API_DIRECT_URL = "https://zencord.site/api/badges";
 export const ZENCORD_GITHUB_FALLBACK_URL = "https://raw.githubusercontent.com/turki-basha/ZenCord/main/badges.json";
 export const VENCORD_BADGES_URL = "https://badges.vencord.dev/badges.json";
 
@@ -61,8 +62,9 @@ async function loadBadges(noCache = false) {
     const merged: ZenBadgesDatabase = {};
 
     try {
-        const [apiRes, fallbackRes, venRes] = await Promise.allSettled([
+        const [apiWwwRes, apiDirectRes, fallbackRes, venRes] = await Promise.allSettled([
             fetch(ZENCORD_API_BADGES_URL, init).then(r => r.ok ? r.json() : null),
+            fetch(ZENCORD_API_DIRECT_URL, init).then(r => r.ok ? r.json() : null),
             fetch(ZENCORD_GITHUB_FALLBACK_URL, init).then(r => r.ok ? r.json() : null),
             fetch(VENCORD_BADGES_URL, init).then(r => r.ok ? r.json() : null)
         ]);
@@ -80,11 +82,20 @@ async function loadBadges(noCache = false) {
             }
         }
 
-        // Apply Website Database API (highest priority)
-        if (apiRes.status === "fulfilled" && apiRes.value && typeof apiRes.value === "object") {
-            for (const [userId, badges] of Object.entries(apiRes.value as Record<string, any>)) {
+        // Apply direct website API response if available
+        if (apiDirectRes.status === "fulfilled" && apiDirectRes.value && typeof apiDirectRes.value === "object") {
+            for (const [userId, badges] of Object.entries(apiDirectRes.value as Record<string, any>)) {
                 if (Array.isArray(badges)) {
-                    merged[userId] = [...(merged[userId] || []), ...badges];
+                    merged[userId] = badges;
+                }
+            }
+        }
+
+        // Apply canonical www website API response (highest priority)
+        if (apiWwwRes.status === "fulfilled" && apiWwwRes.value && typeof apiWwwRes.value === "object") {
+            for (const [userId, badges] of Object.entries(apiWwwRes.value as Record<string, any>)) {
+                if (Array.isArray(badges)) {
+                    merged[userId] = badges;
                 }
             }
         }
