@@ -183,7 +183,7 @@ function VencordSettings() {
                     <QuickAction
                         Icon={WebsiteIcon}
                         text="Visit Website"
-                        action={() => VencordNative.native.openExternal("https://zencord-theta.vercel.app/")}
+                        action={() => VencordNative.native.openExternal("https://www.zencord.site/")}
                     />
                     <QuickAction
                         Icon={OpenExternalIcon}

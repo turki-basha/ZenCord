@@ -33,4 +33,4 @@ If you discover a security vulnerability or exploit vector within ZenCord, pleas
 
 Official discussions and development coordination take place in our community:
 - Discord: https://discord.gg/EYzpnZuSba
-- Portal: https://zencord-theta.vercel.app
+- Portal: https://www.zencord.site

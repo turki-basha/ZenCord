@@ -8,7 +8,7 @@ on:
             - .github/workflows/build.yml
             - src/**
             - browser/**
-            - scripts/build/**
+            - scripts/**
             - package.json
             - pnpm-lock.yaml
 
@@ -20,7 +20,7 @@ env:
 
 jobs:
     Build:
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
 
         steps:
             - uses: actions/checkout@v4
@@ -48,19 +48,29 @@ jobs:
               run: pnpm generatePluginJson dist/plugins.json dist/plugin-readmes.json
 
             - name: Clean up unnecessary files
+              shell: bash
               run: |
                   rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
+            - name: Build Windows GUI Installer (ZenCordInstaller.exe)
+              shell: pwsh
+              run: |
+                  Compress-Archive -Path dist\* -DestinationPath ZenCordPayload.zip -Force
+                  C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /out:dist\ZenCordInstaller.exe /win32icon:ZenCord.ico /resource:banner.png /resource:ZenCord.ico /resource:ZenCordPayload.zip /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll scripts\ZenCordGuiInstaller.cs
+                  Remove-Item ZenCordPayload.zip -Force
+
             - name: Get commit hash
               id: release_values
+              shell: bash
               run: |
                   echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-            - name: Publish latest release for auto-updater
+            - name: Publish latest release with installer
               if: github.repository == 'turki-basha/ZenCord'
+              shell: bash
               run: |
                   gh release delete latest --yes || true
-                  gh release create latest dist/* --title "ZenCord $RELEASE_TAG" --notes "Latest automated build of ZenCord ($RELEASE_TAG)"
+                  gh release create latest dist/* --title "ZenCord $RELEASE_TAG" --notes "Latest automated build of ZenCord ($RELEASE_TAG) including ZenCordInstaller.exe for Windows."
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}

@@ -5,7 +5,7 @@ High-performance, modular, and privacy-centric Discord client modification.
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-0969da.svg?style=flat-square)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-2ea44f.svg?style=flat-square)](#platform-support)
-[![Website](https://img.shields.io/badge/Website-zencord--theta.vercel.app-5865f2.svg?style=flat-square)](https://zencord-theta.vercel.app/)
+[![Website](https://img.shields.io/badge/Website-zencord--theta.vercel.app-5865f2.svg?style=flat-square)](https://www.zencord.site/)
 
 ---
 
@@ -104,7 +104,7 @@ Settings storage path:
 
 ## Official Channels
 
-- **Portal:** [https://zencord-theta.vercel.app](https://zencord-theta.vercel.app/)
+- **Portal:** [https://www.zencord.site/](https://www.zencord.site/)
 - **Community:** [https://discord.gg/EYzpnZuSba](https://discord.gg/EYzpnZuSba)
 - **Source Code:** [https://github.com/turki-basha/ZenCord](https://github.com/turki-basha/ZenCord)
 
