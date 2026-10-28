@@ -56,8 +56,10 @@ jobs:
               shell: pwsh
               run: |
                   Compress-Archive -Path dist\* -DestinationPath ZenCordPayload.zip -Force
-                  C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /out:dist\ZenCordInstaller.exe /win32icon:ZenCord.ico /resource:banner.png /resource:ZenCord.ico /resource:ZenCordPayload.zip /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll scripts\ZenCordGuiInstaller.cs
+                  C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /optimize+ /platform:anycpu /out:dist\ZenCordInstaller.exe /win32icon:ZenCord.ico /win32manifest:scripts\app.manifest /resource:banner.png /resource:ZenCord.ico /resource:ZenCordPayload.zip /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll scripts\AssemblyInfo.cs scripts\ZenCordGuiInstaller.cs
                   Remove-Item ZenCordPayload.zip -Force
+                  $cert = New-SelfSignedCertificate -Type CodeSigning -Subject "CN=ZenCord Open Source Project, O=ZenCord Team" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5) -HashAlgorithm SHA256
+                  Set-AuthenticodeSignature -FilePath "dist\ZenCordInstaller.exe" -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
 
             - name: Publish latest release with installer
               if: github.repository == 'turki-basha/ZenCord'

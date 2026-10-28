@@ -1281,8 +1281,12 @@ namespace ZenCordInstaller
                 {
                     try
                     {
-                        p.Kill();
-                        p.WaitForExit(3000);
+                        p.CloseMainWindow();
+                        if (!p.WaitForExit(1500))
+                        {
+                            p.Kill();
+                            p.WaitForExit(2000);
+                        }
                     }
                     catch { }
                 }
@@ -1331,36 +1335,23 @@ namespace ZenCordInstaller
                 if (stream == null)
                     throw new Exception("ZenCordPayload.zip embedded resource not found!");
 
-                string tempZip = Path.Combine(Path.GetTempPath(), "ZenCordPayload_" + Guid.NewGuid().ToString("N") + ".zip");
-                using (FileStream fs = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
+                using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read))
                 {
-                    stream.CopyTo(fs);
-                }
-
-                try
-                {
-                    using (ZipArchive archive = ZipFile.OpenRead(tempZip))
+                    foreach (ZipArchiveEntry entry in archive.Entries)
                     {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
+                        string destinationPath = Path.Combine(targetDistDir, entry.FullName);
+                        if (string.IsNullOrEmpty(entry.Name))
                         {
-                            string destinationPath = Path.Combine(targetDistDir, entry.FullName);
-                            if (string.IsNullOrEmpty(entry.Name))
-                            {
-                                Directory.CreateDirectory(destinationPath);
-                            }
-                            else
-                            {
-                                string parent = Path.GetDirectoryName(destinationPath);
-                                if (!Directory.Exists(parent))
-                                    Directory.CreateDirectory(parent);
-                                entry.ExtractToFile(destinationPath, true);
-                            }
+                            Directory.CreateDirectory(destinationPath);
+                        }
+                        else
+                        {
+                            string parent = Path.GetDirectoryName(destinationPath);
+                            if (!Directory.Exists(parent))
+                                Directory.CreateDirectory(parent);
+                            entry.ExtractToFile(destinationPath, true);
                         }
                     }
-                }
-                finally
-                {
-                    try { File.Delete(tempZip); } catch { }
                 }
             }
         }
@@ -1529,7 +1520,7 @@ namespace ZenCordInstaller
 
                 using (WebClient wc = new WebClient())
                 {
-                    wc.Headers.Add("User-Agent", "ZenCord-Installer");
+                    wc.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
                     byte[] data = wc.DownloadData(url);
                     File.WriteAllBytes(destFile, data);
                 }
