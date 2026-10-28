@@ -198,3 +198,4 @@ export function getNextPrayer(timings: PrayerTimings): {
         hoursLeft: Math.floor(fajrMinutesTomorrow / 60)
     };
 }
+

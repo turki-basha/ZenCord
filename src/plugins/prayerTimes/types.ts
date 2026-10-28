@@ -54,3 +54,4 @@ export const PRAYER_NAMES: Record<string, { ar: string; en: string; icon: string
     Maghrib: { ar: "المغرب", en: "Maghrib", icon: "🌇" },
     Isha: { ar: "العشاء", en: "Isha", icon: "🌙" }
 };
+

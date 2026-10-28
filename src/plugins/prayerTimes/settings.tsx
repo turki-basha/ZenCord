@@ -45,3 +45,4 @@ export const settings = definePluginSettings({
         default: true
     }
 });
+

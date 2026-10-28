@@ -10,6 +10,7 @@ import { Settings } from "@api/Settings";
 import { CogWheel, InfoIcon } from "@components/Icons";
 import { AddonCard } from "@components/settings/AddonCard";
 import { getPluginI18n } from "@plugins/arabicUI/translations";
+import { promptToRestart } from "@utils/promptToRestart";
 import { Plugin } from "@utils/types";
 import { React, showToast } from "@webpack/common";
 
@@ -53,6 +54,12 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
         if (pluginRequiresRestart(plugin)) {
             settings.enabled = !wasEnabled;
             onRestartNeeded(plugin.name, "enabled");
+            promptToRestart("reload", {
+                title: "إعادة تشغيل ديسكورد مطلوبة (Restart Required)",
+                subtitle: `يلزم إعادة تشغيل ديسكورد لتطبيق تغييرات إضافة (${plugin.name}) بشكل سليم.`,
+                confirmText: "إعادة التشغيل الآن (Restart)",
+                cancelText: "لاحقاً (Later)"
+            });
             return;
         }
 

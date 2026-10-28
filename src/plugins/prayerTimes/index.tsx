@@ -16,6 +16,7 @@ export default definePlugin({
     tags: ["Utility", "Arabic"],
     authors: [Devs.ZenCord],
     enabledByDefault: true,
+    requiresRestart: true,
     settings,
 
     PrayerTimesWidget

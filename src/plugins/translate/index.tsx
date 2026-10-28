@@ -66,8 +66,9 @@ export default definePlugin({
     name: "Translate",
     description: "ترجمة فورية للرسائل الواردة والصادرة بجميع اللغات عبر محرك Google مجاناً بدون حدود (Zen Translator)",
     tags: ["Chat", "Utility"],
-    authors: [Devs.Ven, Devs.AshtonMemer, Devs.koish1],
+    authors: [Devs.ZenCord],
     enabledByDefault: true,
+    requiresRestart: true,
     settings,
     contextMenus: {
         "message": messageCtxPatch

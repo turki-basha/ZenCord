@@ -49,7 +49,7 @@ export interface Dev {
 export const Devs = /* #__PURE__*/ Object.freeze({
     ZenCord: {
         name: "ZenCord Team",
-        id: 0n
+        id: 853046251465343027n
     },
     Ven: {
         name: "V",
