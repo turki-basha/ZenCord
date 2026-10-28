@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 import { PrayerTimesWidget } from "./PrayerTimesWidget";
@@ -13,12 +14,7 @@ export default definePlugin({
     name: "PrayerTimes",
     description: "عرض مواقيت الصلاة الدقيقة والتاريخ الهجري في الهيدر العلوي بأسلوب أنيق وخفيف (Prayer Times & Hijri Calendar Header)",
     tags: ["Utility", "Arabic"],
-    authors: [
-        {
-            name: "ZenCord Team",
-            id: 853046251465343027n
-        }
-    ],
+    authors: [Devs.ZenCord],
     enabledByDefault: true,
     settings,
 
