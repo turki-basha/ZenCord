@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
@@ -18,6 +19,24 @@ export default definePlugin({
     enabledByDefault: true,
     requiresRestart: true,
     settings,
+
+    patches: [
+        {
+            find: '?"BACK_FORWARD_NAVIGATION":',
+            replacement: {
+                match: /(trailing:.{0,100}?children:\[)/,
+                replace: "$1$self.renderHeaderPrayerWidget(),"
+            }
+        }
+    ],
+
+    renderHeaderPrayerWidget() {
+        return (
+            <ErrorBoundary key="zc-prayer-times" noop>
+                <PrayerTimesWidget />
+            </ErrorBoundary>
+        );
+    },
 
     PrayerTimesWidget
 });

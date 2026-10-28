@@ -33,7 +33,7 @@ export function formatPrayerTime(timeStr: string, is24h: boolean, isArabic: bool
 /**
  * Approximate offline Hijri Date calculation fallback
  */
-function getOfflineHijriDate(date: Date): HijriDateInfo {
+export function getOfflineHijriDate(date: Date): HijriDateInfo {
     try {
         // Intl DateTimeFormat islamic-umalqura
         const formatter = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
@@ -69,7 +69,7 @@ function getOfflineHijriDate(date: Date): HijriDateInfo {
 /**
  * Offline fallback times for Riyadh / Default city if offline
  */
-function getOfflineFallbackTimings(): PrayerTimings {
+export function getOfflineFallbackTimings(): PrayerTimings {
     return {
         Fajr: "05:08",
         Sunrise: "06:27",

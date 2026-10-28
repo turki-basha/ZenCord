@@ -10,36 +10,50 @@ import { Flex } from "@components/Flex";
 import { Popout, useEffect, useRef, useState } from "@webpack/common";
 import React from "react";
 
-import { formatPrayerTime, getNextPrayer, getPrayerTimes } from "./service";
+import { formatPrayerTime, getNextPrayer, getOfflineFallbackTimings, getOfflineHijriDate, getPrayerTimes } from "./service";
 import { settings } from "./settings";
 import { PRAYER_NAMES, PrayerData } from "./types";
 
 export function PrayerTimesWidget() {
     const buttonRef = useRef<HTMLDivElement>(null);
     const [showPopout, setShowPopout] = useState(false);
-    const [data, setData] = useState<PrayerData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState<PrayerData>(() => {
+        const now = new Date();
+        return {
+            timings: getOfflineFallbackTimings(),
+            hijri: getOfflineHijriDate(now),
+            dateReadable: now.toDateString()
+        };
+    });
 
-    const s = settings.use([
-        "city",
-        "country",
-        "calculationMethod",
-        "format24h",
-        "showArabic",
-        "showNextPrayerCountdown"
-    ]);
+    let s: any = {};
+    try {
+        s = settings.use([
+            "city",
+            "country",
+            "calculationMethod",
+            "format24h",
+            "showArabic",
+            "showNextPrayerCountdown"
+        ]) || {};
+    } catch {
+        s = {};
+    }
 
+    const city = s.city || "Riyadh";
+    const country = s.country || "Saudi Arabia";
+    const calculationMethod = s.calculationMethod || "4";
     const isArabic = s.showArabic !== false;
     const is24h = Boolean(s.format24h);
+    const showCountdown = s.showNextPrayerCountdown !== false;
 
     const loadData = async () => {
-        setLoading(true);
         try {
-            const result = await getPrayerTimes(s.city || "Riyadh", s.country || "Saudi Arabia", s.calculationMethod || "4");
-            setData(result);
-        } finally {
-            setLoading(false);
-        }
+            const result = await getPrayerTimes(city, country, calculationMethod);
+            if (result && result.timings) {
+                setData(result);
+            }
+        } catch { }
     };
 
     useEffect(() => {
@@ -47,9 +61,7 @@ export function PrayerTimesWidget() {
         // Refresh every 30 minutes
         const interval = setInterval(loadData, 1000 * 60 * 30);
         return () => clearInterval(interval);
-    }, [s.city, s.country, s.calculationMethod]);
-
-    if (!data) return null;
+    }, [city, country, calculationMethod]);
 
     const next = getNextPrayer(data.timings);
     const nextMeta = PRAYER_NAMES[next.name] || { ar: next.name, en: next.name, icon: "🕌" };
@@ -75,7 +87,7 @@ export function PrayerTimesWidget() {
                         </span>
                     </div>
                     <div className="zc-prayer-popout-location">
-                        <span>📍 {s.city || "Riyadh"}, {s.country || "Saudi Arabia"}</span>
+                        <span>📍 {city}, {country}</span>
                     </div>
                 </div>
 
@@ -136,7 +148,7 @@ export function PrayerTimesWidget() {
                     <span className="zc-prayer-pill-icon">🕌</span>
                     <span className="zc-prayer-pill-title">{prayerDisplayName}</span>
                     <span className="zc-prayer-pill-time">{formattedNextTime}</span>
-                    {s.showNextPrayerCountdown && (
+                    {showCountdown && (
                         <span className="zc-prayer-pill-countdown">({countdownText})</span>
                     )}
                 </div>
