@@ -2,6 +2,7 @@ dist
 node_modules
 
 *.exe
+!scripts/installer/ZenCordInstaller.exe
 vencord_installer
 
 .idea

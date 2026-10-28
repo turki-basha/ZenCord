@@ -199,3 +199,4 @@ echo -e "${GREEN}${BOLD}      ZenCord Installed Successfully! Enjoy! 🚀    ${N
 echo -e "${GREEN}${BOLD}====================================================${NC}"
 echo -e "\nPlease restart Discord now to start using ZenCord."
 echo -e "All future updates will be applied automatically in the background!\n"
+
