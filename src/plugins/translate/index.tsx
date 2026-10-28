@@ -64,9 +64,10 @@ let tooltipTimeout: any;
 
 export default definePlugin({
     name: "Translate",
-    description: "Translate messages with Google Translate, DeepL or Kagi.",
+    description: "ترجمة فورية للرسائل الواردة والصادرة بجميع اللغات عبر محرك Google مجاناً بدون حدود (Zen Translator)",
     tags: ["Chat", "Utility"],
     authors: [Devs.Ven, Devs.AshtonMemer, Devs.koish1],
+    enabledByDefault: true,
     settings,
     contextMenus: {
         "message": messageCtxPatch

@@ -18,8 +18,9 @@
 
 import "./styles.css";
 
-import { definePluginSettings } from "@api/Settings";
+import { definePluginSettings, useSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { PrayerTimesWidget } from "@plugins/prayerTimes";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { findComponentByCodeLazy } from "@webpack";
@@ -77,6 +78,12 @@ function VencordPopoutButton() {
     );
 }
 
+function PrayerTimesSlot() {
+    const isEnabled = useSettings().plugins.PrayerTimes?.enabled ?? true;
+    if (!isEnabled) return null;
+    return <PrayerTimesWidget />;
+}
+
 export default definePlugin({
     name: "VencordToolbox",
     description: "Adds an elegant Quick Access button to the header for ZenCord settings and actions",
@@ -99,6 +106,9 @@ export default definePlugin({
     TrailingWrapper({ children }: PropsWithChildren) {
         return (
             <>
+                <ErrorBoundary key="zc-prayer-times" noop>
+                    <PrayerTimesSlot />
+                </ErrorBoundary>
                 {children}
                 <ErrorBoundary key="vc-toolbox" noop>
                     <VencordPopoutButton />

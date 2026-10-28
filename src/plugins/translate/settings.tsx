@@ -32,7 +32,7 @@ export const settings = definePluginSettings({
     receivedOutput: {
         type: OptionType.STRING,
         description: "Language incoming messages are translated to",
-        default: "en",
+        default: "ar",
         hidden: true
     },
     sentInput: {
