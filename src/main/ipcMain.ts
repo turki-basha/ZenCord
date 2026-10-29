@@ -35,7 +35,7 @@ import { ALLOWED_PROTOCOLS, QUICK_CSS_PATH, SETTINGS_DIR, THEMES_DIR } from "./u
 import { ensureSafePath } from "./utils/ensureSafePath";
 import { makeLinksOpenExternally } from "./utils/externalLinks";
 
-const RENDERER_CSS_PATH = join(__dirname, IS_VESKTOP ? "vencordDesktopRenderer.css" : "renderer.css");
+const RENDERER_CSS_PATH = join(__dirname, IS_VESKTOP ? (existsSync(join(__dirname, "zencordDesktopRenderer.css")) ? "zencordDesktopRenderer.css" : "vencordDesktopRenderer.css") : "renderer.css");
 
 mkdirSync(THEMES_DIR, { recursive: true });
 
@@ -160,7 +160,7 @@ ipcMain.handle(IpcEvents.OPEN_MONACO_EDITOR, async () => {
         darkTheme: true,
         backgroundColor: nativeTheme.shouldUseDarkColors ? "#1e1e1e" : "white",
         webPreferences: {
-            preload: join(__dirname, IS_DISCORD_DESKTOP ? "preload.js" : "vencordDesktopPreload.js"),
+            preload: join(__dirname, IS_DISCORD_DESKTOP ? "preload.js" : (existsSync(join(__dirname, "zencordDesktopPreload.js")) ? "zencordDesktopPreload.js" : "vencordDesktopPreload.js")),
             contextIsolation: true,
             nodeIntegration: false,
             sandbox: false

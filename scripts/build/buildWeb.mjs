@@ -103,7 +103,7 @@ const buildConfigs = [
             IS_USERSCRIPT: "true",
             window: "unsafeWindow",
         },
-        outfile: "dist/Vencord.user.js",
+        outfile: "dist/ZenCord.user.js",
         banner: {
             js: readFileSync("browser/userscript.meta.js", "utf-8").replace("%version%", `${VERSION}.${new Date().getTime()}`)
         },
@@ -175,10 +175,10 @@ async function buildExtension(target, files) {
     console.info("Unpacked Extension written to dist/" + target);
 }
 
-const appendCssRuntime = readFile("dist/Vencord.user.css", "utf-8").then(content => {
+const appendCssRuntime = readFile("dist/ZenCord.user.css", "utf-8").then(content => {
     const cssRuntime = `unsafeWindow._vcUserScriptRendererCss=\`${content.replaceAll("`", "\\`")}\``;
 
-    return appendFile("dist/Vencord.user.js", cssRuntime);
+    return appendFile("dist/ZenCord.user.js", cssRuntime);
 });
 
 if (!process.argv.includes("--skip-extension")) {

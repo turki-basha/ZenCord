@@ -53,10 +53,13 @@ if (IS_VESKTOP || !IS_VANILLA) {
 
             switch (url) {
                 case "renderer.js.map":
+                case "zencordDesktopRenderer.js.map":
                 case "vencordDesktopRenderer.js.map":
                 case "preload.js.map":
+                case "zencordDesktopPreload.js.map":
                 case "vencordDesktopPreload.js.map":
                 case "patcher.js.map":
+                case "zencordDesktopMain.js.map":
                 case "vencordDesktopMain.js.map":
                     return net.fetch(pathToFileURL(join(__dirname, url)).toString());
                 default:

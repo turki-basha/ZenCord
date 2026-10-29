@@ -50,7 +50,7 @@ jobs:
       - name: Clean up unnecessary files
         shell: bash
         run: |
-          rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
+          rm -rf dist/*-unpacked dist/vendor ZenCord.user.css zencordDesktopRenderer.css zencordDesktopRenderer.css.map Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
       - name: Preserve Fixed Cross-Platform Installers (Windows, macOS, Linux)
         shell: bash

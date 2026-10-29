@@ -167,12 +167,12 @@ const buildConfigs = ([
         }
     },
 
-    // Vencord Desktop main & renderer & preload
+    // ZenCord Desktop main & renderer & preload
     {
         ...nodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
-        outfile: "dist/vencordDesktopMain.js",
-        footer: { js: "//# sourceURL=file:///VencordDesktopMain\n" + sourceMapFooter("vencordDesktopMain") },
+        outfile: "dist/zencordDesktopMain.js",
+        footer: { js: "//# sourceURL=file:///ZenCordDesktopMain\n" + sourceMapFooter("zencordDesktopMain") },
         sourcemap,
         plugins: [
             ...nodeCommonOpts.plugins,
@@ -187,10 +187,10 @@ const buildConfigs = ([
     {
         ...commonOpts,
         entryPoints: ["src/Vencord.ts"],
-        outfile: "dist/vencordDesktopRenderer.js",
+        outfile: "dist/zencordDesktopRenderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: { js: "//# sourceURL=file:///VencordDesktopRenderer\n" + sourceMapFooter("vencordDesktopRenderer") },
+        footer: { js: "//# sourceURL=file:///ZenCordDesktopRenderer\n" + sourceMapFooter("zencordDesktopRenderer") },
         globalName: "Vencord",
         sourcemap,
         plugins: [
@@ -206,8 +206,8 @@ const buildConfigs = ([
     {
         ...nodeCommonOpts,
         entryPoints: ["src/preload.ts"],
-        outfile: "dist/vencordDesktopPreload.js",
-        footer: { js: "//# sourceURL=file:///VencordPreload\n" + sourceMapFooter("vencordDesktopPreload") },
+        outfile: "dist/zencordDesktopPreload.js",
+        footer: { js: "//# sourceURL=file:///ZenCordPreload\n" + sourceMapFooter("zencordDesktopPreload") },
         sourcemap,
         define: {
             ...defines,
