@@ -6,7 +6,7 @@
 
 import { Settings } from "@api/Settings";
 
-export const translations: Record<string, string> = {
+export const zencordTranslations: Record<string, string> = {
     // Core Tabs & Navigation
     "ZenCord Settings": "إعدادات زن كورد",
     "Vencord Settings": "إعدادات زن كورد",
@@ -69,6 +69,192 @@ export const translations: Record<string, string> = {
     "Fake Video": "كاميرا وهمية (Fake Video)",
     "Automatically fake mute whenever Fake Deafen is enabled": "تفعيل الميوت الوهمي تلقائياً عند تفعيل الديفن الوهمي",
     "Show a quick popup toast notification when toggling fake states": "إظهار إشعار سريع عند تفعيل أو تعطيل الحالة الوهمية"
+};
+
+export const discordSettingsTranslations: Record<string, string> = {
+    // Left Sidebar Categories (User Settings)
+    "USER SETTINGS": "إعدادات المستخدم",
+    "User Settings": "إعدادات المستخدم",
+    "My Account": "حسابي",
+    "Profiles": "الملفات الشخصية",
+    "User Profile": "الملف الشخصي",
+    "Server Profiles": "الملفات الشخصية بالسيرفرات",
+    "Privacy & Safety": "الخصوصية والأمان",
+    "Family Center": "مركز العائلة",
+    "Authorized Apps": "التطبيقات المعتمدة",
+    "Devices": "الأجهزة المتصلة",
+    "Connections": "الحسابات المرتبطة",
+    "Clips": "المقاطع (Clips)",
+    "Friend Requests": "طلبات الصداقة",
+
+    // Billing Categories
+    "BILLING SETTINGS": "إعدادات الفوترة والاشتراكات",
+    "Server Boost": "دعم السيرفرات (Boost)",
+    "Subscriptions": "الاشتراكات",
+    "Gift Inventory": "مخزون الهدايا",
+    "Billing": "الفواتير وطرق الدفع",
+
+    // App Settings Categories
+    "APP SETTINGS": "إعدادات التطبيق",
+    "Appearance": "المظهر",
+    "Accessibility": "إمكانية الوصول",
+    "Voice & Video": "الصوت والفيديو",
+    "Text & Images": "النصوص والصور",
+    "Notifications": "الإشعارات",
+    "Keybinds": "اختصارات المفاتيح",
+    "Language": "اللغة",
+    "Windows Settings": "إعدادات ويندوز",
+    "Linux Settings": "إعدادات لينكس",
+    "Streamer Mode": "وضع البث (Streamer Mode)",
+    "Advanced": "إعدادات متقدمة",
+
+    // Activity Settings Categories
+    "ACTIVITY SETTINGS": "إعدادات النشاط",
+    "Activity Privacy": "خصوصية النشاط",
+    "Registered Games": "الألعاب المسجلة",
+    "Log Out": "تسجيل الخروج",
+    "Logging Out": "جارٍ تسجيل الخروج...",
+
+    // My Account Section
+    "Display Name": "الاسم الظاهر",
+    "Username": "اسم المستخدم",
+    "Email": "البريد الإلكتروني",
+    "Phone Number": "رقم الهاتف",
+    "Reveal": "إظهار",
+    "Hide": "إخفاء",
+    "Edit": "تعديل",
+    "Password and Authentication": "كلمة المرور والمصادقة",
+    "Change Password": "تغيير كلمة المرور",
+    "Current Password": "كلمة المرور الحالية",
+    "New Password": "كلمة المرور الجديدة",
+    "Confirm Password": "تأكيد كلمة المرور",
+    "Two-Factor Authentication": "المصادقة الثنائية (2FA)",
+    "Enable Two-Factor Auth": "تفعيل المصادقة الثنائية",
+    "View Backup Codes": "عرض رموز النسخ الاحتياطي",
+    "Account Removal": "حذف أو تعطيل الحساب",
+    "Disable Account": "تعطيل الحساب",
+    "Delete Account": "حذف الحساب",
+
+    // Profiles Section
+    "About Me": "نبذة عني",
+    "Pronouns": "الضمائر",
+    "Avatar": "الصورة الرمزية",
+    "Profile Banner": "بانر الملف الشخصي",
+    "Change Avatar": "تغيير الصورة الرمزية",
+    "Remove Avatar": "إزالة الصورة الرمزية",
+    "Change Banner": "تغيير البانر",
+    "Profile Theme": "سمة الملف الشخصي",
+    "Primary Color": "اللون الأساسي",
+    "Accent Color": "اللون الثانوي",
+    "Custom Status": "الحالة المخصصة",
+    "Preview": "معاينة",
+
+    // Appearance Section
+    "THEME": "المظهر العام",
+    "Theme": "المظهر العام",
+    "Dark": "داكن",
+    "Light": "فاتح",
+    "Midnight": "أسود حالك (Midnight)",
+    "Darker": "داكن أكثر",
+    "Sync with computer": "مزامنة مع إعدادات الجهاز",
+    "MESSAGE DISPLAY": "طريقة عرض الرسائل",
+    "Message Display": "طريقة عرض الرسائل",
+    "Cozy": "مريح (مع الصور الرمزية)",
+    "Compact": "مدمج (مساحة أقل)",
+    "CHAT FONT SCALING": "حجم خط المحادثة",
+    "Chat Font Scaling": "حجم خط المحادثة",
+    "SPACE BETWEEN MESSAGE GROUPS": "المسافة بين مجموعات الرسائل",
+    "Space Between Message Groups": "المسافة بين مجموعات الرسائل",
+    "ZOOM LEVEL": "مستوى التكبير",
+    "Zoom Level": "مستوى التكبير",
+
+    // Voice & Video Section
+    "VOICE SETTINGS": "إعدادات الصوت",
+    "INPUT DEVICE": "جهاز الإدخال (الميكروفون)",
+    "OUTPUT DEVICE": "جهاز الإخراج (السماعات)",
+    "Input Device": "جهاز الإدخال (الميكروفون)",
+    "Output Device": "جهاز الإخراج (السماعات)",
+    "INPUT VOLUME": "مستوى صوت الميكروفون",
+    "OUTPUT VOLUME": "مستوى صوت السماعات",
+    "Input Volume": "مستوى صوت الميكروفون",
+    "Output Volume": "مستوى صوت السماعات",
+    "MIC TEST": "اختبار الميكروفون",
+    "Mic Test": "اختبار الميكروفون",
+    "Let's Check": "بدء الفحص",
+    "Stop Testing": "إيقاف الفحص",
+    "INPUT MODE": "وضع الإدخال",
+    "Input Mode": "وضع الإدخال",
+    "Voice Activity": "التحسس الصوتي التلقائي",
+    "Push to Talk": "الضغط للتحدث (Push to Talk)",
+    "Shortcut": "زر الاختصار",
+    "Record Keybind": "تسجيل الاختصار",
+    "Automatically determine input sensitivity": "تحديد حساسية الميكروفون تلقائياً",
+    "VIDEO SETTINGS": "إعدادات الفيديو والكاميرا",
+    "CAMERA": "الكاميرا",
+    "Camera": "الكاميرا",
+    "Test Video": "اختبار الكاميرا",
+    "ADVANCED": "خيارات متقدمة",
+    "Echo Cancellation": "إلغاء صدى الصوت",
+    "Noise Suppression": "حجب الضوضاء",
+    "Advanced Voice Activity": "التحسس الصوتي المتقدم",
+    "Automatic Gain Control": "التحكم التلقائي بمستوى الصوت",
+    "Attenuation": "خفض أصوات البرامج الأخرى",
+    "Audio Subsystem": "النظام الصوتي الفرعي",
+
+    // Text & Images Section
+    "Display images, videos, and lolcats": "عرض الصور ومقاطع الفيديو والوسائط",
+    "When uploaded directly to Discord": "عند الرفع المباشر إلى ديسكورد",
+    "When posted as links to chat": "عند النشر كروابط في المحادثة",
+    "Show embeds and website preview info from links": "إظهار المعاينات ومعلومات الروابط",
+    "Show emoji reactions on messages": "إظهار التفاعلات على الرسائل",
+    "Automatically convert emoticons in your messages to emoji": "تحويل الرموز التعبيرية تلقائياً إلى إيموجي",
+
+    // Notifications Section
+    "Enable Desktop Notifications": "تفعيل إشعارات سطح المكتب",
+    "Enable Unread Message Badge": "تفعيل شارة الرسائل غير المقروءة",
+    "Enable Taskbar Flashing": "وميض شريط المهام عند وصول إشعار",
+    "Inactive Timeout": "مهلة عدم النشاط",
+    "Sounds": "الأصوات",
+
+    // Keybinds Section
+    "Keyboard Shortcuts": "اختصارات لوحة المفاتيح",
+    "Add a Keybind": "إضافة اختصار جديد",
+    "Action": "الإجراء",
+    "Keybind": "زر الاختصار",
+
+    // Windows Settings Section
+    "Open Discord": "فتح ديسكورد عند تشغيل الجهاز",
+    "Start Minimized": "البدء مصغراً في الخلفية",
+    "Minimize to Tray": "التصغير إلى شريط المهام (Tray)",
+
+    // Advanced Section
+    "Developer Mode": "وضع المطورين (Developer Mode)",
+    "Hardware Acceleration": "تسريع العتاد (Hardware Acceleration)",
+    "Application Test Mode": "وضع اختبار التطبيقات",
+
+    // Common Buttons & Modals inside Settings
+    "Save Changes": "حفظ التغييرات",
+    "Reset": "إعادة ضبط",
+    "Cancel": "إلغاء",
+    "Confirm": "تأكيد",
+    "Done": "تم",
+    "Close": "إغلاق",
+    "Back": "رجوع",
+    "Next": "التالي",
+    "Okay": "حسناً",
+    "Got It": "فهمت ذلك",
+    "Learn More": "معرفة المزيد",
+    "Are you sure?": "هل أنت متأكد؟",
+    "Delete": "حذف",
+    "Remove": "إزالة",
+    "Enable": "تفعيل",
+    "Disable": "تعطيل",
+    "ESC": "خروج (ESC)"
+};
+
+export const translations: Record<string, string> = {
+    ...zencordTranslations,
+    ...discordSettingsTranslations
 };
 
 export const pluginNameTranslations: Record<string, { name: string; desc: string }> = {
@@ -845,7 +1031,7 @@ export const pluginNameTranslations: Record<string, { name: string; desc: string
 };
 
 export function getPluginI18n(plugin: { name: string; description: string }) {
-    if (Settings.plugins?.ArabicUI?.enabled) {
+    if (Settings.plugins?.ArabicUI?.enabled && Settings.plugins?.ArabicUI?.translatePluginList !== false) {
         const trans = pluginNameTranslations[plugin.name]
             || Object.entries(pluginNameTranslations).find(([k]) => k.toLowerCase() === plugin.name.toLowerCase())?.[1];
         if (trans) {

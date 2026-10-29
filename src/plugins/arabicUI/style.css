@@ -3,8 +3,23 @@
 .vc-arabic-active,
 .vc-arabic-active .vc-settings-tab,
 .vc-arabic-active .vc-settings-card,
-.vc-arabic-active [data-tab-id*="vencord"] {
+.vc-arabic-active [data-tab-id*="vencord"],
+.vc-arabic-active [class*="standardSidebarView"],
+.vc-arabic-active [class*="sidebarRegion"],
+.vc-arabic-active [class*="contentRegion"],
+.vc-arabic-active [class*="settings_"] {
     font-family: Cairo, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Ensure code blocks, inputs and icons preserve their original monospace and font icons */
+.vc-arabic-active code,
+.vc-arabic-active pre,
+.vc-arabic-active [class*="codeBlock"],
+.vc-arabic-active [class*="codeContainer"],
+.vc-arabic-active [class*="markup_"] code,
+.vc-arabic-active [class*="icon_"],
+.vc-arabic-active svg text {
+    font-family: Consolas, 'Courier New', monospace !important;
 }
 
 .vc-arabic-active [data-tab-id*="vencord"] {
