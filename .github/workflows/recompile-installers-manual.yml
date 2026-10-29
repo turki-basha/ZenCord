@@ -1,7 +1,14 @@
 name: Recompile Installers (Manual Dispatch Only)
 
-# ONLY run this manually if you explicitly need to recompile the installers.
-# Keeping the installers static on normal builds preserves their hash reputation on Windows, macOS, and Linux.
+# ==============================================================================
+# ⚠️ WORKFLOW DISABLED TEMPORARILY FOR SMARTSCREEN & FILE REPUTATION ACCUMULATION
+# ⚠️ تم إيقاف بناء ملفات التثبيت مؤقتاً بالكامل للحفاظ على ثبات الـ SHA256 وتجميع سمعة Windows SmartScreen
+# ==============================================================================
+# All ZenCord installers (ZenCordInstaller.exe, ZenCordInstaller.dmg, ZenCordInstaller-linux.AppImage, etc.)
+# are permanently locked and frozen in the 'latest' release. DO NOT recompile or build new installers
+# because every recompilation generates a new binary hash which immediately resets the Windows SmartScreen
+# and antivirus reputation counter.
+# ==============================================================================
 
 on:
   workflow_dispatch:
@@ -10,85 +17,97 @@ permissions:
   contents: write
 
 jobs:
-  build-linux-installer:
+  disabled-notice:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
-      - name: Clone and Customize Installer
+      - name: Notice
         run: |
-          git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
-          cd installer-src
-          sed -i 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
-          sed -i 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
-          sed -i 's|"Vencord"|"ZenCord"|g' patcher.go
-          sed -i 's|Vencord|ZenCord|g' constants.go
-          sed -i 's|Vencord|ZenCord|g' cli.go
+          echo "⚠️ Installer builds are temporarily DISABLED to accumulate permanent Windows SmartScreen and Gatekeeper reputation."
+          echo "⚠️ All installers remain static with fixed SHA256 hashes."
 
-      - name: Build Linux CLI Installer
-        run: |
-          cd installer-src
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -tags "cli static" -ldflags "-s -w" -o ../ZenCordInstallerCli-linux
-          chmod +x ../ZenCordInstallerCli-linux
-
-      - name: Build Linux GUI / AppImage Package
-        run: |
-          cd installer-src
-          sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xorg-dev libasound2-dev || true
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags "static" -ldflags "-s -w" -o ../ZenCordInstaller-linux.AppImage || cp ../ZenCordInstallerCli-linux ../ZenCordInstaller-linux.AppImage
-          chmod +x ../ZenCordInstaller-linux.AppImage
-
-      - name: Upload Linux Installers to Latest Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload latest ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage --clobber || true
-
-  build-mac-installer:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
-      - name: Clone and Customize Installer
-        run: |
-          git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
-          cd installer-src
-          sed -i '' 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
-          sed -i '' 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
-          sed -i '' 's|"Vencord"|"ZenCord"|g' patcher.go
-          sed -i '' 's|Vencord|ZenCord|g' constants.go
-          sed -i '' 's|Vencord|ZenCord|g' cli.go
-
-      - name: Build macOS Universal CLI (Apple Silicon + Intel)
-        run: |
-          cd installer-src
-          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -tags "cli static" -ldflags "-s -w" -o installer-amd64
-          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -tags "cli static" -ldflags "-s -w" -o installer-arm64
-          lipo -create installer-amd64 installer-arm64 -output ../ZenCordInstallerCli-darwin
-          chmod +x ../ZenCordInstallerCli-darwin
-
-      - name: Build macOS GUI DMG
-        run: |
-          cd installer-src
-          mkdir -p build/ZenCordInstaller.app/Contents/MacOS
-          mkdir -p build/ZenCordInstaller.app/Contents/Resources
-          cp -R macos/VencordInstaller.app/* build/ZenCordInstaller.app/ || true
-          cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/ZenCordInstaller
-          cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/VencordInstaller || true
-          hdiutil create -volname "ZenCord Installer" -srcfolder build/ZenCordInstaller.app -ov -format UDZO ../ZenCordInstaller.dmg
-
-      - name: Upload macOS Installers to Latest Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload latest ZenCordInstallerCli-darwin ZenCordInstaller.dmg --clobber || true
+# ==============================================================================
+# TEMPORARILY COMMENTED OUT JOBS BELOW (DO NOT UNCOMMENT UNTIL REPUTATION IS READY)
+# ==============================================================================
+# jobs:
+#   build-linux-installer:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+# 
+#       - name: Setup Go
+#         uses: actions/setup-go@v5
+#         with:
+#           go-version: '1.22'
+# 
+#       - name: Clone and Customize Installer
+#         run: |
+#           git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
+#           cd installer-src
+#           sed -i 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
+#           sed -i 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
+#           sed -i 's|"Vencord"|"ZenCord"|g' patcher.go
+#           sed -i 's|Vencord|ZenCord|g' constants.go
+#           sed -i 's|Vencord|ZenCord|g' cli.go
+# 
+#       - name: Build Linux CLI Installer
+#         run: |
+#           cd installer-src
+#           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -tags "cli static" -ldflags "-s -w" -o ../ZenCordInstallerCli-linux
+#           chmod +x ../ZenCordInstallerCli-linux
+# 
+#       - name: Build Linux GUI / AppImage Package
+#         run: |
+#           cd installer-src
+#           sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xorg-dev libasound2-dev || true
+#           CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags "static" -ldflags "-s -w" -o ../ZenCordInstaller-linux.AppImage || cp ../ZenCordInstallerCli-linux ../ZenCordInstaller-linux.AppImage
+#           chmod +x ../ZenCordInstaller-linux.AppImage
+# 
+#       - name: Upload Linux Installers to Latest Release
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           gh release upload latest ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage --clobber || true
+# 
+#   build-mac-installer:
+#     runs-on: macos-latest
+#     steps:
+#       - uses: actions/checkout@v4
+# 
+#       - name: Setup Go
+#         uses: actions/setup-go@v5
+#         with:
+#           go-version: '1.22'
+# 
+#       - name: Clone and Customize Installer
+#         run: |
+#           git clone --depth 1 https://github.com/Vendicated/VencordInstaller.git installer-src
+#           cd installer-src
+#           sed -i '' 's|Vendicated/Vencord|turki-basha/ZenCord|g' constants.go
+#           sed -i '' 's|https://vencord.dev/releases/vencord|https://api.github.com/repos/turki-basha/ZenCord/releases/latest|g' constants.go
+#           sed -i '' 's|"Vencord"|"ZenCord"|g' patcher.go
+#           sed -i '' 's|Vencord|ZenCord|g' constants.go
+#           sed -i '' 's|Vencord|ZenCord|g' cli.go
+# 
+#       - name: Build macOS Universal CLI (Apple Silicon + Intel)
+#         run: |
+#           cd installer-src
+#           CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -tags "cli static" -ldflags "-s -w" -o installer-amd64
+#           CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -tags "cli static" -ldflags "-s -w" -o installer-arm64
+#           lipo -create installer-amd64 installer-arm64 -output ../ZenCordInstallerCli-darwin
+#           chmod +x ../ZenCordInstallerCli-darwin
+# 
+#       - name: Build macOS GUI DMG
+#         run: |
+#           cd installer-src
+#           mkdir -p build/ZenCordInstaller.app/Contents/MacOS
+#           mkdir -p build/ZenCordInstaller.app/Contents/Resources
+#           cp -R macos/VencordInstaller.app/* build/ZenCordInstaller.app/ || true
+#           cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/ZenCordInstaller
+#           cp ../ZenCordInstallerCli-darwin build/ZenCordInstaller.app/Contents/MacOS/VencordInstaller || true
+#           hdiutil create -volname "ZenCord Installer" -srcfolder build/ZenCordInstaller.app -ov -format UDZO ../ZenCordInstaller.dmg
+# 
+#       - name: Upload macOS Installers to Latest Release
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           gh release upload latest ZenCordInstallerCli-darwin ZenCordInstaller.dmg --clobber || true

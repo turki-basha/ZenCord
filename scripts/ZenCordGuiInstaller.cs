@@ -1,3 +1,10 @@
+// ==============================================================================
+// ⚠️ DO NOT RECOMPILE - FROZEN FOR WINDOWS SMARTSCREEN REPUTATION ACCUMULATION
+// ⚠️ تم قفل وإيقاف بناء هذا الملف مؤقتاً لتجميع سمعة Windows SmartScreen
+// The existing ZenCordInstaller.exe binary in the latest release is static and permanent.
+// Recompiling this will produce a new hash and immediately trigger SmartScreen untrusted warnings.
+// ==============================================================================
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
