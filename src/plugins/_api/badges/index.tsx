@@ -18,7 +18,7 @@
 
 import "./fixDiscordBadgePadding.css";
 
-import { _getBadges, BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Badges";
+import { _getBadges, BadgePosition, BadgeRarity, BadgeUserArgs, DirectoryBadge, ProfileBadge } from "@api/Badges";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { CopyIcon, LinkIcon } from "@components/Icons";
@@ -34,6 +34,26 @@ import {
 } from "./zenBadges";
 
 let DonorBadges = {} as ZenBadgesDatabase;
+let DirectoryBadges = {} as Record<string, DirectoryBadge>;
+
+function toDirectoryBadge(b: ProfileBadge, userId: string): DirectoryBadge {
+    const id = `zc-${userId}-${b.id}`;
+
+    return DirectoryBadges[id] ??= {
+        badge_id: id,
+        name: b.name ?? b.description ?? "",
+        description: b.detail ?? b.description ?? b.name ?? "",
+        info_label: b.infoLabel ?? "ZenCord",
+        rarity: b.rarity ?? BadgeRarity.COMMON,
+        simple_icon_url: b.iconSrc!,
+        complex_icon_static_url: b.largeIconSrc ?? b.iconSrc!,
+        obtained_at: b.obtainedAt,
+        is_earnable: false,
+        owned: true,
+        hidden: false,
+        tiers: []
+    };
+}
 
 export const ZENCORD_API_BADGES_URL = "https://www.zencord.site/api/badges";
 export const ZENCORD_API_DIRECT_URL = "https://zencord.site/api/badges";
@@ -143,6 +163,10 @@ export default definePlugin({
                 {
                     match: /href:(\i)\.link/,
                     replace: "...$self.getBadgeMouseEventHandlers($1),$&"
+                },
+                {
+                    match: /legacyBadgeId:(\i),userId:(\i),.{0,100}?=\i,\i=\(0,\i\.\i\)\(\1\)/,
+                    replace: "$&??$self.getDirectoryBadgeId($1,$2)"
                 }
             ]
         },
@@ -151,6 +175,20 @@ export default definePlugin({
             replacement: {
                 match: /getBadges\(\)\{.{0,100}?return\[/,
                 replace: "$&...$self.getBadges(this),"
+            }
+        },
+        {
+            find: '"BadgeDirectoryStore"',
+            replacement: {
+                match: /getBadgeById\((\i),(\i)\)\{/,
+                replace: "$&const zencordBadge=$self.getDirectoryBadge($1);if(zencordBadge)return zencordBadge;"
+            }
+        },
+        {
+            find: "badge_directory_closed",
+            replacement: {
+                match: /(\i\.\i\.getBadges\((\i)\))(?=:\[\],\[\2\]\))/,
+                replace: "[...$1,...$self.getDirectoryBadges($2)]"
             }
         }
     ],
@@ -176,6 +214,26 @@ export default definePlugin({
 
     async stop() {
         clearInterval(intervalId);
+        DirectoryBadges = {};
+    },
+
+    getDirectoryBadge(id: string) {
+        return DirectoryBadges[id];
+    },
+
+    getDirectoryBadges(userId: string) {
+        return this.getBadges({ userId, guildId: "" })
+            .filter(b => b.iconSrc)
+            .map(b => toDirectoryBadge(b, userId));
+    },
+
+    getDirectoryBadgeId(badgeId: string, userId?: string) {
+        if (!userId) return;
+
+        const badge = this.getBadges({ userId, guildId: "" })
+            .find(b => b.id === badgeId && b.iconSrc);
+
+        if (badge) return toDirectoryBadge(badge, userId).badge_id;
     },
 
     getBadges(profile: { userId: string; guildId: string; }) {

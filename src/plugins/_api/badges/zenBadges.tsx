@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Badges";
+import { BadgePosition, BadgeRarity, BadgeUserArgs, ProfileBadge } from "@api/Badges";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { CopyIcon, LinkIcon } from "@components/Icons";
@@ -153,12 +153,20 @@ export function createZenBadgeFromDb(entry: ZenBadgeDbEntry, index: number, user
 
     const iconSrc = entry.badge || defaultIcon;
     const tooltip = entry.tooltip || defaultTitle;
+    const rarity = type === "developer"
+        ? BadgeRarity.MYTHIC
+        : (type === "vip" ? BadgeRarity.EPIC : (type === "bot" ? BadgeRarity.RARE : BadgeRarity.COMMON));
 
     return {
         id: `zencord_db_badge_${userId}_${index}`,
         key: `zencord_${userId}_${index}`,
         description: tooltip,
+        name: tooltip,
+        detail: defaultDescription,
+        infoLabel: "ZenCord",
+        rarity,
         iconSrc,
+        largeIconSrc: iconSrc,
         icon: iconSrc,
         position: BadgePosition.START,
         props: {

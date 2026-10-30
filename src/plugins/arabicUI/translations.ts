@@ -8,10 +8,15 @@ import { Settings } from "@api/Settings";
 
 export const zencordTranslations: Record<string, string> = {
     // Core Tabs & Navigation
+    "ZenCord": "زن كورد",
+    "Vencord": "زن كورد",
     "ZenCord Settings": "إعدادات زن كورد",
     "Vencord Settings": "إعدادات زن كورد",
     "Plugins": "الإضافات البرمجية",
     "Themes": "الثيمات والمظاهر",
+    "Performance": "الأداء والسرعة",
+    "ZenCord Performance": "أداء زن كورد",
+    "ZenCord Performance Engine": "محرك أداء زن كورد",
     "Updater": "محدث البرنامج",
     "ZenCord Updater": "محدث زن كورد",
     "Cloud": "المزامنة السحابية",
@@ -249,7 +254,122 @@ export const discordSettingsTranslations: Record<string, string> = {
     "Remove": "إزالة",
     "Enable": "تفعيل",
     "Disable": "تعطيل",
-    "ESC": "خروج (ESC)"
+    "ESC": "خروج (ESC)",
+
+    // Password & Security & Account Details
+    "Password & Security": "كلمة المرور والأمان",
+    "Password": "كلمة المرور",
+    "Multi-Factor Authentication": "المصادقة المتعددة (2FA)",
+    "Logged-in Devices": "الأجهزة المسجلة",
+    "Account Standing": "حالة الحساب",
+    "Standing": "حالة الحساب",
+    "Good": "جيدة",
+    "All good! You don't have any active violations.": "كل شيء على ما يرام! ليس لديك أي مخالفات نشطة.",
+    "View Standing Details": "عرض تفاصيل حالة الحساب",
+    "Security": "الأمان",
+    "Security Keys": "مفاتيح الأمان",
+    "Authenticator App": "تطبيق المصادقة",
+    "SMS Backup Authentication": "المصادقة الاحتياطية عبر الرسائل القصيرة (SMS)",
+    "Backup Codes": "رموز النسخ الاحتياطي",
+    "Disabling your account means you can recover it at any time after taking this action.": "تعطيل حسابك يعني أنه يمكنك استعادته في أي وقت لاحقاً.",
+
+    // Windows & System Settings
+    "General": "عام",
+    "Automatically open Discord when your computer starts up": "تشغيل ديسكورد تلقائياً عند بدء تشغيل الكمبيوتر",
+    "Start Discord minimized": "تشغيل ديسكورد مصغراً",
+    "Start Discord in the background, out of your way.": "تشغيل ديسكورد في الخلفية لتجنب مقاطعتك.",
+    "Minimize Discord to System Tray": "تصغير ديسكورد إلى شريط المهام (System Tray)",
+    "Clicking X minimizes Discord instead of closing it completely.": "الضغط على زر X يقوم بتصغير ديسكورد بدلاً من إغلاقه بالكامل.",
+    "Enable Hardware Acceleration": "تفعيل تسريع العتاد (Hardware Acceleration)",
+    "Uses your GPU to make Discord run more smoothly. Turn this off if you're experiencing visual glitches like frame drops in games or performance problems.": "يستخدم بطاقة الرسوميات (GPU) لجعل ديسكورد يعمل بسلاسة أكبر. عطل هذا الخيار إذا واجهت مشاكل أو انخفاضاً في الإطارات أثناء الألعاب.",
+
+    // Custom Keybinds Section
+    "Custom Keybinds": "اختصارات المفاتيح المخصصة",
+    "Keybinds are custom keyboard shortcuts that let you perform specific actions in Discord without needing to click through menus.": "اختصارات المفاتيح هي اختصارات لوحة مفاتيح مخصصة تتيح لك تنفيذ إجراءات محددة في ديسكورد بضغطة زر دون الحاجة للتنقل عبر القوائم.",
+    "Keybinds are disabled while this page is visible.": "يتم تعطيل اختصارات المفاتيح مؤقتاً أثناء التواجد في هذه الصفحة.",
+    "Keybind Action": "إجراء الاختصار",
+    "Edit Keybind": "تعديل الاختصار",
+    "Add Keybind": "إضافة اختصار",
+    "Save Clip": "حفظ كليب",
+    "Clips the last 30 seconds to 2 minutes of your stream, depending on your settings.": "يقوم بحفظ آخر 30 ثانية إلى دقيقتين من البث، حسب إعداداتك.",
+    "Unassigned": "غير محدد",
+    "Push to Talk (Normal)": "الضغط للتحدث (عادي)",
+    "Push to Talk (Priority)": "الضغط للتحدث (أولوية)",
+    "Push to Mute": "الضغط لكتم الصوت",
+    "Toggle Mute": "تبديل كتم الصوت (ميوت)",
+    "Toggle Deafen": "تبديل تعطيل السمع (ديفن)",
+    "Toggle Streamer Mode": "تبديل وضع البث",
+    "Toggle Overlay": "تبديل الأوفرلاي (Overlay)",
+    "Toggle Overlay Lock": "قفل الأوفرلاي",
+    "Activate Overlay Chat": "تفعيل شات الأوفرلاي",
+    "Toggle Screen Share": "تبديل مشاركة الشاشة",
+    "Navigate back": "الرجوع للخلف",
+    "Navigate forward": "التقدم للأمام",
+
+    // Profiles Section
+    "You can use markdown and links if you'd like.": "يمكنك استخدام تنسيقات Markdown والروابط إذا أردت.",
+    "Avatar Decoration": "زينة الصورة الرمزية",
+    "Change Decoration": "تغيير الزينة",
+    "Profile Effect": "تأثير الملف الشخصي",
+    "Change Effect": "تغيير التأثير",
+    "Choose a server to customize your profile for that server.": "اختر سيرفراً لتخصيص ملفك الشخصي داخله فقط.",
+    "Badges": "الشارات",
+    "Primary": "الأساسي",
+    "Accent": "الثانوي",
+
+    // Voice & Video Section
+    "Voice Processing": "معالجة الصوت",
+    "Having mic issues? Check our guide": "هل تواجه مشاكل في الميكروفون؟ راجع دليل المساعدة",
+    "Standard": "قياسي",
+    "Legacy": "قديم",
+    "Experimental": "تجريبي",
+
+    // Privacy & Safety Section
+    "Direct Message Safety": "أمان الرسائل المباشرة",
+    "Filter direct messages from non-friends": "تصفية الرسائل المباشرة من غير الأصدقاء",
+    "Filter all direct messages": "تصفية جميع الرسائل المباشرة",
+    "Do not filter direct messages": "عدم تصفية الرسائل المباشرة",
+    "Server Privacy Defaults": "إعدادات خصوصية السيرفرات الافتراضية",
+    "Allow direct messages from server members": "السماح بالرسائل المباشرة من أعضاء السيرفر",
+    "Allow activity status to show in servers": "إظهار حالة النشاط داخل السيرفرات",
+    "How We Use Your Data": "كيفية استخدام بياناتك",
+    "Use data to improve Discord": "استخدام البيانات لتحسين ديسكورد",
+    "Use data to customize my Discord experience": "استخدام البيانات لتخصيص تجربتك",
+    "Request Data": "طلب نسخة من بياناتي",
+
+    // Accessibility Section
+    "Saturation": "تشبع الألوان",
+    "Role Colors": "ألوان الرتب",
+    "Show role colors in names": "إظهار ألوان الرتب على الأسماء",
+    "Show role colors next to names": "إظهار ألوان الرتب بجانب الأسماء",
+    "Don't show role colors": "عدم إظهار ألوان الرتب",
+    "Reduced Motion": "تقليل الحركة والانتقالات",
+    "Enable Reduced Motion": "تفعيل تقليل الحركة",
+    "Sync with computer settings": "مزامنة مع إعدادات النظام",
+    "Stickers": "الستيكرات",
+    "Always animate": "متحركة دائماً",
+    "Animate on interaction": "التحريك عند التفاعل أو التحويم",
+    "Never animate": "عدم التحريك إطلاقاً",
+    "Text-to-Speech Rate": "سرعة قراءة النصوص (TTS)",
+
+    // Devices Section
+    "Log Out All Known Devices": "تسجيل الخروج من جميع الأجهزة المعروفة",
+    "Current Device": "الجهاز الحالي",
+    "Log Out of Device": "تسجيل الخروج من هذا الجهاز",
+
+    // Clips Section
+    "Enable Clips": "تفعيل المقاطع (Clips)",
+    "Clip Length": "مدة المقطع",
+    "Resolution": "دقة الفيديو",
+    "Frame Rate": "معدل الإطارات (FPS)",
+    "Record Audio": "تسجيل الصوت",
+
+    // Billing & Subscriptions Section
+    "Payment Methods": "طرق الدفع",
+    "Add Payment Method": "إضافة طريقة دفع",
+    "Billing History": "سجل الفواتير",
+    "Transaction History": "سجل المعاملات",
+    "Redeem Codes": "استرداد الرموز"
 };
 
 export const translations: Record<string, string> = {

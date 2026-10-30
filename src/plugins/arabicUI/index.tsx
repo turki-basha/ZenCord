@@ -84,12 +84,27 @@ function isIgnoredElement(el: HTMLElement): boolean {
     return false;
 }
 
+const regexTranslations: [RegExp, (match: RegExpMatchArray) => string][] = [
+    [/^(\d+)\s+devices?$/i, m => `${m[1]} أجهزة`],
+    [/^(\d+)\s+members?$/i, m => `${m[1]} أعضاء`],
+    [/^(\d+)\s+mutual\s+servers?$/i, m => `${m[1]} سيرفرات مشتركة`],
+    [/^(\d+)\s+mutual\s+friends?$/i, m => `${m[1]} أصدقاء مشتركين`],
+];
+
 function getTranslationForText(text: string): string | null {
     if (settings.store.translateZenCordUI !== false && zencordTranslations[text]) {
         return zencordTranslations[text];
     }
-    if (settings.store.translateDiscordSettings !== false && discordSettingsTranslations[text]) {
-        return discordSettingsTranslations[text];
+    if (settings.store.translateDiscordSettings !== false) {
+        if (discordSettingsTranslations[text]) {
+            return discordSettingsTranslations[text];
+        }
+        for (const [regex, replacer] of regexTranslations) {
+            const m = text.match(regex);
+            if (m) {
+                return replacer(m);
+            }
+        }
     }
     if (settings.store.translatePluginList !== false && pluginNameTranslations[text]) {
         return pluginNameTranslations[text].name;
