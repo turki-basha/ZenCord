@@ -1,0 +1,49 @@
+{
+    "manifest_version": 2,
+    "minimum_chrome_version": "91",
+
+    "name": "ZenCord Web",
+    "description": "A peaceful, lightweight Discord mod in your browser",
+    "author": "ZenCord Team",
+    "homepage_url": "https://github.com/turki-basha/ZenCord",
+    "icons": {
+        "128": "icon.png"
+    },
+
+    "permissions": [
+        "webRequest",
+        "webRequestBlocking",
+        "*://*.discord.com/*",
+        "https://raw.githubusercontent.com/*"
+    ],
+
+    "content_scripts": [
+        {
+            "run_at": "document_start",
+            "matches": ["*://*.discord.com/*"],
+            "js": ["content.js"],
+            "all_frames": true,
+            "world": "ISOLATED"
+        },
+        {
+            "run_at": "document_start",
+            "matches": ["*://*.discord.com/*"],
+            "js": ["dist/Vencord.js"],
+            "all_frames": true,
+            "world": "MAIN"
+        }
+    ],
+
+    "background": {
+        "scripts": ["background.js"]
+    },
+
+    "web_accessible_resources": ["dist/Vencord.js", "dist/Vencord.css"],
+
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "vencord-firefox@vendicated.dev",
+            "strict_min_version": "128.0"
+        }
+    }
+}

@@ -1,0 +1,16 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+.vc-voiceguard-note {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-inline-start: 3px solid var(--status-warning, #f0b232);
+    border-radius: 6px;
+    background: var(--zencord-tint-hover);
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 20px;
+}

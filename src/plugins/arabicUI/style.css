@@ -1,0 +1,115 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Cairo:wght@400;500;600;700;800&family=El+Messiri:wght@500;600;700&family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap');
+
+/* Default Arabic Font Styling */
+.zc-arabic-active,
+.zc-arabic-active .vc-settings-tab,
+.zc-arabic-active .vc-settings-card,
+.zc-arabic-active [data-tab-id*="vencord"],
+.zc-arabic-active [data-tab-id*="zencord"],
+.zc-arabic-active [class*="standardSidebarView"],
+.zc-arabic-active [class*="sidebarRegion"],
+.zc-arabic-active [class*="contentRegion"],
+.zc-arabic-active [class*="settings_"] {
+    font-family: Cairo, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Font Variations */
+.zc-arabic-font-tajawal,
+.zc-arabic-font-tajawal .vc-settings-tab,
+.zc-arabic-font-tajawal .vc-settings-card,
+.zc-arabic-font-tajawal [data-tab-id*="vencord"],
+.zc-arabic-font-tajawal [data-tab-id*="zencord"],
+.zc-arabic-font-tajawal [class*="standardSidebarView"],
+.zc-arabic-font-tajawal [class*="sidebarRegion"],
+.zc-arabic-font-tajawal [class*="contentRegion"],
+.zc-arabic-font-tajawal [class*="settings_"] {
+    font-family: Tajawal, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+.zc-arabic-font-almarai,
+.zc-arabic-font-almarai .vc-settings-tab,
+.zc-arabic-font-almarai .vc-settings-card,
+.zc-arabic-font-almarai [data-tab-id*="vencord"],
+.zc-arabic-font-almarai [data-tab-id*="zencord"],
+.zc-arabic-font-almarai [class*="standardSidebarView"],
+.zc-arabic-font-almarai [class*="sidebarRegion"],
+.zc-arabic-font-almarai [class*="contentRegion"],
+.zc-arabic-font-almarai [class*="settings_"] {
+    font-family: Almarai, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+.zc-arabic-font-readex,
+.zc-arabic-font-readex .vc-settings-tab,
+.zc-arabic-font-readex .vc-settings-card,
+.zc-arabic-font-readex [data-tab-id*="vencord"],
+.zc-arabic-font-readex [data-tab-id*="zencord"],
+.zc-arabic-font-readex [class*="standardSidebarView"],
+.zc-arabic-font-readex [class*="sidebarRegion"],
+.zc-arabic-font-readex [class*="contentRegion"],
+.zc-arabic-font-readex [class*="settings_"] {
+    font-family: 'Readex Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+.zc-arabic-font-elmessiri,
+.zc-arabic-font-elmessiri .vc-settings-tab,
+.zc-arabic-font-elmessiri .vc-settings-card,
+.zc-arabic-font-elmessiri [data-tab-id*="vencord"],
+.zc-arabic-font-elmessiri [data-tab-id*="zencord"],
+.zc-arabic-font-elmessiri [class*="standardSidebarView"],
+.zc-arabic-font-elmessiri [class*="sidebarRegion"],
+.zc-arabic-font-elmessiri [class*="contentRegion"],
+.zc-arabic-font-elmessiri [class*="settings_"] {
+    font-family: 'El Messiri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+.zc-arabic-rtl code,
+.zc-arabic-rtl pre,
+.zc-arabic-rtl input,
+.zc-arabic-rtl textarea {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+/* BiDi Isolation: Ensure code blocks, inputs, tags, and icons preserve their original monospace & LTR direction */
+.zc-arabic-active code,
+.zc-arabic-active pre,
+.zc-arabic-active [class*="codeBlock"],
+.zc-arabic-active [class*="codeContainer"],
+.zc-arabic-active [class*="markup_"] code,
+.zc-arabic-active [class*="icon_"],
+.zc-arabic-active svg text {
+    font-family: Consolas, 'Courier New', monospace !important;
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: isolate !important;
+}
+
+.zc-arabic-active [data-tab-id*="vencord"],
+.zc-arabic-active [data-tab-id*="zencord"] {
+    font-weight: 600;
+}
+
+.zc-arabic-active .vc-settings-quick-action-text {
+    font-size: 0.95em;
+}
+
+/* Optional RTL layout mode */
+.zc-arabic-rtl [class*="standardSidebarView"] [class*="sidebarRegion"] {
+    order: 2;
+}
+
+.zc-arabic-rtl [class*="standardSidebarView"] [class*="contentRegion"] {
+    order: 1;
+}
+
+.zc-arabic-rtl .vc-settings-tab,
+.zc-arabic-rtl .vc-settings-card {
+    direction: rtl;
+    text-align: right;
+}

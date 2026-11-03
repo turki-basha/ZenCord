@@ -1,0 +1,179 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { definePluginSettings } from "@api/Settings";
+import { Devs } from "@utils/constants";
+import definePlugin, { OptionType } from "@utils/types";
+import { ContextMenuApi, FluxDispatcher, Menu, MessageActions } from "@webpack/common";
+import { Channel, Message } from "@zencord/discord-types";
+
+enum GreetMode {
+    Greet = "Greet",
+    NormalMessage = "Message"
+}
+
+const settings = definePluginSettings({
+    greetMode: {
+        type: OptionType.SELECT,
+        options: [
+            { label: "Greet (you can only greet 3 times)", value: GreetMode.Greet, default: true },
+            { label: "Normal Message (you can greet spam)", value: GreetMode.NormalMessage }
+        ],
+        description: "Choose the greet mode"
+    }
+}).withPrivateSettings<{
+    multiGreetChoices?: string[];
+    unholyMultiGreetEnabled?: boolean;
+}>();
+
+let WELCOME_STICKERS: any;
+
+function greet(channel: Channel, message: Message, stickers: string[]) {
+    const options = MessageActions.getSendMessageOptionsForReply({
+        channel,
+        message,
+        shouldMention: true,
+        showMentionToggle: true
+    });
+
+    if (settings.store.greetMode === GreetMode.NormalMessage || stickers.length > 1) {
+        options.stickerIds = stickers;
+        const msg = {
+            content: "",
+            tts: false,
+            invalidEmojis: [],
+            validNonShortcutEmojis: []
+        };
+
+        MessageActions._sendMessage(channel.id, msg, options);
+    } else {
+        MessageActions.sendGreetMessage(channel.id, stickers[0], options);
+    }
+}
+
+
+function GreetMenu({ channel, message }: { message: Message, channel: Channel; }) {
+    const s = settings.use(["greetMode", "multiGreetChoices"]);
+    const { greetMode, multiGreetChoices = [] } = s;
+
+    return (
+        <Menu.Menu
+            navId="greet-sticker-picker"
+            onClose={() => FluxDispatcher.dispatch({ type: "CONTEXT_MENU_CLOSE" })}
+            aria-label="Greet Sticker Picker"
+        >
+            <Menu.MenuGroup
+                label="Greet Mode"
+            >
+                {Object.values(GreetMode).map(mode => (
+                    <Menu.MenuRadioItem
+                        key={mode}
+                        group="greet-mode"
+                        id={"greet-mode-" + mode}
+                        label={mode}
+                        checked={mode === greetMode}
+                        action={() => s.greetMode = mode}
+                    />
+                ))}
+            </Menu.MenuGroup>
+
+            <Menu.MenuSeparator />
+
+            <Menu.MenuGroup
+                label="Greet Stickers"
+            >
+                {WELCOME_STICKERS.map(sticker => (
+                    <Menu.MenuItem
+                        key={sticker.id}
+                        id={"greet-" + sticker.id}
+                        label={sticker.description.split(" ")[0]}
+                        action={() => greet(channel, message, [sticker.id])}
+                    />
+                ))}
+            </Menu.MenuGroup>
+
+            {!settings.store.unholyMultiGreetEnabled ? null : (
+                <>
+                    <Menu.MenuSeparator />
+
+                    <Menu.MenuItem
+                        label="Unholy Multi-Greet"
+                        id="unholy-multi-greet"
+                    >
+                        {WELCOME_STICKERS.map(sticker => {
+                            const checked = multiGreetChoices.some(s => s === sticker.id);
+
+                            return (
+                                <Menu.MenuCheckboxItem
+                                    key={sticker.id}
+                                    id={"multi-greet-" + sticker.id}
+                                    label={sticker.description.split(" ")[0]}
+                                    checked={checked}
+                                    disabled={!checked && multiGreetChoices.length >= 3}
+                                    action={() => {
+                                        s.multiGreetChoices = checked
+                                            ? multiGreetChoices.filter(s => s !== sticker.id)
+                                            : [...multiGreetChoices, sticker.id];
+                                    }}
+                                />
+                            );
+                        })}
+
+                        <Menu.MenuSeparator />
+                        <Menu.MenuItem
+                            id="multi-greet-submit"
+                            label="Send Greets"
+                            action={() => greet(channel, message, multiGreetChoices!)}
+                            disabled={multiGreetChoices.length === 0}
+                        />
+
+                    </Menu.MenuItem>
+                </>
+            )}
+        </Menu.Menu>
+    );
+}
+
+export default definePlugin({
+    name: "GreetStickerPicker",
+    description: "Allows you to use any greet sticker instead of only the random one by right-clicking the 'Wave to say hi!' button",
+    tags: ["Emotes", "Customisation"],
+    authors: [Devs.Ven],
+
+    settings,
+
+    patches: [
+        {
+            find: "#{intl::WELCOME_CTA_LABEL}",
+            replacement: {
+                match: /className:\i\.\i,(?=.{0,40}?"sticker")(?<={channel:\i,message:\i}=(\i).+?)/,
+                replace: "$&onContextMenu:(vcEvent)=>$self.pickSticker(vcEvent, $1),"
+            }
+        },
+        {
+            find: '"Wumpus waves hello"',
+            replacement: {
+                match: /(?<==)(?=\[{id:"749054660769218631",format_type:\d,description:"Wumpus waves hello")/,
+                replace: "$self.WELCOME_STICKERS="
+            }
+        }
+    ],
+
+    set WELCOME_STICKERS(value: any) {
+        WELCOME_STICKERS = value;
+    },
+
+    pickSticker(
+        event: React.UIEvent,
+        props: {
+            channel: Channel,
+            message: Message;
+        }
+    ) {
+        if (!(props.message as any).deleted)
+            ContextMenuApi.openContextMenu(event, () => <GreetMenu {...props} />);
+    }
+});

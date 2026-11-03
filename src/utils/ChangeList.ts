@@ -1,0 +1,38 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+export class ChangeList<T> implements Iterable<T> {
+    private set = new Set<T>();
+
+    public get changeCount() {
+        return this.set.size;
+    }
+
+    public get hasChanges() {
+        return this.changeCount > 0;
+    }
+
+    public handleChange(item: T) {
+        if (!this.set.delete(item))
+            this.set.add(item);
+    }
+
+    public add(item: T) {
+        return this.set.add(item);
+    }
+
+    public remove(item: T) {
+        return this.set.delete(item);
+    }
+
+    public getChanges() {
+        return this.set.values();
+    }
+
+    public [Symbol.iterator]() {
+        return this.getChanges();
+    }
+}

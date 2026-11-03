@@ -1,0 +1,66 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { definePluginSettings } from "@api/Settings";
+import { managedStyleRootNode } from "@api/Styles";
+import { Devs } from "@utils/constants";
+import { createAndAppendStyle } from "@utils/css";
+import definePlugin, { OptionType } from "@utils/types";
+
+let style: HTMLStyleElement;
+
+const settings = definePluginSettings({
+    blurAmount: {
+        type: OptionType.NUMBER,
+        description: "Blur Amount (in pixels)",
+        default: 10,
+        onChange: setCss
+    }
+});
+
+function setCss() {
+    style.textContent = `
+        .vc-nsfw-img [class*=imageContainer],
+        .vc-nsfw-img [class*=wrapperPaused] {
+            filter: blur(${settings.store.blurAmount}px);
+            transition: filter 0.2s;
+
+            &:hover {
+                filter: blur(0);
+            }
+        }
+        `;
+}
+
+export default definePlugin({
+    name: "BlurNSFW",
+    description: "Blur attachments in NSFW channels until hovered",
+    tags: ["Privacy", "Appearance"],
+    authors: [Devs.Ven],
+    settings,
+
+    patches: [
+        {
+            find: "}renderStickersAccessories(",
+            replacement: [
+                {
+                    match: /(\.renderReactions\(\i\).+?className:)/,
+                    replace: '$&(this?.props?.channel?.nsfw?"vc-nsfw-img ":"")+'
+                }
+            ]
+        }
+    ],
+
+    start() {
+        style = createAndAppendStyle("VcBlurNsfw", managedStyleRootNode);
+
+        setCss();
+    },
+
+    stop() {
+        style?.remove();
+    }
+});

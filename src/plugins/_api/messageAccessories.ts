@@ -1,0 +1,23 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { Devs } from "@utils/constants";
+import definePlugin from "@utils/types";
+
+export default definePlugin({
+    name: "MessageAccessoriesAPI",
+    description: "API to add message accessories.",
+    authors: [Devs.Cyn],
+    patches: [
+        {
+            find: "#{intl::REMOVE_ATTACHMENT_BODY}",
+            replacement: {
+                match: /children:(\[[^\]]{0,100}?this.renderSuppressConfirmModal[^\]]{0,100}?\])/,
+                replace: "children:Vencord.Api.MessageAccessories._modifyAccessories($1,this?.props)",
+            },
+        },
+    ],
+});

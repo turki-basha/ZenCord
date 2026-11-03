@@ -1,0 +1,103 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { NoEntrySignIcon } from "@components/Icons";
+import { classNameFactory } from "@utils/css";
+import { classes } from "@utils/misc";
+import { t } from "@utils/zenI18n";
+import { Tooltip, useEffect, useState } from "@webpack/common";
+import type { User } from "@zencord/discord-types";
+
+import { type DetectionRecord, ensureDetection, getDetectionRecord, getDetectionTtlMs, subscribeToDetection } from "./detection";
+
+const cl = classNameFactory("vc-detect-block-");
+
+interface DetectionSnapshot {
+    userId: string;
+    record?: DetectionRecord;
+}
+
+/**
+ * @param passive في قائمة الأعضاء: اقرأ النتيجة المخزّنة فقط ولا تُطلق كشفاً جديداً.
+ * القائمة تُركّب شارةً لكلّ عضو ظاهر، فكان كل تمرير يُطلق عشرات طلبات الكشف دفعةً
+ * واحدة (وتحديثات حالة متتالية). الكشف يبقى فعّالاً في الملف الشخصي وفي الرسائل.
+ */
+function useBlockState(userId: string, passive = false) {
+    const [snapshot, setSnapshot] = useState<DetectionSnapshot>(() => ({
+        userId,
+        record: getDetectionRecord(userId)
+    }));
+    const record = snapshot.userId === userId ? snapshot.record : getDetectionRecord(userId);
+
+    useEffect(() => {
+        const syncState = () => {
+            setSnapshot({
+                userId,
+                record: getDetectionRecord(userId)
+            });
+        };
+
+        syncState();
+
+        return subscribeToDetection(userId, syncState);
+    }, [userId]);
+
+    useEffect(() => {
+        if (!record) {
+            if (!passive) void ensureDetection(userId);
+            return;
+        }
+
+        const remainingMs = record.checkedAt + getDetectionTtlMs(record.state) - Date.now();
+        if (remainingMs <= 0) {
+            if (!passive) setSnapshot({ userId });
+            return;
+        }
+
+        const timeout = window.setTimeout(() => {
+            if (!passive) setSnapshot({ userId });
+        }, remainingMs);
+        return () => window.clearTimeout(timeout);
+    }, [record, userId, passive]);
+
+    return record?.state ?? "unknown";
+}
+
+export interface DetectBlockBadgeProps {
+    user?: User | null;
+    isMemberList?: boolean;
+    isMessage?: boolean;
+    isProfile?: boolean;
+}
+
+export function DetectBlockBadge({ user, isMemberList, isMessage, isProfile }: DetectBlockBadgeProps) {
+    if (!user) return null;
+
+    const state = useBlockState(user.id, isMemberList);
+    if (state !== "blockedYou") return null;
+
+    return (
+        <Tooltip text={t("هذا المستخدم قام بحظرك.", "This user has blocked you.")}>
+            {tooltipProps => (
+                <span
+                    {...tooltipProps}
+                    className={classes(
+                        cl("indicator"),
+                        isProfile && cl("indicator-profile"),
+                        isMessage && cl("indicator-message"),
+                        isMemberList && cl("indicator-member-list")
+                    )}
+                >
+                    <NoEntrySignIcon
+                        className={cl("icon")}
+                        width={isProfile || isMemberList ? 17 : 20}
+                        height={isProfile || isMemberList ? 17 : 20}
+                    />
+                </span>
+            )}
+        </Tooltip>
+    );
+}

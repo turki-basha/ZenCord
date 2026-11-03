@@ -1,0 +1,34 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { Devs } from "@utils/constants";
+import definePlugin from "@utils/types";
+import { FluxDispatcher, UserStore } from "@webpack/common";
+
+interface StreamEvent {
+    streamKey: string;
+}
+
+function toggleStreamerMode({ streamKey }: StreamEvent, value: boolean) {
+    if (!streamKey.endsWith(UserStore.getCurrentUser().id)) return;
+
+    FluxDispatcher.dispatch({
+        type: "STREAMER_MODE_UPDATE",
+        key: "enabled",
+        value
+    });
+}
+
+export default definePlugin({
+    name: "StreamerModeOnStream",
+    description: "Automatically enables streamer mode when you start streaming in Discord",
+    tags: ["Privacy", "Utility"],
+    authors: [Devs.IcedMarina],
+    flux: {
+        STREAM_CREATE: d => toggleStreamerMode(d, true),
+        STREAM_DELETE: d => toggleStreamerMode(d, false)
+    }
+});

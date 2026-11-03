@@ -1,0 +1,61 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import { definePluginSettings } from "@api/Settings";
+import { OptionType } from "@utils/types";
+
+export const settings = definePluginSettings({
+    // المفتاح الرئيسي لمختبر الصوت: حين يُطفأ لا نفرض شيئاً على المكالمات
+    // الجديدة وتبقى إعدادات ديسكورد نفسها هي الحاكمة. لا يُخفى من صفحة
+    // الإضافات كي يبقى الإطفاء ممكناً حتى لو لم يفتح المستخدم المختبر.
+    applyToCalls: {
+        type: OptionType.BOOLEAN,
+        default: true,
+        description: "Apply your Voice Lab settings to every call. When off, Discord's own audio settings take over."
+    },
+    autoDeafenOnTest: {
+        type: OptionType.BOOLEAN,
+        default: true,
+        description: "Self-deafen while the loopback mic test is active (so you don't hear the channel doubled)"
+    },
+    // Whether the user has slid the "external tools" gate open. Persisted so the
+    // warning is read once, not on every visit; OptionType.CUSTOM keeps it out of
+    // the settings page — it is a record of consent, not a knob to flip there.
+    externalToolsUnlocked: {
+        type: OptionType.CUSTOM,
+        description: "",
+        default: false
+    },
+    // Persisted processing intent (echo / AGC / noise / VAD threshold). Hidden from the
+    // settings page (OptionType.CUSTOM) — it's driven by the panel, not the settings UI.
+    // MicPro owns this because Discord's per-connection audio setters don't update the
+    // MediaEngineStore getters, so the store can't be the source of truth for these.
+    procState: {
+        type: OptionType.CUSTOM,
+        description: "",
+        default: null as null | {
+            echo: boolean;
+            agc: boolean;
+            noiseMode: "none" | "standard" | "krisp";
+            vadThreshold: number;
+        }
+    },
+    // حالة المعالجة قبل تفعيل الستيريو (يُطفئ الستيريو إلغاء الضوضاء والصدى وAGC)،
+    // تُعاد عند إطفائه. محفوظةٌ لا في الذاكرة: من أعاد التشغيل والستيريو مفعّل ثمّ
+    // أطفأه كان يبقى ميكروفونه بلا معالجة.
+    savedProcessing: {
+        type: OptionType.CUSTOM,
+        description: "",
+        default: null as null | { noiseMode: "none" | "standard" | "krisp"; echo: boolean; agc: boolean; }
+    },
+    // كنسُ بدء التشغيل يُتمّ الإزالة قبل أن تُفتح الصفحة، فيُعلَّم هنا كي تُخبر بطاقة
+    // «ستيريو دائم» صاحبها أنّ الإزالة تمّت — ثمّ يُمسح حين تُعرض.
+    permanentStereoRemoved: {
+        type: OptionType.CUSTOM,
+        description: "",
+        default: false
+    }
+});

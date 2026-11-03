@@ -1,0 +1,412 @@
+/* Settings */
+
+.vc-plugins-settings:has(> .zenquests-settings-search) {
+    reading-flow: flex-visual;
+}
+
+.zenquests-settings-search {
+    order: -1;
+    margin-top: 5px;
+}
+
+.zenquests-settings-search-empty {
+    margin-top: 12px;
+    color: var(--text-muted);
+}
+
+.zenquests-setting {
+    border-radius: 3px;
+    border-left: 3px solid var(--text-strong);
+    padding: 8px;
+    user-select: text;
+}
+
+.zenquests-settings-divider-small {
+    margin: 10px 0;
+}
+
+.zenquests-settings-divider-medium {
+    margin: 15px 0;
+}
+
+.zenquests-settings-divider-large {
+    margin: 20px 0;
+}
+
+.zenquests-dimmed-settings-item {
+    filter: brightness(0.5);
+}
+
+.zenquests-setting-header {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.zenquests-setting-subheader {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 15px 0 5px;
+}
+
+.zenquests-setting-paragraph {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 5px 0;
+    line-height: normal;
+}
+
+.zenquests-setting-description {
+    margin-bottom: 15px;
+    line-height: normal;
+}
+
+.zenquests-setting-description-multi-paragraph {
+    line-height: 0.2em;
+}
+
+[class*="clickTrapContainer"] > div > .zenquests-settings-tooltip {
+    margin-right: 4px;
+}
+
+.zenquests-settings-tooltip-content {
+    text-align: justify;
+    white-space: pre-line;
+}
+
+.zenquests-setting-switch {
+    margin-bottom: 5px;
+}
+
+.zenquests-setting-switch [class*="container_"] [class*="labelContainer_"] label {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.zenquests-setting-subtle-switch [class*="container_"] [class*="labelContainer_"] label,
+.zenquests-setting-switch [class*="container_"] [class*="labelContainer_"] div {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.zenquests-notice-card {
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 4px;
+    line-height: 0.2em;
+}
+
+.zenquests-notice-card-red {
+    border-left: 3px solid var(--status-danger);
+    background-color: color-mix(in srgb, var(--status-danger) 12%, transparent);
+}
+
+.zenquests-notice-card-blue {
+    border-left: 3px solid var(--background-brand);
+    background-color: color-mix(in srgb, var(--background-brand) 12%, transparent);
+}
+
+.zenquests-notice-card-solo {
+    margin: 12px 0 0;
+}
+
+.zenquests-settings-button > button[data-mana-component="button"] {
+    border-radius: 3px;
+}
+
+.zenquests-settings-button > button[data-mana-component="button"] span {
+    font-size: 14px;
+}
+
+.zenquests-setting [data-floating-ui-focusable][class*="selectDropdown"],
+.zenquests-setting [data-mana-component="select-input-field"] > [class*="selectField"],
+.zenquests-setting [data-mana-component="select-input-field"] [class*="tagList"] > div {
+    border-radius: 3px;
+}
+
+.zenquests-inline-volume-slider {
+    margin-top: 0;
+}
+
+.zenquests-sound-preview-button {
+    color: var(--interactive-normal);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+.zenquests-sound-preview-button:hover,
+.zenquests-sound-preview-button.zenquests-playing-audio {
+    background: var(--background-modifier-hover);
+}
+
+.zenquests-sound-preview-button:hover {
+    color: var(--interactive-active);
+}
+
+.zenquests-sound-preview-button.zenquests-playing-audio {
+    color: var(--red-500);
+}
+
+.zenquests-sound-preview-button:disabled {
+    cursor: default;
+}
+
+.zenquests-sound-select [class*="selectedIcon"] {
+    display: none;
+}
+
+.zenquests-no-top-margin,
+.zenquests-margin-top-0 {
+    margin-top: 0;
+}
+
+.zenquests-margin-top-1 {
+    margin-top: 1px;
+}
+
+.zenquests-margin-top-2 {
+    margin-top: 2px;
+}
+
+.zenquests-margin-top-3 {
+    margin-top: 3px;
+}
+
+.zenquests-margin-top-4 {
+    margin-top: 4px;
+}
+
+.zenquests-margin-top-5 {
+    margin-top: 5px;
+}
+
+.zenquests-margin-top-6 {
+    margin-top: 6px;
+}
+
+.zenquests-margin-top-7 {
+    margin-top: 7px;
+}
+
+.zenquests-margin-top-8 {
+    margin-top: 8px;
+}
+
+.zenquests-margin-top-9 {
+    margin-top: 9px;
+}
+
+.zenquests-margin-top-10 {
+    margin-top: 10px;
+}
+
+.zenquests-margin-top-11 {
+    margin-top: 11px;
+}
+
+.zenquests-margin-top-12 {
+    margin-top: 12px;
+}
+
+.zenquests-margin-top-13 {
+    margin-top: 13px;
+}
+
+.zenquests-margin-top-14 {
+    margin-top: 14px;
+}
+
+.zenquests-margin-top-15 {
+    margin-top: 15px;
+}
+
+.zenquests-no-bottom-margin,
+.zenquests-margin-bottom-0 {
+    margin-bottom: 0;
+}
+
+.zenquests-margin-bottom-1 {
+    margin-bottom: 1px;
+}
+
+.zenquests-margin-bottom-2 {
+    margin-bottom: 2px;
+}
+
+.zenquests-margin-bottom-3 {
+    margin-bottom: 3px;
+}
+
+.zenquests-margin-bottom-4 {
+    margin-bottom: 4px;
+}
+
+.zenquests-margin-bottom-5 {
+    margin-bottom: 5px;
+}
+
+.zenquests-margin-bottom-6 {
+    margin-bottom: 6px;
+}
+
+.zenquests-margin-bottom-7 {
+    margin-bottom: 7px;
+}
+
+.zenquests-margin-bottom-8 {
+    margin-bottom: 8px;
+}
+
+.zenquests-margin-bottom-9 {
+    margin-bottom: 9px;
+}
+
+.zenquests-margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.zenquests-margin-bottom-11 {
+    margin-bottom: 11px;
+}
+
+.zenquests-margin-bottom-12 {
+    margin-bottom: 12px;
+}
+
+.zenquests-margin-bottom-13 {
+    margin-bottom: 13px;
+}
+
+.zenquests-margin-bottom-14 {
+    margin-bottom: 14px;
+}
+
+.zenquests-margin-bottom-15 {
+    margin-bottom: 15px;
+}
+
+.zenquests-settings-row {
+    margin-top: 4px;
+    display: flex;
+    gap: 4px;
+    align-items: flex-start;
+}
+
+.zenquests-settings-row-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.zenquests-settings-row-item-content {
+    flex: 0 0 auto;
+}
+
+.zenquests-settings-slider-control-container {
+    margin: 4px 0 0;
+    background-color: var(--input-background-default, var(--input-background));
+    padding: 0 12px 0 4px;
+    border-radius: 3px;
+    border: 1px solid var(--border-normal);
+    min-height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.zenquests-settings-slider-control {
+    margin: 0 4px;
+    width: 100%;
+}
+
+.zenquests-sound-select-row-item {
+    flex: 0 1 67%;
+}
+
+.zenquests-volume-slider-row-item {
+    flex: 0 1 33%;
+}
+
+/* Quest Tiles */
+
+.zenquests-quest-tile-gradient-row-item {
+    flex: 0 1 42%;
+}
+
+.zenquests-quest-tile-preload-row-item {
+    flex: 0 1 58%;
+}
+
+.zenquests-quest-tile-color-row {
+    align-items: stretch;
+}
+
+.zenquests-quest-tile-color-row-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.zenquests-settings-color-picker.zenquests-quest-tile-color-picker {
+    display: flex;
+    height: 38px;
+    min-height: 38px;
+    min-width: 0;
+    margin-top: 5px;
+}
+
+.zenquests-settings-color-picker.zenquests-quest-tile-color-picker > [class*="colorSwatch"] {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 38px;
+}
+
+.zenquests-settings-color-picker.zenquests-quest-tile-color-picker [class*="swatch"],
+.zenquests-settings-color-picker.zenquests-quest-tile-color-picker [class*="Swatch"] {
+    width: 100%;
+    height: 100%;
+    min-height: 38px;
+    border-radius: 3px;
+}
+
+.zenquests-settings-color-picker.zenquests-disabled-color-picker {
+    filter: brightness(0.5);
+    pointer-events: none;
+}
+
+.zenquests-quest-tile-color-button {
+    margin-top: 6px;
+}
+
+/* Quest Button Settings */
+
+.zenquests-settings-color-picker.zenquests-quest-button-color-picker {
+    display: flex;
+    height: 38px;
+    min-height: 38px;
+    min-width: 0;
+    margin-top: 5px;
+}
+
+.zenquests-settings-color-picker.zenquests-quest-button-color-picker > [class*="colorSwatch"] {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 38px;
+}
+
+.zenquests-settings-color-picker.zenquests-quest-button-color-picker [class*="swatch"],
+.zenquests-settings-color-picker.zenquests-quest-button-color-picker [class*="Swatch"] {
+    width: 100%;
+    height: 100%;
+    min-height: 38px;
+    border-radius: 3px;
+}

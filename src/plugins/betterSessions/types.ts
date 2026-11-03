@@ -1,0 +1,20 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+export interface SessionInfo {
+    session: {
+        id_hash: string;
+        approx_last_used_time: Date;
+        client_info: {
+            os: string;
+            platform: string;
+            location: string;
+        };
+    },
+    current?: boolean;
+}
+
+export type Session = SessionInfo["session"];

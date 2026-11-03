@@ -1,0 +1,80 @@
+/*
+ * ZenCord, a Discord client mod
+ * Copyright (c) 2026 ZenCord Team and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import "./styles.css";
+
+import { definePluginSettings } from "@api/Settings";
+import ErrorBoundary from "@components/ErrorBoundary";
+import { TooltipContainer } from "@components/TooltipContainer";
+import { Devs } from "@utils/constants";
+import { classNameFactory } from "@utils/css";
+import definePlugin, { OptionType } from "@utils/types";
+import { DateUtils, RelationshipStore, Text } from "@webpack/common";
+import { User } from "@zencord/discord-types";
+import { PropsWithChildren } from "react";
+
+const formatter = new Intl.DateTimeFormat(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+});
+
+const cl = classNameFactory("vc-sortFriendRequests-");
+
+function getSince(user: User) {
+    return new Date(RelationshipStore.getSince(user.id));
+}
+
+const settings = definePluginSettings({
+    showDates: {
+        type: OptionType.BOOLEAN,
+        description: "Show dates on friend requests",
+        default: false,
+        restartNeeded: true
+    }
+});
+
+export default definePlugin({
+    name: "SortFriendRequests",
+    authors: [Devs.Megu],
+    description: "Sorts friend requests by date of receipt",
+    tags: ["Friends", "Organisation"],
+    settings,
+
+    patches: [{
+        find: "getRelationshipCounts(){",
+        replacement: {
+            match: /\}\)\.sortBy\((.+?)\)\.value\(\)/,
+            replace: "}).sortBy(row => $self.wrapSort(($1), row)).value()"
+        }
+    }, {
+        find: "#{intl::FRIEND_REQUEST_CANCEL}",
+        replacement: {
+            predicate: () => settings.store.showDates,
+            match: /(?<=children:\[)\(0,.{0,100}user:\i,hovered:\i.+?(?=,\(0)(?<=user:(\i).+?)/,
+            replace: (children, user) => `$self.WrapperDateComponent({user:${user},children:${children}})`
+        }
+    }],
+
+    wrapSort(comparator: Function, row: any) {
+        return row.type === 3 || row.type === 4
+            ? -getSince(row.user)
+            : comparator(row);
+    },
+
+    WrapperDateComponent: ErrorBoundary.wrap(({ user, children }: PropsWithChildren<{ user: User; }>) => {
+        const since = getSince(user);
+
+        return <div className={cl("wrapper")}>
+            {children}
+            {!isNaN(since.getTime()) && (
+                <TooltipContainer text={DateUtils.dateFormat(since, "LLLL")} tooltipClassName={cl("tooltip")}>
+                    <Text variant="text-xs/normal" className={cl("date")}>{formatter.format(since)}</Text>
+                </TooltipContainer>
+            )}
+        </div>;
+    }, { noop: true })
+});
