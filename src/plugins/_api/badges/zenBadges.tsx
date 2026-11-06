@@ -16,11 +16,15 @@ import { ContextMenuApi, Forms, Menu, Modal, openModal } from "@webpack/common";
  * يمكن للموقع عبر قاعدة البيانات تمرير أي رابط صورة أو GIF مخصص، أو الاكتفاء بتحديد النوع (type).
  */
 export const ZEN_BADGE_ICONS = {
+    // 0. شارة المالك والمؤسس (ZenCord Owner & Founder)
+    OWNER: "https://cdn.discordapp.com/emojis/1564964557208944720.webp?size=96&animated=true",
+
     // 1. شارة المتبرع / الداعم (ZenCord Supporter)
     DONOR: "https://cdn.discordapp.com/emojis/1564696511953248398.webp?size=96",
 
-    // 2. شارة المبرمجين (خاصة بك وبالمبرمجين فقط)
+    // 2. شارة المبرمجين والمشاركين (ZenCord Developer & Contributor)
     DEVELOPER: "https://cdn.discordapp.com/emojis/1564698785551097986.webp?size=96",
+    CONTRIBUTOR: "https://cdn.discordapp.com/emojis/1564687280537608313.webp?size=96",
 
     // 3. شارة بوتات زن كورد (ZenCord Official Bot)
     BOT: "https://cdn.discordapp.com/emojis/1564687539556585492.webp?size=96",
@@ -35,7 +39,7 @@ export const ZEN_BADGE_ICONS = {
  * {
  *   "USER_DISCORD_ID": [
  *     {
- *       "type": "developer" | "bot" | "vip" | "donor" | "custom",
+ *       "type": "owner" | "developer" | "contributor" | "bot" | "vip" | "donor" | "custom",
  *       "tooltip": "النص الذي يظهر عند الوقوف على الشارة بالماوس",
  *       "badge": "رابط صورة أو GIF للشارة (اختياري - إن لم يحدد سيستخدم الأيقونة الافتراضية للنوع)"
  *     }
@@ -43,7 +47,7 @@ export const ZEN_BADGE_ICONS = {
  * }
  */
 export interface ZenBadgeDbEntry {
-    type?: "developer" | "bot" | "vip" | "donor" | "custom";
+    type?: "owner" | "developer" | "contributor" | "bot" | "vip" | "donor" | "custom";
     tooltip?: string;
     badge?: string;
 }
@@ -77,7 +81,11 @@ function ZenBadgeContextMenu({ badge }: { badge: Omit<ProfileBadge, "id"> & Badg
     );
 }
 
-function openBadgeModal(title: string, subtitle: string, iconSrc: string, description: string) {
+function openBadgeModal(title: string, subtitle: string, iconSrc: string, description: string, isOwner = false) {
+    const boxShadow = isOwner
+        ? "0 0 35px rgba(234, 179, 8, 0.65)"
+        : "0 0 25px rgba(99, 102, 241, 0.45)";
+
     openModal(props => (
         <ErrorBoundary noop>
             <Modal
@@ -107,7 +115,7 @@ function openBadgeModal(title: string, subtitle: string, iconSrc: string, descri
                                 height: 80,
                                 borderRadius: "50%",
                                 margin: "0 auto",
-                                boxShadow: "0 0 25px rgba(99, 102, 241, 0.45)",
+                                boxShadow,
                                 objectFit: "contain"
                             }}
                         />
@@ -129,33 +137,54 @@ function openBadgeModal(title: string, subtitle: string, iconSrc: string, descri
  */
 export function createZenBadgeFromDb(entry: ZenBadgeDbEntry, index: number, userId: string): ProfileBadge {
     const type = entry.type || "donor";
+    const isOwner = userId === "853046251465343027" || type === "owner";
+
     let defaultTitle = "ZenCord Supporter";
     let defaultSubtitle = "Valued Project Donor";
     let defaultIcon = ZEN_BADGE_ICONS.DONOR;
     let defaultDescription = "Thank you for supporting the development of ZenCord! Your contributions keep the project alive.";
+    let rarity = BadgeRarity.COMMON;
 
-    if (type === "developer") {
-        defaultTitle = "ZenCord Developer";
-        defaultSubtitle = "Official Developer & Contributor";
+    if (isOwner) {
+        defaultTitle = entry.tooltip || "ZenCord Owner & Founder";
+        defaultSubtitle = "Official Creator & Project Owner";
+        defaultIcon = ZEN_BADGE_ICONS.OWNER;
+        defaultDescription = "This user is the official Creator, Founder & Owner of ZenCord. They hold full ownership of the project and maintain its core ecosystem.";
+        rarity = BadgeRarity.MYTHIC;
+    } else if (type === "developer") {
+        defaultTitle = entry.tooltip || "ZenCord Developer";
+        defaultSubtitle = "Official Developer & Core Contributor";
         defaultIcon = ZEN_BADGE_ICONS.DEVELOPER;
         defaultDescription = "This user is a verified developer of the ZenCord project, building and maintaining custom features.";
+        rarity = BadgeRarity.MYTHIC;
+    } else if (type === "contributor") {
+        defaultTitle = entry.tooltip || "ZenCord Contributor";
+        defaultSubtitle = "Plugin Creator & Project Contributor";
+        defaultIcon = ZEN_BADGE_ICONS.CONTRIBUTOR;
+        defaultDescription = "This user has contributed code, plugins, or essential improvements to the ZenCord ecosystem.";
+        rarity = BadgeRarity.MYTHIC;
     } else if (type === "bot") {
-        defaultTitle = "ZenCord Official Bot";
+        defaultTitle = entry.tooltip || "ZenCord Official Bot";
         defaultSubtitle = "Verified ZenCord Automation";
         defaultIcon = ZEN_BADGE_ICONS.BOT;
         defaultDescription = "This application is an officially verified bot integrated with the ZenCord ecosystem.";
+        rarity = BadgeRarity.RARE;
     } else if (type === "vip") {
-        defaultTitle = "ZenCord VIP";
+        defaultTitle = entry.tooltip || "ZenCord VIP";
         defaultSubtitle = "Exclusive VIP Member";
         defaultIcon = ZEN_BADGE_ICONS.VIP;
         defaultDescription = "This user is an exclusive VIP member of ZenCord with access to elite privileges and early features.";
+        rarity = BadgeRarity.EPIC;
+    } else if (type === "custom") {
+        defaultTitle = entry.tooltip || "ZenCord Special Badge";
+        defaultSubtitle = "Special Verified Badge";
+        defaultIcon = entry.badge || ZEN_BADGE_ICONS.DONOR;
+        defaultDescription = entry.tooltip ? `${entry.tooltip} - Verified Special ZenCord Badge.` : "Special badge awarded by ZenCord.";
+        rarity = BadgeRarity.EPIC;
     }
 
     const iconSrc = entry.badge || defaultIcon;
     const tooltip = entry.tooltip || defaultTitle;
-    const rarity = type === "developer"
-        ? BadgeRarity.MYTHIC
-        : (type === "vip" ? BadgeRarity.EPIC : (type === "bot" ? BadgeRarity.RARE : BadgeRarity.COMMON));
 
     return {
         id: `zencord_db_badge_${userId}_${index}`,
@@ -178,6 +207,6 @@ export function createZenBadgeFromDb(entry: ZenBadgeDbEntry, index: number, user
         onContextMenu: (event, badge) => {
             ContextMenuApi.openContextMenu(event, () => <ZenBadgeContextMenu badge={badge} />);
         },
-        onClick: () => openBadgeModal(defaultTitle, defaultSubtitle, iconSrc, defaultDescription)
+        onClick: () => openBadgeModal(defaultTitle, defaultSubtitle, iconSrc, defaultDescription, isOwner)
     } as ProfileBadge;
 }

@@ -254,6 +254,23 @@ export default definePlugin({
     },
 
     getDonorBadges(userId: string) {
-        return DonorBadges[userId]?.map((badge, idx) => createZenBadgeFromDb(badge, idx, userId));
+        const badges = DonorBadges[userId]?.map((badge, idx) => createZenBadgeFromDb(badge, idx, userId)) || [];
+
+        // Check if user is registered in Devs (Plugin author or Core contributor)
+        const hasDevBadge = badges.some(b => b.rarity === BadgeRarity.MYTHIC);
+        if (!hasDevBadge) {
+            const isContributor = Object.values(Devs).some(dev => {
+                const d = dev as { id?: bigint; badge?: boolean; };
+                return d.id?.toString() === userId && d.badge !== false;
+            });
+            if (isContributor) {
+                badges.push(createZenBadgeFromDb({
+                    type: "contributor",
+                    tooltip: "ZenCord Contributor"
+                }, badges.length, userId));
+            }
+        }
+
+        return badges.length > 0 ? badges : undefined;
     }
 });
