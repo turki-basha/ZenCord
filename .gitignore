@@ -33,3 +33,8 @@ ZenCordPayload.zip
 assets/
 AndroidManifest.xml
 scripts/dedupeTranslations.cjs
+
+# Local files (not to be pushed to remote)
+badges.json
+copy-dist.js
+
