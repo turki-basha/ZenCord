@@ -44,6 +44,7 @@ export const settings = definePluginSettings({
 export function applyPerformanceClasses() {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
+    if (!root) return;
     const s = settings.store;
 
     if (s.ultraProfile || s.disableBlur) {
@@ -72,18 +73,21 @@ export default definePlugin({
     enabledByDefault: true,
     required: true,
     hidden: true,
-
     settings,
 
     startAt: StartAt.Init,
 
     start() {
         applyPerformanceClasses();
+        if (typeof document !== "undefined" && !document.documentElement) {
+            document.addEventListener("DOMContentLoaded", applyPerformanceClasses, { once: true });
+        }
     },
 
     stop() {
         if (typeof document === "undefined") return;
         const root = document.documentElement;
+        if (!root) return;
         root.classList.remove("zc-no-blur", "zc-chat-accel", "zc-no-anim");
     },
 });

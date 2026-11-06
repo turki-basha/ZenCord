@@ -1,7 +1,7 @@
 {
     "name": "zencord",
     "private": "true",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "High-performance, modular, and privacy-centric Discord client modification",
     "homepage": "https://www.zencord.site/",
     "bugs": {

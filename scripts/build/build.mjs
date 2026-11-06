@@ -141,7 +141,7 @@ const buildConfigs = ([
         outfile: "dist/renderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: { js: "window.ZenCord = Vencord;\n//# sourceURL=file:///ZenCordRenderer\n" + sourceMapFooter("renderer") },
+        footer: { js: "window.ZenCord = Vencord;\nvoid 0;\n//# sourceURL=file:///ZenCordRenderer\n" + sourceMapFooter("renderer") },
         globalName: "Vencord",
         sourcemap,
         plugins: [
@@ -190,7 +190,7 @@ const buildConfigs = ([
         outfile: "dist/zencordDesktopRenderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: { js: "window.ZenCord = Vencord;\n//# sourceURL=file:///ZenCordDesktopRenderer\n" + sourceMapFooter("zencordDesktopRenderer") },
+        footer: { js: "window.ZenCord = Vencord;\nvoid 0;\n//# sourceURL=file:///ZenCordDesktopRenderer\n" + sourceMapFooter("zencordDesktopRenderer") },
         globalName: "Vencord",
         sourcemap,
         plugins: [
