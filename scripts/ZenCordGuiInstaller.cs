@@ -1396,7 +1396,47 @@ namespace ZenCordInstaller
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string zenCordDir = Path.Combine(appData, "ZenCord");
                 string zenCordDist = Path.Combine(zenCordDir, "dist");
-                ExtractZenCordPayload(zenCordDist);
+
+                if (!Directory.Exists(zenCordDist))
+                    Directory.CreateDirectory(zenCordDist);
+
+                bool fetchedOnline = false;
+                try
+                {
+                    statusLabel.Text = isArabic ? "جاري تحميل أحدث ملفات ZenCord من الخادم..." : "Fetching latest ZenCord release files...";
+                    Application.DoEvents();
+
+                    using (WebClient wc = new WebClient())
+                    {
+                        wc.Headers["User-Agent"] = "ZenCordInstaller/1.0";
+                        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                        string baseUrl = "https://github.com/turki-basha/ZenCord/releases/latest/download/";
+                        string[] requiredFiles = new string[] { "patcher.js", "preload.js", "renderer.js", "renderer.css" };
+
+                        foreach (string file in requiredFiles)
+                        {
+                            string dest = Path.Combine(zenCordDist, file);
+                            wc.DownloadFile(baseUrl + file, dest);
+                        }
+
+                        File.WriteAllText(Path.Combine(zenCordDist, "package.json"), "{}");
+                        fetchedOnline = true;
+                    }
+                }
+                catch
+                {
+                    // If offline or network error, fallback to embedded payload
+                    try
+                    {
+                        ExtractZenCordPayload(zenCordDist);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!fetchedOnline && !File.Exists(Path.Combine(zenCordDist, "patcher.js")))
+                            throw ex;
+                    }
+                }
 
                 string patcherPath = Path.Combine(zenCordDist, "patcher.js");
                 if (!File.Exists(patcherPath))
