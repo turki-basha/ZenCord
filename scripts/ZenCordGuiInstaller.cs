@@ -1348,7 +1348,7 @@ namespace ZenCordInstaller
             using (Stream stream = asm.GetManifestResourceStream("ZenCordPayload.zip"))
             {
                 if (stream == null)
-                    throw new Exception("ZenCordPayload.zip embedded resource not found!");
+                    return;
 
                 using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read))
                 {
@@ -1400,7 +1400,6 @@ namespace ZenCordInstaller
                 if (!Directory.Exists(zenCordDist))
                     Directory.CreateDirectory(zenCordDist);
 
-                bool fetchedOnline = false;
                 try
                 {
                     statusLabel.Text = isArabic ? "جاري تحميل أحدث ملفات ZenCord من الخادم..." : "Fetching latest ZenCord release files...";
@@ -1408,7 +1407,7 @@ namespace ZenCordInstaller
 
                     using (WebClient wc = new WebClient())
                     {
-                        wc.Headers["User-Agent"] = "ZenCordInstaller/1.0";
+                        wc.Headers["User-Agent"] = "ZenCordInstaller/1.0.2";
                         ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
                         string baseUrl = "https://github.com/turki-basha/ZenCord/releases/latest/download/";
@@ -1421,26 +1420,28 @@ namespace ZenCordInstaller
                         }
 
                         File.WriteAllText(Path.Combine(zenCordDist, "package.json"), "{}");
-                        fetchedOnline = true;
                     }
                 }
                 catch
                 {
-                    // If offline or network error, fallback to embedded payload
+                    // If offline or network error, fallback to embedded payload if available
                     try
                     {
                         ExtractZenCordPayload(zenCordDist);
                     }
-                    catch (Exception ex)
+                    catch { }
+
+                    if (!File.Exists(Path.Combine(zenCordDist, "patcher.js")))
                     {
-                        if (!fetchedOnline && !File.Exists(Path.Combine(zenCordDist, "patcher.js")))
-                            throw ex;
+                        throw new Exception(isArabic
+                            ? "تعذر تحميل ملفات ZenCord من الخادم. يرجى التحقق من اتصالك بالإنترنت."
+                            : "Failed to download ZenCord release files. Please check your internet connection.");
                     }
                 }
 
                 string patcherPath = Path.Combine(zenCordDist, "patcher.js");
                 if (!File.Exists(patcherPath))
-                    throw new Exception("Patcher file was not extracted: " + patcherPath);
+                    throw new Exception("Patcher file was not found: " + patcherPath);
 
                 string resDir = target.ResourcesPath;
                 string appAsar = Path.Combine(resDir, "app.asar");
