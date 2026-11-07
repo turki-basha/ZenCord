@@ -63,8 +63,7 @@ jobs:
           cp ZenCordInstallerCli-linux AppDir/usr/bin/ZenCordInstaller
           cat << 'EOF' > AppDir/AppRun
 #!/bin/sh
-HERE="$(dirname "$(readlink -f "${0}")")"
-exec "$HERE/usr/bin/ZenCordInstaller" "$@"
+exec "$(dirname "$(readlink -f "$0")")/usr/bin/ZenCordInstaller" "$@"
 EOF
           chmod +x AppDir/AppRun
           cat << 'EOF' > AppDir/zencord.desktop
@@ -76,8 +75,7 @@ Type=Application
 Terminal=true
 Categories=Utility;
 EOF
-          cp ZenCord.ico AppDir/zencord.ico || true
-          cp banner.png AppDir/zencord.png || true
+          cp logo.png AppDir/zencord.png
           
           # Download appimagetool and extract to bypass FUSE requirements in CI
           wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
@@ -85,7 +83,7 @@ EOF
           ./appimagetool --appimage-extract
           
           # Build genuine Type-2 SquashFS AppImage
-          ARCH=x86_64 ./squashfs-root/AppRun AppDir ZenCordInstaller-linux.AppImage || cp ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage
+          ARCH=x86_64 ./squashfs-root/AppRun --no-appstream AppDir ZenCordInstaller-linux.AppImage || cp ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage
           chmod +x ZenCordInstaller-linux.AppImage
 
       - name: Upload Linux Installers to Latest Release
