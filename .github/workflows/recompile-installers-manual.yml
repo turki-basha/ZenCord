@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - .github/workflows/recompile-installers-manual.yml
+      - scripts/patch_installer_src.py
+      - scripts/ZenCordGuiInstaller.cs
 
 permissions:
   contents: write
