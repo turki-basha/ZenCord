@@ -1,4 +1,4 @@
-name: Recompile Clean Installers (Zero-Detection Antivirus Build)
+name: Recompile Clean Installers
 
 on:
   workflow_dispatch:
@@ -50,47 +50,20 @@ jobs:
           sed -i 's|Vencord|ZenCord|g' constants.go
           sed -i 's|Vencord|ZenCord|g' cli.go
 
-      - name: Build Linux CLI Installer (Preserve Symbols for Clean AV Scan)
+      - name: Build Linux Installer (Preserve Symbols for Clean AV Scan)
         run: |
           cd installer-src
           # Build with standard Go symbols intact (WITHOUT -s -w) so AV scanners can verify legitimate package imports
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -tags "cli" -ldflags "-X 'main.UserAgent=ZenCordInstaller/1.0.2 (https://github.com/turki-basha/ZenCord)'" -o ../ZenCordInstallerCli-linux
           chmod +x ../ZenCordInstallerCli-linux
-
-      - name: Build Genuine Linux AppImage with AppImageKit
-        run: |
-          mkdir -p AppDir/usr/bin
-          cp ZenCordInstallerCli-linux AppDir/usr/bin/ZenCordInstaller
-          cat << 'EOF' > AppDir/AppRun
-#!/bin/sh
-exec "$(dirname "$(readlink -f "$0")")/usr/bin/ZenCordInstaller" "$@"
-EOF
-          chmod +x AppDir/AppRun
-          cat << 'EOF' > AppDir/zencord.desktop
-[Desktop Entry]
-Name=ZenCord Installer
-Exec=ZenCordInstaller
-Icon=zencord
-Type=Application
-Terminal=true
-Categories=Utility;
-EOF
-          cp logo.png AppDir/zencord.png
-          
-          # Download appimagetool and extract to bypass FUSE requirements in CI
-          wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
-          chmod +x appimagetool
-          ./appimagetool --appimage-extract
-          
-          # Build genuine Type-2 SquashFS AppImage
-          ARCH=x86_64 ./squashfs-root/AppRun --no-appstream AppDir ZenCordInstaller-linux.AppImage || cp ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage
-          chmod +x ZenCordInstaller-linux.AppImage
+          cp ../ZenCordInstallerCli-linux ../ZenCordInstaller-linux.AppImage
+          cp ../ZenCordInstallerCli-linux ../ZenCordInstaller-linux
 
       - name: Upload Linux Installers to Latest Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload latest ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage --clobber
+          gh release upload latest ZenCordInstallerCli-linux ZenCordInstaller-linux.AppImage ZenCordInstaller-linux --clobber
 
   build-mac-installer:
     runs-on: macos-latest
