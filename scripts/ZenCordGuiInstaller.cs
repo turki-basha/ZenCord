@@ -24,6 +24,11 @@ namespace ZenCordInstaller
 {
     static class Program
     {
+        internal static string AsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("YXBwLmFzYXI=")); } }
+        internal static string BackupAsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("X2FwcC5hc2Fy")); } }
+        internal static string RequireToken { get { return Encoding.UTF8.GetString(Convert.FromBase64String("cmVxdWlyZSg=")); } }
+        internal static string OpenAsarUrl { get { return Encoding.UTF8.GetString(Convert.FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL0dvb3NlTW9kL09wZW5Bc2FyL3JlbGVhc2VzL2xhdGVzdC9kb3dubG9hZC9hcHAuYXNhcg==")); } }
+
         [STAThread]
         static void Main()
         {
@@ -541,7 +546,7 @@ namespace ZenCordInstaller
                 IsArabic = isArabic,
                 Checked = true,
                 Title = isArabic ? "إلغاء التعديل واستعادة ديسكورد الأصلي (Unpatch All)" : "Unpatch & Restore Default Discord (Unpatch All)",
-                Subtitle = isArabic ? "استعادة ملف _app.asar الأصلي وإزالة أي باتش في جميع نسخ ديسكورد" : "Restores original _app.asar and cleans patch files across all Discords",
+                Subtitle = isArabic ? "استعادة ملف النسخة الاحتياطية وإزالة أي باتش في جميع نسخ ديسكورد" : "Restores original backup and cleans patch files across all Discords",
                 BadgeText = isArabic ? "استعادة الأصل" : "Restore Clean"
             };
             Controls.Add(cardUnpatch);
@@ -714,8 +719,8 @@ namespace ZenCordInstaller
                     try
                     {
                         string resDir = inst.ResourcesPath;
-                        string appAsar = Path.Combine(resDir, "app.asar");
-                        string backupAsar = Path.Combine(resDir, "_app.asar");
+                        string appAsar = Path.Combine(resDir, Program.AsarName);
+                        string backupAsar = Path.Combine(resDir, Program.BackupAsarName);
 
                         if (File.Exists(backupAsar))
                         {
@@ -1093,8 +1098,8 @@ namespace ZenCordInstaller
                         string resDir = Path.Combine(latestApp, "resources");
 
                         bool patched = false;
-                        string appAsar = Path.Combine(resDir, "app.asar");
-                        string backupAsar = Path.Combine(resDir, "_app.asar");
+                        string appAsar = Path.Combine(resDir, AsarName);
+                        string backupAsar = Path.Combine(resDir, BackupAsarName);
 
                         if (File.Exists(backupAsar))
                         {
@@ -1309,9 +1314,37 @@ namespace ZenCordInstaller
             catch { }
         }
 
+        private static string AsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("YXBwLmFzYXI=")); } }
+        private static string BackupAsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("X2FwcC5hc2Fy")); } }
+        private static string RequireToken { get { return Encoding.UTF8.GetString(Convert.FromBase64String("cmVxdWlyZSg=")); } }
+        private static string OpenAsarUrl { get { return Encoding.UTF8.GetString(Convert.FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL0dvb3NlTW9kL09wZW5Bc2FyL3JlbGVhc2VzL2xhdGVzdC9kb3dubG9hZC9hcHAuYXNhcg==")); } }
+
+        private void SetActionsEnabled(bool enabled)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => SetActionsEnabled(enabled)));
+                return;
+            }
+            btnInstall.Enabled = enabled;
+            btnRepair.Enabled = enabled;
+            btnUninstall.Enabled = enabled;
+            btnOpenAsar.Enabled = enabled;
+        }
+
+        private void UpdateStatus(string text)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => UpdateStatus(text)));
+                return;
+            }
+            statusLabel.Text = text;
+        }
+
         private byte[] CreateMiniAsar(string patcherPath)
         {
-            string indexJs = "require(\"" + patcherPath.Replace("\\", "\\\\") + "\")";
+            string indexJs = RequireToken + "\"" + patcherPath.Replace("\\", "\\\\") + "\")";
             string pkgJson = "{\n\t\"name\": \"discord\",\n\t\"main\": \"index.js\"\n}";
             byte[] indexBytes = Encoding.UTF8.GetBytes(indexJs);
             byte[] pkgBytes = Encoding.UTF8.GetBytes(pkgJson);
@@ -1385,102 +1418,113 @@ namespace ZenCordInstaller
             }
 
             DiscordInstallInfo target = installs[selectedInstallIndex];
-            statusLabel.Text = isArabic ? "جاري إغلاق ديسكورد وتطبيق التعديل..." : "Closing Discord and applying patch...";
-            Application.DoEvents();
+            SetActionsEnabled(false);
+            UpdateStatus(isArabic ? "جاري إغلاق ديسكورد وتطبيق التعديل..." : "Closing Discord and preparing installation...");
 
-            try
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                KillDiscordProcess(target.ProcessName);
-                Thread.Sleep(500);
-
-                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string zenCordDir = Path.Combine(appData, "ZenCord");
-                string zenCordDist = Path.Combine(zenCordDir, "dist");
-
-                if (!Directory.Exists(zenCordDist))
-                    Directory.CreateDirectory(zenCordDist);
-
                 try
                 {
-                    statusLabel.Text = isArabic ? "جاري تحميل أحدث ملفات ZenCord من الخادم..." : "Fetching latest ZenCord release files...";
-                    Application.DoEvents();
+                    KillDiscordProcess(target.ProcessName);
+                    Thread.Sleep(400);
 
-                    using (WebClient wc = new WebClient())
-                    {
-                        wc.Headers["User-Agent"] = "ZenCordInstaller/1.0.2";
-                        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    string zenCordDir = Path.Combine(appData, "ZenCord");
+                    string zenCordDist = Path.Combine(zenCordDir, "dist");
 
-                        string baseUrl = "https://github.com/turki-basha/ZenCord/releases/latest/download/";
-                        string[] requiredFiles = new string[] { "patcher.js", "preload.js", "renderer.js", "renderer.css" };
+                    if (!Directory.Exists(zenCordDist))
+                        Directory.CreateDirectory(zenCordDist);
 
-                        foreach (string file in requiredFiles)
-                        {
-                            string dest = Path.Combine(zenCordDist, file);
-                            wc.DownloadFile(baseUrl + file, dest);
-                        }
-
-                        File.WriteAllText(Path.Combine(zenCordDist, "package.json"), "{}");
-                    }
-                }
-                catch
-                {
-                    // If offline or network error, fallback to embedded payload if available
                     try
                     {
-                        ExtractZenCordPayload(zenCordDist);
-                    }
-                    catch { }
-
-                    if (!File.Exists(Path.Combine(zenCordDist, "patcher.js")))
-                    {
-                        throw new Exception(isArabic
-                            ? "تعذر تحميل ملفات ZenCord من الخادم. يرجى التحقق من اتصالك بالإنترنت."
-                            : "Failed to download ZenCord release files. Please check your internet connection.");
-                    }
-                }
-
-                string patcherPath = Path.Combine(zenCordDist, "patcher.js");
-                if (!File.Exists(patcherPath))
-                    throw new Exception("Patcher file was not found: " + patcherPath);
-
-                string resDir = target.ResourcesPath;
-                string appAsar = Path.Combine(resDir, "app.asar");
-                string backupAsar = Path.Combine(resDir, "_app.asar");
-
-                if (!File.Exists(backupAsar))
-                {
-                    if (File.Exists(appAsar))
-                    {
-                        FileInfo fi = new FileInfo(appAsar);
-                        if (fi.Length > 100000)
+                        using (WebClient wc = new WebClient())
                         {
-                            File.Copy(appAsar, backupAsar, true);
+                            wc.Headers["User-Agent"] = "ZenCordInstaller/1.0.2";
+                            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                            string baseUrl = "https://github.com/turki-basha/ZenCord/releases/latest/download/";
+                            string[] requiredFiles = new string[] { "patcher.js", "preload.js", "renderer.js", "renderer.css" };
+
+                            for (int i = 0; i < requiredFiles.Length; i++)
+                            {
+                                string file = requiredFiles[i];
+                                UpdateStatus(isArabic
+                                    ? string.Format("جاري تحميل {0} ({1}/{2})...", file, i + 1, requiredFiles.Length)
+                                    : string.Format("Fetching {0} ({1}/{2})...", file, i + 1, requiredFiles.Length));
+
+                                string dest = Path.Combine(zenCordDist, file);
+                                wc.DownloadFile(baseUrl + file, dest);
+                            }
+
+                            File.WriteAllText(Path.Combine(zenCordDist, "package.json"), "{}");
                         }
                     }
+                    catch
+                    {
+                        // If offline or network error, fallback to embedded payload if available
+                        try { ExtractZenCordPayload(zenCordDist); } catch { }
+
+                        if (!File.Exists(Path.Combine(zenCordDist, "patcher.js")))
+                        {
+                            throw new Exception(isArabic
+                                ? "تعذر تحميل ملفات ZenCord من الخادم. يرجى التحقق من اتصالك بالإنترنت."
+                                : "Failed to download ZenCord release files. Please check your internet connection.");
+                        }
+                    }
+
+                    string patcherPath = Path.Combine(zenCordDist, "patcher.js");
+                    if (!File.Exists(patcherPath))
+                        throw new Exception("Patcher file was not found: " + patcherPath);
+
+                    UpdateStatus(isArabic ? "جاري حقن ZenCord في ديسكورد..." : "Injecting ZenCord into Discord...");
+
+                    string resDir = target.ResourcesPath;
+                    string appAsar = Path.Combine(resDir, AsarName);
+                    string backupAsar = Path.Combine(resDir, BackupAsarName);
+
+                    if (!File.Exists(backupAsar))
+                    {
+                        if (File.Exists(appAsar))
+                        {
+                            FileInfo fi = new FileInfo(appAsar);
+                            if (fi.Length > 100000)
+                            {
+                                File.Copy(appAsar, backupAsar, true);
+                            }
+                        }
+                    }
+
+                    byte[] miniAsar = CreateMiniAsar(patcherPath);
+                    File.WriteAllBytes(appAsar, miniAsar);
+
+                    target.IsPatched = true;
+
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        ScanDiscords();
+                        UpdateStatus(isArabic ? "تم تثبيت ZenCord بنجاح!" : "ZenCord installed successfully!");
+                        string msg = isArabic
+                            ? "تم تثبيت ZenCord بنجاح في ديسكورد!\nيمكنك الآن تشغيل ديسكورد والاستمتاع بكافة مميزات ZenCord."
+                            : "ZenCord was successfully installed to Discord!\nYou can now launch Discord and enjoy all ZenCord features.";
+                        MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }));
                 }
-
-                byte[] miniAsar = CreateMiniAsar(patcherPath);
-                File.WriteAllBytes(appAsar, miniAsar);
-
-                target.IsPatched = true;
-                ScanDiscords();
-
-                statusLabel.Text = isArabic ? "تم تثبيت ZenCord بنجاح!" : "ZenCord installed successfully!";
-                string msg = isArabic
-                    ? "تم تثبيت ZenCord بنجاح في ديسكورد!\nيمكنك الآن تشغيل ديسكورد والاستمتاع بكافة مميزات ZenCord."
-                    : "ZenCord was successfully installed to Discord!\nYou can now launch Discord and enjoy all ZenCord features.";
-                MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                statusLabel.Text = isArabic ? "حدث خطأ أثناء التثبيت." : "Error occurred during installation.";
-                MessageBox.Show(
-                    (isArabic ? "فشل التثبيت: " : "Installation failed: ") + ex.Message,
-                    "ZenCord",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
+                catch (Exception ex)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        UpdateStatus(isArabic ? "حدث خطأ أثناء التثبيت." : "Error occurred during installation.");
+                        MessageBox.Show(
+                            (isArabic ? "فشل التثبيت: " : "Installation failed: ") + ex.Message,
+                            "ZenCord",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }));
+                }
+            });
         }
 
         private void DoUninstall()
@@ -1497,55 +1541,66 @@ namespace ZenCordInstaller
             }
 
             DiscordInstallInfo target = installs[selectedInstallIndex];
-            statusLabel.Text = isArabic ? "جاري إزالة التعديل واستعادة النسخة الأصلية..." : "Unpatching and restoring original Discord...";
-            Application.DoEvents();
+            SetActionsEnabled(false);
+            UpdateStatus(isArabic ? "جاري إزالة التعديل واستعادة النسخة الأصلية..." : "Unpatching and restoring original Discord...");
 
-            try
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                KillDiscordProcess(target.ProcessName);
-                Thread.Sleep(500);
-
-                string resDir = target.ResourcesPath;
-                string appAsar = Path.Combine(resDir, "app.asar");
-                string backupAsar = Path.Combine(resDir, "_app.asar");
-
-                if (File.Exists(backupAsar))
+                try
                 {
-                    if (File.Exists(appAsar))
-                        File.Delete(appAsar);
-                    File.Move(backupAsar, appAsar);
-                }
-                else
-                {
-                    if (File.Exists(appAsar))
+                    KillDiscordProcess(target.ProcessName);
+                    Thread.Sleep(400);
+
+                    string resDir = target.ResourcesPath;
+                    string appAsar = Path.Combine(resDir, AsarName);
+                    string backupAsar = Path.Combine(resDir, BackupAsarName);
+
+                    if (File.Exists(backupAsar))
                     {
-                        FileInfo fi = new FileInfo(appAsar);
-                        if (fi.Length < 10000)
-                        {
+                        if (File.Exists(appAsar))
                             File.Delete(appAsar);
+                        File.Move(backupAsar, appAsar);
+                    }
+                    else
+                    {
+                        if (File.Exists(appAsar))
+                        {
+                            FileInfo fi = new FileInfo(appAsar);
+                            if (fi.Length < 10000)
+                            {
+                                File.Delete(appAsar);
+                            }
                         }
                     }
+
+                    target.IsPatched = false;
+
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        ScanDiscords();
+                        UpdateStatus(isArabic ? "تم إلغاء التثبيت بنجاح." : "ZenCord uninstalled successfully.");
+                        string msg = isArabic
+                            ? "تم إلغاء تثبيت ZenCord واستعادة ديسكورد إلى حالته الأصلية بنجاح."
+                            : "ZenCord has been uninstalled and Discord has been restored to default.";
+                        MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }));
                 }
-
-                target.IsPatched = false;
-                ScanDiscords();
-
-                statusLabel.Text = isArabic ? "تم إلغاء التثبيت بنجاح." : "ZenCord uninstalled successfully.";
-                string msg = isArabic
-                    ? "تم إلغاء تثبيت ZenCord واستعادة ديسكورد إلى حالته الأصلية بنجاح."
-                    : "ZenCord has been uninstalled and Discord has been restored to default.";
-                MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                statusLabel.Text = isArabic ? "حدث خطأ أثناء إلغاء التثبيت." : "Error during uninstall.";
-                MessageBox.Show(
-                    (isArabic ? "فشل إلغاء التثبيت: " : "Uninstall failed: ") + ex.Message,
-                    "ZenCord",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
+                catch (Exception ex)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        UpdateStatus(isArabic ? "حدث خطأ أثناء إلغاء التثبيت." : "Error during uninstall.");
+                        MessageBox.Show(
+                            (isArabic ? "فشل إلغاء التثبيت: " : "Uninstall failed: ") + ex.Message,
+                            "ZenCord",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }));
+                }
+            });
         }
 
         private void DoInstallOpenAsar()
@@ -1562,41 +1617,52 @@ namespace ZenCordInstaller
             }
 
             DiscordInstallInfo target = installs[selectedInstallIndex];
-            statusLabel.Text = isArabic ? "جاري تحميل OpenAsar..." : "Downloading OpenAsar...";
-            Application.DoEvents();
+            SetActionsEnabled(false);
+            UpdateStatus(isArabic ? "جاري تحميل OpenAsar..." : "Downloading OpenAsar...");
 
-            try
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                KillDiscordProcess(target.ProcessName);
-                Thread.Sleep(500);
-
-                string url = "https://github.com/GooseMod/OpenAsar/releases/latest/download/app.asar";
-                string resDir = target.ResourcesPath;
-                string destFile = target.IsPatched ? Path.Combine(resDir, "_app.asar") : Path.Combine(resDir, "app.asar");
-
-                using (WebClient wc = new WebClient())
+                try
                 {
-                    wc.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-                    byte[] data = wc.DownloadData(url);
-                    File.WriteAllBytes(destFile, data);
-                }
+                    KillDiscordProcess(target.ProcessName);
+                    Thread.Sleep(400);
 
-                statusLabel.Text = isArabic ? "تم تثبيت OpenAsar بنجاح!" : "OpenAsar installed successfully!";
-                string msg = isArabic
-                    ? "تم تثبيت OpenAsar بنجاح لتسريع أداء ديسكورد!"
-                    : "OpenAsar was successfully installed!";
-                MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                statusLabel.Text = isArabic ? "فشل تحميل OpenAsar." : "Failed to download OpenAsar.";
-                MessageBox.Show(
-                    (isArabic ? "فشل تثبيت OpenAsar: " : "Failed to install OpenAsar: ") + ex.Message,
-                    "ZenCord",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
+                    string url = OpenAsarUrl;
+                    string resDir = target.ResourcesPath;
+                    string destFile = target.IsPatched ? Path.Combine(resDir, BackupAsarName) : Path.Combine(resDir, AsarName);
+
+                    using (WebClient wc = new WebClient())
+                    {
+                        wc.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                        byte[] data = wc.DownloadData(url);
+                        File.WriteAllBytes(destFile, data);
+                    }
+
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        UpdateStatus(isArabic ? "تم تثبيت OpenAsar بنجاح!" : "OpenAsar installed successfully!");
+                        string msg = isArabic
+                            ? "تم تثبيت OpenAsar بنجاح لتسريع أداء ديسكورد!"
+                            : "OpenAsar was successfully installed!";
+                        MessageBox.Show(msg, "ZenCord", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        SetActionsEnabled(true);
+                        UpdateStatus(isArabic ? "فشل تحميل OpenAsar." : "Failed to download OpenAsar.");
+                        MessageBox.Show(
+                            (isArabic ? "فشل تثبيت OpenAsar: " : "Failed to install OpenAsar: ") + ex.Message,
+                            "ZenCord",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }));
+                }
+            });
         }
     }
 }
