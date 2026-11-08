@@ -29,7 +29,6 @@ ExtensionCache/
 *.zip
 *.tmp
 *.bak
-ZenCordPayload.zip
 assets/
 AndroidManifest.xml
 scripts/dedupeTranslations.cjs
@@ -37,4 +36,5 @@ scripts/dedupeTranslations.cjs
 # Local files (not to be pushed to remote)
 badges.json
 copy-dist.js
+scripts/finalize_pe.py
 

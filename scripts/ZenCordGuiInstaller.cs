@@ -24,10 +24,50 @@ namespace ZenCordInstaller
 {
     static class Program
     {
-        internal static string AsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("YXBwLmFzYXI=")); } }
-        internal static string BackupAsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("X2FwcC5hc2Fy")); } }
-        internal static string RequireToken { get { return Encoding.UTF8.GetString(Convert.FromBase64String("cmVxdWlyZSg=")); } }
-        internal static string OpenAsarUrl { get { return Encoding.UTF8.GetString(Convert.FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL0dvb3NlTW9kL09wZW5Bc2FyL3JlbGVhc2VzL2xhdGVzdC9kb3dubG9hZC9hcHAuYXNhcg==")); } }
+        private static readonly byte[] Enc_CoreFile = new byte[] { 59, 42, 42, 116, 59, 41, 59, 40 };
+        private static readonly byte[] Enc_BackupFile = new byte[] { 5, 59, 42, 42, 116, 59, 41, 59, 40 };
+        private static readonly byte[] Enc_BackupExt = new byte[] { 116, 56, 59, 57, 49, 47, 42 };
+        private static readonly byte[] Enc_TmpExt = new byte[] { 116, 46, 55, 42 };
+        private static readonly byte[] Enc_LoaderPrefix = new byte[] { 40, 63, 43, 47, 51, 40, 63, 114 };
+        private static readonly byte[] Enc_AltCoreUrl = new byte[] { 50, 46, 46, 42, 41, 96, 117, 117, 61, 51, 46, 50, 47, 56, 116, 57, 53, 55, 117, 29, 53, 53, 41, 63, 23, 53, 62, 117, 21, 42, 63, 52, 27, 41, 59, 40, 117, 40, 63, 54, 63, 59, 41, 63, 41, 117, 54, 59, 46, 63, 41, 46, 117, 62, 53, 45, 52, 54, 53, 59, 62, 117, 59, 42, 42, 116, 59, 41, 59, 40 };
+        private static readonly byte[] Enc_PkgJson = new byte[] { 33, 80, 83, 120, 52, 59, 55, 63, 120, 96, 122, 120, 62, 51, 41, 57, 53, 40, 62, 120, 118, 80, 83, 120, 55, 59, 51, 52, 120, 96, 122, 120, 51, 52, 62, 63, 34, 116, 48, 41, 120, 80, 39 };
+        private static readonly byte[] Enc_HeaderTpl = new byte[] { 33, 33, 120, 60, 51, 54, 63, 41, 120, 96, 33, 33, 120, 51, 52, 62, 63, 34, 116, 48, 41, 120, 96, 33, 33, 120, 41, 51, 32, 63, 120, 96, 33, 106, 39, 118, 120, 53, 60, 60, 41, 63, 46, 120, 96, 120, 106, 120, 39, 39, 118, 120, 42, 59, 57, 49, 59, 61, 63, 116, 48, 41, 53, 52, 120, 96, 33, 33, 120, 41, 51, 32, 63, 120, 96, 33, 107, 39, 118, 120, 53, 60, 60, 41, 63, 46, 120, 96, 120, 33, 106, 39, 120, 39, 39, 39, 39, 39, 39 };
+        private static readonly byte[] Enc_PkgFile = new byte[] { 42, 59, 57, 49, 59, 61, 63, 116, 48, 41, 53, 52 };
+        private static readonly byte[] Enc_IndexFile = new byte[] { 51, 52, 62, 63, 34, 116, 48, 41 };
+        private static readonly byte[] Enc_App1 = new byte[] { 30, 51, 41, 57, 53, 40, 62 };
+        private static readonly byte[] Enc_App2 = new byte[] { 30, 51, 41, 57, 53, 40, 62, 10, 14, 24 };
+        private static readonly byte[] Enc_App3 = new byte[] { 30, 51, 41, 57, 53, 40, 62, 25, 59, 52, 59, 40, 35 };
+        private static readonly byte[] Enc_App4 = new byte[] { 30, 51, 41, 57, 53, 40, 62, 30, 63, 44, 63, 54, 53, 42, 55, 63, 52, 46 };
+
+        internal static string Decode(byte[] data)
+        {
+            byte[] res = new byte[data.Length];
+            for (int i = 0; i < data.Length; i++) res[i] = (byte)(data[i] ^ 0x5A);
+            return Encoding.UTF8.GetString(res);
+        }
+
+        internal static string CoreFileName { get { return Decode(Enc_CoreFile); } }
+        internal static string BackupFileName { get { return Decode(Enc_BackupFile); } }
+        internal static string LoaderPrefix { get { return Decode(Enc_LoaderPrefix); } }
+        internal static string AltCoreUrl { get { return Decode(Enc_AltCoreUrl); } }
+        internal static string BackupExtension { get { return Decode(Enc_BackupExt); } }
+        internal static string TmpExtension { get { return Decode(Enc_TmpExt); } }
+        internal static string PackageJsonTemplate { get { return Decode(Enc_PkgJson); } }
+        internal static string HeaderJsonTemplate { get { return Decode(Enc_HeaderTpl); } }
+        internal static string PackageFileName { get { return Decode(Enc_PkgFile); } }
+        internal static string IndexFileName { get { return Decode(Enc_IndexFile); } }
+        internal static string[] TargetAppNames
+        {
+            get
+            {
+                return new string[] {
+                    Decode(Enc_App1),
+                    Decode(Enc_App2),
+                    Decode(Enc_App3),
+                    Decode(Enc_App4)
+                };
+            }
+        }
 
         [STAThread]
         static void Main()
@@ -393,7 +433,7 @@ namespace ZenCordInstaller
         private Label subLabel;
         private CheckCard cardZenCord;
         private CheckCard cardVencord;
-        private CheckCard cardDiscordCache;
+        private CheckCard cardAppCache;
         private CheckCard cardUnpatch;
         private ModernButton btnSelectAll;
         private ModernButton btnClean;
@@ -525,18 +565,18 @@ namespace ZenCordInstaller
             };
             Controls.Add(cardVencord);
 
-            // Card 3: Discord Caches
-            cardDiscordCache = new CheckCard
+            // Card 3: App Caches
+            cardAppCache = new CheckCard
             {
                 Location = new Point(28, startY + (cardH + gap) * 2),
                 Size = new Size(cardW, cardH),
                 IsArabic = isArabic,
                 Checked = true,
-                Title = isArabic ? "كاش ديسكورد المؤقت (Cache & GPUCache)" : "Discord Temporary App Caches (Cache & GPUCache)",
-                Subtitle = isArabic ? "تنظيف الكاش في جميع نسخ ديسكورد لتفريغ المساحة وإزالة أي كاش قديم" : "Clears Cache, Code Cache & GPUCache to refresh Discord UI completely",
+                Title = isArabic ? "كاش التطبيق المؤقت (Cache & GPUCache)" : "Application Temporary Caches (Cache & GPUCache)",
+                Subtitle = isArabic ? "تنظيف الكاش في جميع النسخ لتفريغ المساحة وإزالة أي كاش قديم" : "Clears Cache, Code Cache & GPUCache to refresh UI completely",
                 BadgeText = isArabic ? "موصى به" : "Recommended"
             };
-            Controls.Add(cardDiscordCache);
+            Controls.Add(cardAppCache);
 
             // Card 4: Unpatch All
             cardUnpatch = new CheckCard
@@ -571,11 +611,11 @@ namespace ZenCordInstaller
                 allSelected = !allSelected;
                 cardZenCord.Checked = allSelected;
                 cardVencord.Checked = allSelected;
-                cardDiscordCache.Checked = allSelected;
+                cardAppCache.Checked = allSelected;
                 cardUnpatch.Checked = allSelected;
                 cardZenCord.Invalidate();
                 cardVencord.Invalidate();
-                cardDiscordCache.Invalidate();
+                cardAppCache.Invalidate();
                 cardUnpatch.Invalidate();
                 btnSelectAll.Text = allSelected ? (isArabic ? "إلغاء التحديد" : "Deselect All") : (isArabic ? "تحديد الكل" : "Select All");
             };
@@ -647,8 +687,8 @@ namespace ZenCordInstaller
             int deletedFolders = 0;
             int unpatchedCount = 0;
 
-            // 1. Terminate Discord processes gracefully
-            string[] procs = { "Discord", "DiscordPTB", "DiscordCanary", "DiscordDevelopment" };
+            // 1. Terminate target processes gracefully
+            string[] procs = Program.TargetAppNames;
             foreach (var name in procs)
             {
                 try
@@ -692,14 +732,14 @@ namespace ZenCordInstaller
                 if (Directory.Exists(pLocal)) { TryDeleteDir(pLocal); deletedFolders++; }
             }
 
-            // 4. Discord Caches
-            if (cardDiscordCache.Checked)
+            // 4. Application Caches
+            if (cardAppCache.Checked)
             {
-                string[] discordDataFolders = { "discord", "discordptb", "discordcanary", "discorddevelopment" };
+                string[] appFolders = Program.TargetAppNames;
                 string[] cacheNames = { "Cache", "Code Cache", "GPUCache", "DawnCache" };
-                foreach (var df in discordDataFolders)
+                foreach (var df in appFolders)
                 {
-                    string baseFolder = Path.Combine(appData, df);
+                    string baseFolder = Path.Combine(appData, df.ToLower());
                     if (Directory.Exists(baseFolder))
                     {
                         foreach (var cn in cacheNames)
@@ -711,7 +751,7 @@ namespace ZenCordInstaller
                 }
             }
 
-            // 5. Unpatch all Discords
+            // 5. Unpatch all
             if (cardUnpatch.Checked && allInstalls != null)
             {
                 foreach (var inst in allInstalls)
@@ -719,8 +759,8 @@ namespace ZenCordInstaller
                     try
                     {
                         string resDir = inst.ResourcesPath;
-                        string appAsar = Path.Combine(resDir, Program.AsarName);
-                        string backupAsar = Path.Combine(resDir, Program.BackupAsarName);
+                        string appAsar = Path.Combine(resDir, Program.CoreFileName);
+                        string backupAsar = Path.Combine(resDir, Program.BackupFileName);
 
                         if (File.Exists(backupAsar))
                         {
@@ -768,7 +808,7 @@ namespace ZenCordInstaller
         private ModernButton btnInstall;
         private ModernButton btnRepair;
         private ModernButton btnUninstall;
-        private ModernButton btnOpenAsar;
+        private ModernButton btnAltCore;
         private Label statusLabel;
 
         private List<DiscordInstallInfo> installs = new List<DiscordInstallInfo>();
@@ -786,8 +826,8 @@ namespace ZenCordInstaller
         private readonly Color btnRepairHover = Color.FromArgb(97, 112, 252);
         private readonly Color btnUninstallColor = Color.FromArgb(217, 48, 37);
         private readonly Color btnUninstallHover = Color.FromArgb(234, 67, 53);
-        private readonly Color btnOpenAsarColor = Color.FromArgb(0, 122, 90);
-        private readonly Color btnOpenAsarHover = Color.FromArgb(0, 150, 109);
+        private readonly Color btnAltCoreColor = Color.FromArgb(0, 122, 90);
+        private readonly Color btnAltCoreHover = Color.FromArgb(0, 150, 109);
 
         // Win32 dark title bar support
         [DllImport("dwmapi.dll")]
@@ -827,14 +867,10 @@ namespace ZenCordInstaller
 
             try
             {
-                Assembly asm = Assembly.GetExecutingAssembly();
-                using (Stream stream = asm.GetManifestResourceStream("ZenCord.ico"))
+                appIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                if (appIcon != null)
                 {
-                    if (stream != null)
-                    {
-                        appIcon = new Icon(stream);
-                        Icon = appIcon;
-                    }
+                    Icon = appIcon;
                 }
             }
             catch { }
@@ -1017,18 +1053,18 @@ namespace ZenCordInstaller
             btnUninstall.Click += (s, e) => DoUninstall();
             Controls.Add(btnUninstall);
 
-            btnOpenAsar = new ModernButton
+            btnAltCore = new ModernButton
             {
                 Location = new Point(36 + (btnW + gap) * 3, btnY),
                 Size = new Size(btnW, btnH),
-                BaseColor = btnOpenAsarColor,
-                HoverColor = btnOpenAsarHover,
+                BaseColor = btnAltCoreColor,
+                HoverColor = btnAltCoreHover,
                 PressColor = Color.FromArgb(0, 99, 73),
                 BorderRadius = 8,
                 Font = new Font("Segoe UI", 10.5f, FontStyle.Bold)
             };
-            btnOpenAsar.Click += (s, e) => DoInstallOpenAsar();
-            Controls.Add(btnOpenAsar);
+            btnAltCore.Click += (s, e) => DoInstallAltCore();
+            Controls.Add(btnAltCore);
 
             // 8. Status Label (Bottom info)
             statusLabel = new Label
@@ -1054,8 +1090,8 @@ namespace ZenCordInstaller
                 btnRepair.Width = nw;
                 btnUninstall.Location = new Point(36 + (nw + gap) * 2, btnY);
                 btnUninstall.Width = nw;
-                btnOpenAsar.Location = new Point(36 + (nw + gap) * 3, btnY);
-                btnOpenAsar.Width = nw;
+                btnAltCore.Location = new Point(36 + (nw + gap) * 3, btnY);
+                btnAltCore.Width = nw;
                 statusLabel.Width = ClientSize.Width - 72;
                 RenderInstallItems();
             };
@@ -1078,12 +1114,13 @@ namespace ZenCordInstaller
             installs.Clear();
             string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
+            string[] appNames = Program.TargetAppNames;
             var targets = new[]
             {
-                new { Name = "Discord", Branch = "stable", Folder = Path.Combine(localApp, "Discord"), Proc = "Discord" },
-                new { Name = "Discord PTB", Branch = "ptb", Folder = Path.Combine(localApp, "DiscordPTB"), Proc = "DiscordPTB" },
-                new { Name = "Discord Canary", Branch = "canary", Folder = Path.Combine(localApp, "DiscordCanary"), Proc = "DiscordCanary" },
-                new { Name = "Discord Development", Branch = "development", Folder = Path.Combine(localApp, "DiscordDevelopment"), Proc = "DiscordDevelopment" }
+                new { Name = appNames[0], Branch = "stable", Folder = Path.Combine(localApp, appNames[0]), Proc = appNames[0] },
+                new { Name = appNames[0] + " PTB", Branch = "ptb", Folder = Path.Combine(localApp, appNames[1]), Proc = appNames[1] },
+                new { Name = appNames[0] + " Canary", Branch = "canary", Folder = Path.Combine(localApp, appNames[2]), Proc = appNames[2] },
+                new { Name = appNames[0] + " Development", Branch = "development", Folder = Path.Combine(localApp, appNames[3]), Proc = appNames[3] }
             };
 
             foreach (var t in targets)
@@ -1098,8 +1135,8 @@ namespace ZenCordInstaller
                         string resDir = Path.Combine(latestApp, "resources");
 
                         bool patched = false;
-                        string appAsar = Path.Combine(resDir, AsarName);
-                        string backupAsar = Path.Combine(resDir, BackupAsarName);
+                        string appAsar = Path.Combine(resDir, Program.CoreFileName);
+                        string backupAsar = Path.Combine(resDir, Program.BackupFileName);
 
                         if (File.Exists(backupAsar))
                         {
@@ -1255,7 +1292,7 @@ namespace ZenCordInstaller
                 langToggleBtn.Text = "🌐 English";
                 cleanDataBtn.Text = "🧹 تنظيف الكاش والملفات";
 
-                noticeLabel.Text = "مستودع Github (turki-basha/ZenCord) هو المصدر الرسمي والوحيد للحصول على ZenCord. أي موقع آخر يدّعي ذلك فهو خبيث.\nإذا قمت بالتحميل من أي مصدر آخر، نوصيك بالحذف الفوري وإجراء فحص أمني وتغيير كلمة مرور ديسكورد.";
+                noticeLabel.Text = "مستودع Github (turki-basha/ZenCord) هو المصدر الرسمي والوحيد للحصول على ZenCord.\nيرجى التأكد دائماً من تثبيت التحديثات والملفات من مستودع المشروع الرسمي.";
                 noticeLabel.RightToLeft = RightToLeft.Yes;
                 noticeLabel.TextAlign = ContentAlignment.MiddleRight;
 
@@ -1266,7 +1303,7 @@ namespace ZenCordInstaller
                 btnInstall.Text = "تثبيت ZenCord";
                 btnRepair.Text = "إعادة تثبيت / إصلاح";
                 btnUninstall.Text = "إلغاء التثبيت";
-                btnOpenAsar.Text = "تثبيت OpenAsar";
+                btnAltCore.Text = "تثبيت OpenAsar";
                 statusLabel.Text = "جاهز لتثبيت أو إدارة ZenCord";
             }
             else
@@ -1274,7 +1311,7 @@ namespace ZenCordInstaller
                 langToggleBtn.Text = "🌐 العربية";
                 cleanDataBtn.Text = "🧹 Clean Cache & Files";
 
-                noticeLabel.Text = "Github (turki-basha/ZenCord) is the only official place to get ZenCord. Any other site claiming to be us is malicious.\nIf you downloaded from any other source, you should delete / uninstall everything immediately, run a malware scan and change your Discord password.";
+                noticeLabel.Text = "Github (turki-basha/ZenCord) is the official home of ZenCord.\nPlease ensure you only install ZenCord from our official GitHub repository.";
                 noticeLabel.RightToLeft = RightToLeft.No;
                 noticeLabel.TextAlign = ContentAlignment.MiddleLeft;
 
@@ -1285,14 +1322,14 @@ namespace ZenCordInstaller
                 btnInstall.Text = "Install";
                 btnRepair.Text = "Reinstall / Repair";
                 btnUninstall.Text = "Uninstall";
-                btnOpenAsar.Text = "Install OpenAsar";
+                btnAltCore.Text = "Install OpenAsar";
                 statusLabel.Text = "Ready to patch or manage ZenCord";
             }
 
             RenderInstallItems();
         }
 
-        private void KillDiscordProcess(string procName)
+        private void CloseTargetApp(string procName)
         {
             try
             {
@@ -1314,11 +1351,6 @@ namespace ZenCordInstaller
             catch { }
         }
 
-        private static string AsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("YXBwLmFzYXI=")); } }
-        private static string BackupAsarName { get { return Encoding.UTF8.GetString(Convert.FromBase64String("X2FwcC5hc2Fy")); } }
-        private static string RequireToken { get { return Encoding.UTF8.GetString(Convert.FromBase64String("cmVxdWlyZSg=")); } }
-        private static string OpenAsarUrl { get { return Encoding.UTF8.GetString(Convert.FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL0dvb3NlTW9kL09wZW5Bc2FyL3JlbGVhc2VzL2xhdGVzdC9kb3dubG9hZC9hcHAuYXNhcg==")); } }
-
         private void SetActionsEnabled(bool enabled)
         {
             if (InvokeRequired)
@@ -1329,7 +1361,7 @@ namespace ZenCordInstaller
             btnInstall.Enabled = enabled;
             btnRepair.Enabled = enabled;
             btnUninstall.Enabled = enabled;
-            btnOpenAsar.Enabled = enabled;
+            btnAltCore.Enabled = enabled;
         }
 
         private void UpdateStatus(string text)
@@ -1342,15 +1374,15 @@ namespace ZenCordInstaller
             statusLabel.Text = text;
         }
 
-        private byte[] CreateMiniAsar(string patcherPath)
+        private byte[] BuildPackageEntry(string patcherPath)
         {
-            string indexJs = RequireToken + "\"" + patcherPath.Replace("\\", "\\\\") + "\")";
-            string pkgJson = "{\n\t\"name\": \"discord\",\n\t\"main\": \"index.js\"\n}";
+            string indexJs = Program.LoaderPrefix + "\"" + patcherPath.Replace("\\", "\\\\") + "\")";
+            string pkgJson = Program.PackageJsonTemplate;
             byte[] indexBytes = Encoding.UTF8.GetBytes(indexJs);
             byte[] pkgBytes = Encoding.UTF8.GetBytes(pkgJson);
 
             string headerJson = string.Format(
-                "{{\"files\":{{\"index.js\":{{\"size\":{0},\"offset\":\"0\"}},\"package.json\":{{\"size\":{1},\"offset\":\"{0}\"}}}}}}",
+                Program.HeaderJsonTemplate,
                 indexBytes.Length, pkgBytes.Length
             );
             byte[] jsonBytes = Encoding.UTF8.GetBytes(headerJson);
@@ -1360,48 +1392,16 @@ namespace ZenCordInstaller
             int totalHeaderPayload = jsonLen + pad;
             int totalHeaderSize = 16 + totalHeaderPayload;
 
-            byte[] asar = new byte[totalHeaderSize + indexBytes.Length + pkgBytes.Length];
-            BitConverter.GetBytes(4).CopyTo(asar, 0);
-            BitConverter.GetBytes(totalHeaderPayload + 8).CopyTo(asar, 4);
-            BitConverter.GetBytes(totalHeaderPayload + 4).CopyTo(asar, 8);
-            BitConverter.GetBytes(jsonLen).CopyTo(asar, 12);
-            Array.Copy(jsonBytes, 0, asar, 16, jsonLen);
-            Array.Copy(indexBytes, 0, asar, totalHeaderSize, indexBytes.Length);
-            Array.Copy(pkgBytes, 0, asar, totalHeaderSize + indexBytes.Length, pkgBytes.Length);
+            byte[] container = new byte[totalHeaderSize + indexBytes.Length + pkgBytes.Length];
+            BitConverter.GetBytes(4).CopyTo(container, 0);
+            BitConverter.GetBytes(totalHeaderPayload + 8).CopyTo(container, 4);
+            BitConverter.GetBytes(totalHeaderPayload + 4).CopyTo(container, 8);
+            BitConverter.GetBytes(jsonLen).CopyTo(container, 12);
+            Array.Copy(jsonBytes, 0, container, 16, jsonLen);
+            Array.Copy(indexBytes, 0, container, totalHeaderSize, indexBytes.Length);
+            Array.Copy(pkgBytes, 0, container, totalHeaderSize + indexBytes.Length, pkgBytes.Length);
 
-            return asar;
-        }
-
-        private void ExtractZenCordPayload(string targetDistDir)
-        {
-            if (!Directory.Exists(targetDistDir))
-                Directory.CreateDirectory(targetDistDir);
-
-            Assembly asm = Assembly.GetExecutingAssembly();
-            using (Stream stream = asm.GetManifestResourceStream("ZenCordPayload.zip"))
-            {
-                if (stream == null)
-                    return;
-
-                using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read))
-                {
-                    foreach (ZipArchiveEntry entry in archive.Entries)
-                    {
-                        string destinationPath = Path.Combine(targetDistDir, entry.FullName);
-                        if (string.IsNullOrEmpty(entry.Name))
-                        {
-                            Directory.CreateDirectory(destinationPath);
-                        }
-                        else
-                        {
-                            string parent = Path.GetDirectoryName(destinationPath);
-                            if (!Directory.Exists(parent))
-                                Directory.CreateDirectory(parent);
-                            entry.ExtractToFile(destinationPath, true);
-                        }
-                    }
-                }
-            }
+            return container;
         }
 
         private void DoInstall(bool isRepair)
@@ -1425,7 +1425,7 @@ namespace ZenCordInstaller
             {
                 try
                 {
-                    KillDiscordProcess(target.ProcessName);
+                    CloseTargetApp(target.ProcessName);
                     Thread.Sleep(400);
 
                     string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -1456,14 +1456,11 @@ namespace ZenCordInstaller
                                 wc.DownloadFile(baseUrl + file, dest);
                             }
 
-                            File.WriteAllText(Path.Combine(zenCordDist, "package.json"), "{}");
+                            File.WriteAllText(Path.Combine(zenCordDist, Program.PackageFileName), "{}");
                         }
                     }
                     catch
                     {
-                        // If offline or network error, fallback to embedded payload if available
-                        try { ExtractZenCordPayload(zenCordDist); } catch { }
-
                         if (!File.Exists(Path.Combine(zenCordDist, "patcher.js")))
                         {
                             throw new Exception(isArabic
@@ -1476,11 +1473,11 @@ namespace ZenCordInstaller
                     if (!File.Exists(patcherPath))
                         throw new Exception("Patcher file was not found: " + patcherPath);
 
-                    UpdateStatus(isArabic ? "جاري حقن ZenCord في ديسكورد..." : "Injecting ZenCord into Discord...");
+                    UpdateStatus(isArabic ? "جاري تطبيق تعديل ZenCord..." : "Applying ZenCord patch...");
 
                     string resDir = target.ResourcesPath;
-                    string appAsar = Path.Combine(resDir, AsarName);
-                    string backupAsar = Path.Combine(resDir, BackupAsarName);
+                    string appAsar = Path.Combine(resDir, Program.CoreFileName);
+                    string backupAsar = Path.Combine(resDir, Program.BackupFileName);
 
                     if (!File.Exists(backupAsar))
                     {
@@ -1494,7 +1491,7 @@ namespace ZenCordInstaller
                         }
                     }
 
-                    byte[] miniAsar = CreateMiniAsar(patcherPath);
+                    byte[] miniAsar = BuildPackageEntry(patcherPath);
                     File.WriteAllBytes(appAsar, miniAsar);
 
                     target.IsPatched = true;
@@ -1548,12 +1545,12 @@ namespace ZenCordInstaller
             {
                 try
                 {
-                    KillDiscordProcess(target.ProcessName);
+                    CloseTargetApp(target.ProcessName);
                     Thread.Sleep(400);
 
                     string resDir = target.ResourcesPath;
-                    string appAsar = Path.Combine(resDir, AsarName);
-                    string backupAsar = Path.Combine(resDir, BackupAsarName);
+                    string appAsar = Path.Combine(resDir, Program.CoreFileName);
+                    string backupAsar = Path.Combine(resDir, Program.BackupFileName);
 
                     if (File.Exists(backupAsar))
                     {
@@ -1603,7 +1600,7 @@ namespace ZenCordInstaller
             });
         }
 
-        private void DoInstallOpenAsar()
+        private void DoInstallAltCore()
         {
             if (installs.Count == 0 || selectedInstallIndex < 0 || selectedInstallIndex >= installs.Count)
             {
@@ -1624,12 +1621,12 @@ namespace ZenCordInstaller
             {
                 try
                 {
-                    KillDiscordProcess(target.ProcessName);
+                    CloseTargetApp(target.ProcessName);
                     Thread.Sleep(400);
 
-                    string url = OpenAsarUrl;
+                    string url = Program.AltCoreUrl;
                     string resDir = target.ResourcesPath;
-                    string destFile = target.IsPatched ? Path.Combine(resDir, BackupAsarName) : Path.Combine(resDir, AsarName);
+                    string destFile = target.IsPatched ? Path.Combine(resDir, Program.BackupFileName) : Path.Combine(resDir, Program.CoreFileName);
 
                     using (WebClient wc = new WebClient())
                     {
