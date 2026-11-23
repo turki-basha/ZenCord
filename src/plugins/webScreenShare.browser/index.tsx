@@ -6,15 +6,19 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { getUserSettingLazy } from "@api/UserSettings";
+import { Heading } from "@components/Heading";
 import {
     Divider,
+    Paragraph,
     Span,
 } from "@components/index";
 import { Devs } from "@utils/constants";
 import { classNameFactory } from "@utils/css";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
-import { Checkbox, closeModal, Modal, openModal, Text, } from "@webpack/common";
+import { Checkbox, closeModal, FluxDispatcher, Modal, openModal, useState } from "@webpack/common";
+import { findStoreLazy } from "@webpack";
+import { ApplicationStreamingSettingsStore, GoLiveQuality, GoLiveSourceOptions, MediaEngine, VideoSize, WebRTCConnection } from "@zencord/discord-types";
 
 import managedStyle from "./styles.css?managed";
 
@@ -26,7 +30,9 @@ class NotAllowedError extends Error {
 
 const logger = new Logger("VencordScreenShare");
 
-const getDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+const ApplicationStreamingSettingsStore: ApplicationStreamingSettingsStore = findStoreLazy("ApplicationStreamingSettingsStore");
+
+const originalGetDisplayMedia = navigator.mediaDevices?.getDisplayMedia;
 
 function openScreenSharePicker(options: DisplayMediaStreamOptions) {
     return new Promise<MediaStream>((resolve, reject) => {
@@ -55,7 +61,7 @@ function openScreenSharePicker(options: DisplayMediaStreamOptions) {
     });
 }
 
-function OptionRadio<Settings extends object, Key extends keyof Settings, Options extends ReadonlyArray<string>>(props: {
+function OptionRadio<Settings extends object, Key extends keyof Settings, Options extends ReadonlyArray<string | number>>(props: {
     options: Options;
     labels?: Array<string>;
     settings: Settings;
@@ -92,173 +98,166 @@ function ModalComponent({ modalProps, submit, close, options }: {
 }) {
     const liveSettings = settings.use();
     const disableStreamPreviewsValue = disableStreamPreviews.useSetting();
+    const [quality, setQuality] = useState(() => {
+        const { resolution, fps, soundshareEnabled } = ApplicationStreamingSettingsStore.getState();
+        return { resolution, frameRate: fps, soundshareEnabled };
+    });
 
     async function stream() {
         try {
-            const frameRate = Number(liveSettings.frameRate);
-            const height = Number(liveSettings.resolution);
+            const { resolution, frameRate, soundshareEnabled } = quality;
 
-            // const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-            //     connection => connection.userId === UserStore.getCurrentUser().id
-            // );
+            FluxDispatcher.dispatch({
+                type: "STREAM_UPDATE_SETTINGS",
+                preset: PRESET_CUSTOM,
+                resolution,
+                frameRate,
+                soundshareEnabled
+            });
 
             const videoOptions = typeof options?.video !== "boolean" && !!options.video ? options.video : {};
             const audioOptions = typeof options?.audio !== "boolean" && !!options.audio ? options.audio : {};
-            // allow browser to constrain itself
+            // Discord requests a fixed size. Remove it, applyStreamQuality makes Discord limit the size to the selected quality
             delete videoOptions.width;
+            delete videoOptions.height;
 
             submit(
-                getDisplayMedia({
+                originalGetDisplayMedia.call(navigator.mediaDevices, {
                     video: {
                         ...videoOptions,
-                        frameRate,
-                        height,
+                        frameRate: { max: frameRate }
                     },
-                    audio: {
-                        ...audioOptions,
-                        restrictOwnAudio: true,
-                    },
+                    audio: soundshareEnabled && audioOptions,
+                    systemAudio: soundshareEnabled ? "include" : "exclude",
+                    selfBrowserSurface: "include",
                     surfaceSwitching: "include",
-                    systemAudio: liveSettings.systemAudio ? "exclude" : "include"
-                }).then(t => {
-                    // w3c says this can fail, they don't say why, so just to be safe
-                    try {
-                        const video = t.getVideoTracks()?.[0];
-                        if (video) video.contentHint = liveSettings.contentHint;
-                    } catch { }
-                    return t;
+                    monitorTypeSurfaces: "include"
+                }).then(stream => {
+                    const [track] = stream.getVideoTracks();
+                    if (track) {
+                        track.contentHint = liveSettings.contentHint;
+                    }
+                    return stream;
                 })
             );
-        } catch (error) {
-            logger.error("Error while submitting stream.", error);
-        } finally {
-            close();
+        } catch (e) {
+            logger.error("Failed to start screen share", e);
         }
+
+        close();
     }
 
     return (
-        <div className={cl("modal")}>
-            <Modal
-                {...modalProps}
-
-                size="lg"
-                actionBarInput={
-                    <div className={cl("summary")}>
-                        <Text variant="text-md/semibold" color="text-strong" className={cl("source-or-preset-name")}>{liveSettings.contentHint === "motion" ? "Gaming" : liveSettings.contentHint === "detail" ? "Screenshare" : "Custom"}</Text>
-                        <Text variant="text-xs/medium" color="text-muted" className={cl("summary-detail")}>
-                            <span>{liveSettings.contentHint === "motion" ? "Smoother video" : liveSettings.contentHint === "detail" ? "Cleaner text" : "User preset"}</span>
-                            <span className={cl("ellipsis")}>•</span>
-                            <span>{liveSettings.resolution}p</span>
-                            <span className={cl("ellipsis")}>•</span>
-                            <span>{liveSettings.frameRate}fps</span>
-                            {liveSettings.systemAudio ? <span className={cl("ellipsis")}>•</span> : ""}
-                            {liveSettings.systemAudio ? <span>Stream Muted</span> : ""}
-                        </Text>
-                    </div>
+        <Modal
+            title="Screenshare Options"
+            {...modalProps}
+            actions={[
+                {
+                    text: "Share",
+                    variant: "primary",
+                    onClick: stream
+                },
+                {
+                    text: "Cancel",
+                    variant: "secondary",
+                    onClick: close
                 }
-                actions={[
-                    {
-                        variant: "primary",
-                        text: "Stream",
-                        onClick: stream
-                    }
-                ]}
-            >
-
-                <div>
-                    <div className={cl("flex", "padding")}>
-                        <section className={cl("quality-section")}>
-                            <Text tag="h2" variant="heading-md/semibold" color="text-strong">Resolution</Text>
-                            <OptionRadio
-                                options={StreamResolution}
-                                settings={liveSettings}
-                                settingsKey="resolution"
-                                onChange={value => (liveSettings.resolution = value)}
-                            />
-                        </section>
-
-                        <section className={cl("quality-section")}>
-                            <Text tag="h2" variant="heading-md/semibold" color="text-strong">Frame Rate</Text>
-                            <OptionRadio
-                                options={StreamFps}
-                                settings={liveSettings}
-                                settingsKey="frameRate"
-                                onChange={value => (liveSettings.frameRate = value)}
-                            />
-                        </section>
-                    </div>
-                    <div>
-                        <Text tag="h2" variant="heading-md/semibold" color="text-strong">Stream Mode</Text>
-                        <div>
-                            <OptionRadio
-                                options={StreamContentHint}
-                                labels={["Smoother video", "Cleaner text", "Custom"]}
-                                settings={liveSettings}
-                                settingsKey="contentHint"
-                                onChange={option => (liveSettings.contentHint = option)}
-                            />
-                        </div>
-                    </div>
-                    <Divider />
-                    <div className={cl("padding", "pointer")}>
-                        <Checkbox
-                            value={!!liveSettings.systemAudio}
-                            onChange={(_e, value) => (liveSettings.systemAudio = value)}
-                            shape="box"
-                            reverse={true}>
-                            <div className={cl("control-content")}>
-                                <Text tag="h2" variant="heading-md/semibold" color="text-strong">Mute Stream Audio</Text>
-                                <Text variant="text-sm/normal" color="text-subtle">Prevents system audio from being included in your stream.</Text>
-                            </div>
-                        </Checkbox>
-                    </div>
-                    <div className={cl("padding", "pointer")}>
-                        <Checkbox
-                            value={!disableStreamPreviewsValue}
-                            onChange={(_e, value) => disableStreamPreviews.updateSetting(() => !value)}
-                            shape="box"
-                            reverse={true}>
-                            <div className={cl("control-content")}>
-                                <Text tag="h2" variant="heading-md/semibold" color="text-strong">Show Stream Previews</Text>
-                                <Text variant="text-sm/normal" color="text-subtle">Allows others to see a preview of your stream before they join.</Text>
-                            </div>
-                        </Checkbox>
-                    </div>
-                    <Divider />
-                </div>
-            </Modal>
-        </div>
+            ]}
+        >
+            <Heading tag="h5">STREAM QUALITY</Heading>
+            <OptionRadio
+                options={StreamResolutions}
+                labels={StreamResolutions.map(res => res ? `${res}p` : "Source")}
+                settings={quality}
+                settingsKey="resolution"
+                onChange={resolution => setQuality(q => ({ ...q, resolution }))}
+            />
+            <Divider />
+            <Heading tag="h5">FRAME RATE</Heading>
+            <OptionRadio
+                options={StreamFrameRates}
+                labels={StreamFrameRates.map(fps => `${fps} FPS`)}
+                settings={quality}
+                settingsKey="frameRate"
+                onChange={frameRate => setQuality(q => ({ ...q, frameRate }))}
+            />
+            <Divider />
+            <Heading tag="h5">CONTENT HINT</Heading>
+            <OptionRadio
+                options={StreamContentHint}
+                settings={liveSettings}
+                settingsKey="contentHint"
+                onChange={contentHint => settings.store.contentHint = contentHint}
+            />
+            <Divider />
+            <div className={cl("padding")}>
+                <Checkbox
+                    value={quality.soundshareEnabled}
+                    onChange={(_, soundshareEnabled) => setQuality(q => ({ ...q, soundshareEnabled }))}
+                >
+                    <Span weight="bold">Share System Audio</Span>
+                </Checkbox>
+            </div>
+            <Divider />
+            <div className={cl("padding")}>
+                <Checkbox
+                    value={disableStreamPreviewsValue}
+                    onChange={(_, value) => disableStreamPreviews.updateSetting(value)}
+                >
+                    <Span weight="bold">Disable Stream Previews</Span>
+                </Checkbox>
+            </div>
+        </Modal>
     );
 }
 
-// this is kinda shit and it really should be done via videoQualityManager
-const StreamResolution = ["480", "720", "1080", "1440", "2160"] as const;
-const StreamFps = ["15", "30", "60", "120"] as const;
-const StreamContentHint = ["motion", "detail", ""] as const;
+const StreamResolutions = [0, 480, 720, 1080, 1440] as const;
+const StreamFrameRates = [5, 15, 30, 60] as const;
+const StreamContentHint = ["detail", "motion", "text"] as const;
+
+const PRESET_CUSTOM = 3;
+
+// Discord/app/modules/discord_voice/constants.js
+function getBitrateMax(resolution: number, frameRate: number) {
+    if (resolution <= 480) {
+        return frameRate <= 15 ? 500000 : 750000;
+    }
+    if (resolution <= 720) {
+        return frameRate <= 15 ? 1200000 : 2500000;
+    }
+    if (resolution <= 1080) {
+        return frameRate <= 15 ? 2500000 : 4500000;
+    }
+    return frameRate <= 15 ? 4500000 : 8000000;
+}
+
+function applyStreamQuality(conn: WebRTCConnection, track: MediaStreamTrack, { resolution, frameRate }: GoLiveQuality) {
+    const { width: trackWidth = 1280, height: trackHeight = 720 } = track.getSettings();
+    // 0 is source resolution
+    const height = resolution ? Math.min(resolution, trackHeight) : trackHeight;
+    const width = Math.round(trackWidth * (height / trackHeight));
+    const bitrateMax = getBitrateMax(height, frameRate);
+
+    // Limit capture and encode to the selected size
+    const size: VideoSize = { width, height, framerate: frameRate, pixelCount: width * height };
+    conn.videoQualityManager.setGoliveQuality({ capture: size, encode: size, bitrateMax });
+
+    const params = conn.videoStreamParameters.find(p => p.quality === 100) ?? conn.videoStreamParameters[0];
+    if (params) {
+        params.maxResolution = resolution
+            ? { type: "fixed", width, height }
+            : { type: "source", width: 0, height: 0 };
+    }
+
+    logger.info("Applied stream quality", { width, height, frameRate, bitrateMax });
+}
 
 const settings = definePluginSettings({
-    resolution: {
-        type: OptionType.SELECT,
-        description: "Resolution",
-        hidden: true,
-        options: StreamResolution.map(res => ({ label: res, value: res, default: res === "1080" }))
-    },
-    frameRate: {
-        type: OptionType.SELECT,
-        description: "Frame Rate",
-        hidden: true,
-        options: StreamFps.map(fps => ({ label: fps, value: fps, default: fps === "60" }))
-    },
     contentHint: {
         type: OptionType.SELECT,
         description: "Content Hint",
         hidden: true,
         options: StreamContentHint.map(hint => ({ label: hint, value: hint, default: hint === "motion" }))
-    },
-    systemAudio: {
-        type: OptionType.BOOLEAN,
-        description: "Mute system audio",
-        hidden: true
     }
 });
 
@@ -274,47 +273,83 @@ export default definePlugin({
     managedStyle,
 
     start() {
+        if (!originalGetDisplayMedia) return;
+
         navigator.mediaDevices.getDisplayMedia = openScreenSharePicker;
     },
     stop() {
-        navigator.mediaDevices.getDisplayMedia = getDisplayMedia;
+        navigator.mediaDevices.getDisplayMedia = originalGetDisplayMedia;
     },
 
     patches: [
         {
-            find: "this.getDefaultGoliveQuality()",
+            // Discord resets the streaming settings to 720p or 1080p at 30fps before it opens the picker on web, keep the saved settings
+            find: ".getMediaEngine().getDesktopSource(",
             replacement: {
-                match: /this\.getDefaultGoliveQuality\(\)/,
-                replace: "$self.getGoliveMaxQuality($&)"
+                match: /\(0,\i\.\i\)\(\{preset:\i\.\i\.PRESET_CUSTOM,resolution:\i\.height,frameRate:\i\.\i\.FPS_30,soundshareEnabled:!0\}\),(?=\i\.\i\.getMediaEngine\(\)\.getDesktopSource\()/,
+                replace: ""
+            }
+        },
+        {
+            // Discord ignores the quality on web. It derives the quality from the track constraints, without the frame rate
+            // and with a fixed bitrate, and cannot change the quality of an ongoing stream
+            find: "BaseWebRTCConnection.updateVideoQuality",
+            replacement: {
+                // Run after the rest of setGoLiveSource, which gives the stream its desktop input
+                match: /setGoLiveSource\((\i),\i\)\{(?=if\(null==\1\)this\.eachConnection\(\i=>\i\.setDesktopInput\(null\))/,
+                replace: "$&queueMicrotask(()=>$self.applyGoLiveQuality(this,$1));"
+            }
+        },
+        {
+            find: "getDefaultGoliveQuality(){",
+            replacement: {
+                // When viewers want a smaller resolution, Discord lowers the bitrate but keeps the full encode resolution.
+                // Lower the encode resolution too, like the native client does
+                match: /(getGoliveQuality\(\i,(\i)\)\{.+?return new \i\(\{encode:)this\.goliveMaxQuality\.encode/,
+                replace: "$1$self.scaleEncodeToSinkWants(this.goliveMaxQuality.encode,$2)"
+            }
+        },
+        {
+            // Discord shows the Stream Settings submenu only in the native client
+            find: '"stream-settings-audio-enable"',
+            replacement: {
+                match: /\i\.isPlatformEmbedded(?=\?\(0,\i\.jsx\)\(\i\.\i,\{id:"stream-settings")/,
+                replace: "true"
             }
         }
     ],
-    // this is a maximum, not a true default, this is later constrained properly in GDM anyways
-    // and this way we don't pre-emptively neuter the max stream quality
-    getGoliveMaxQuality(opts: any) {
-        const framerate = 120;
-        const height = 2160;
-        const width = 3840;
 
-        Object.assign(opts, {
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
-        });
-        if (opts?.encode) {
-            Object.assign(opts.encode, {
-                framerate,
-                width,
-                height,
-                pixelCount: height * width
-            });
+    // Discord only calls this when the viewers want fewer pixels than the encode size
+    scaleEncodeToSinkWants(encode: VideoSize, sinkPixelCount: number) {
+        const scale = Math.sqrt(sinkPixelCount / (encode.width * encode.height));
+        return {
+            ...encode,
+            width: Math.round(encode.width * scale),
+            height: Math.round(encode.height * scale)
+        };
+    },
+
+    // Called when a stream starts and when its quality changes
+    async applyGoLiveQuality(engine: MediaEngine, source: GoLiveSourceOptions | null) {
+        if (!source?.desktopDescription) return;
+
+        try {
+            const connections: WebRTCConnection[] = [];
+            engine.eachConnection(c => c.streamUserId === c.userId && connections.push(c as WebRTCConnection), "stream");
+
+            for (const conn of connections) {
+                const track = conn.input.getVideoStream()?.getVideoTracks()[0];
+                if (!track) continue;
+
+                // Discord limits the size in updateVideoQuality, from the capture size of applyStreamQuality
+                await track.applyConstraints({ frameRate: { max: source.quality.frameRate } });
+                // The streaming settings store can update after this handler, so use the requested quality
+                applyStreamQuality(conn, track, source.quality);
+                conn.updateVideoQuality();
+                conn.handleVideo(conn.input.getVideoStreamId());
+            }
+        } catch (e) {
+            logger.error("Failed to apply the stream quality", e);
         }
-        Object.assign(opts.capture, {
-            framerate,
-            width,
-            height,
-            pixelCount: height * width
-        });
-        return opts;
     }
 });

@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { _resolveReady, filters, findByCodeLazy, findByPropsLazy, findLazy, mapMangledModuleLazy, waitFor } from "@webpack";
+import { Logger } from "@utils/Logger";
+import { _resolveReady, filters, findByCode, findByCodeLazy, findByPropsLazy, findLazy, mapMangledModuleLazy, proxyLazyWebpack, waitFor } from "@webpack";
 import * as t from "@zencord/discord-types";
 import type * as TSPattern from "ts-pattern";
 
@@ -54,7 +55,14 @@ waitFor("parseTopic", m => Parser = m);
 export let Alerts: t.Alerts;
 waitFor(["show", "close"], m => Alerts = m);
 
-export const showToast: t.showToast = findByCodeLazy(".currentToastMap.has(");
+export const showToast: t.showToast = proxyLazyWebpack(() => {
+    const Toaster = findByCode(".currentToastMap.get(", "setState");
+    if (Toaster) return Toaster;
+
+    const logger = new Logger("Toast");
+    logger.error("Failed to find showToast! Falling back to logging");
+    return logger.log.bind(logger);
+});
 
 export const UserUtils = {
     getUser: findByCodeLazy(".USER(")

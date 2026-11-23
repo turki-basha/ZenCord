@@ -1,17 +1,6 @@
-.vc-mutual-gdms-modal-tab-bar {
-    gap: 0;
-}
-
-.vc-mutual-gdms-modal-v2-tab-bar {
-    --space-xl: 16px;
-}
-
-.vc-mutual-gdms-scroller {
+.vc-mutual-gdms-list {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     margin-inline-start: -12px;
-}
-
-.vc-mutual-gdms-dm-page-list {
-    gap: 0;
-    margin-inline-start: -8px;
 }

@@ -36,7 +36,7 @@ export interface Dev {
  */
 export const Devs = /* #__PURE__*/ Object.freeze({
     ZenCord: {
-        name: "ZenCord Team",
+        name: "Turki",
         id: 853046251465343027n
     },
     Ven: {
@@ -685,6 +685,10 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     imnotplayinginreallife: {
         name: "I'm not playing in real life",
         id: 841939724306087986n
+    },
+    Cramber: {
+        name: "Cramber",
+        id: 342564015974907914n
     }
 } satisfies Record<string, Dev>);
 

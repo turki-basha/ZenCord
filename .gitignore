@@ -37,4 +37,7 @@ scripts/dedupeTranslations.cjs
 badges.json
 copy-dist.js
 scripts/finalize_pe.py
+scripts/patch_installer_src.py
+installer-src/
+installer-src.zip
 

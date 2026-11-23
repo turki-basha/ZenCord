@@ -18,13 +18,12 @@ print_banner() {
     clear 2>/dev/null || true
     echo -e "${CYAN}${BOLD}"
     cat << "EOF"
-  ______            _____              _ 
- |___  /           / ____|            | |
-    / / ___ _ __  | |     ___  _ __ __| |
-   / / / _ \ '_ \ | |    / _ \| '__/ _` |
-  / /_|  __/ | | || |___| (_) | | | (_| |
- /_____\___|_| |_| \_____\___/|_|  \__,_|
-                                         
+   _____            ______              __
+  /__  /___  ____  / ____/___  ________/ /
+    / // _ \/ __ \/ /   / __ \/ ___/ __  / 
+   / //  __/ / / / /___/ /_/ / /  / /_/ /  
+  /_/ \___/_/ /_/\____/\____/_/   \__,_/   
+
    ZenCord Discord Client Mod - Universal Installer
 EOF
     echo -e "${NC}"
@@ -194,9 +193,17 @@ cat << EOF | (cat > "$LOADER_PKG" 2>/dev/null || sudo tee "$LOADER_PKG" > /dev/n
 }
 EOF
 
-echo -e "\n${GREEN}${BOLD}====================================================${NC}"
-echo -e "${GREEN}${BOLD}      ZenCord Installed Successfully! Enjoy! 🚀    ${NC}"
-echo -e "${GREEN}${BOLD}====================================================${NC}"
+echo -e "\n${GREEN}${BOLD}"
+cat << "EOF"
+   _____            ______              __
+  /__  /___  ____  / ____/___  ________/ /
+    / // _ \/ __ \/ /   / __ \/ ___/ __  / 
+   / //  __/ / / / /___/ /_/ / /  / /_/ /  
+  /_/ \___/_/ /_/\____/\____/_/   \__,_/   
+
+       ZenCord Installed Successfully! 🚀
+EOF
+echo -e "${NC}"
 echo -e "\nPlease restart Discord now to start using ZenCord."
 echo -e "All future updates will be applied automatically in the background!\n"
 

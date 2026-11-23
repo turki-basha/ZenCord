@@ -35,6 +35,7 @@ function t(text?: string): string | undefined {
 
 import { MacOSVibrancySettings } from "./MacVibrancySettings";
 import { NotificationSection } from "./NotificationSettings";
+import { openPlayground } from "./playground";
 import { WindowsMaterialSettings } from "./WindowsMaterialSettings";
 
 const COZY_CONTRIB_IMAGE = "https://cdn.discordapp.com/emojis/1026533070955872337.png";
@@ -192,6 +193,11 @@ function ZenCordSettings() {
                         text={t("View Source Code")!}
                         action={() => (ZenCordNative ?? VencordNative).native.openExternal("https://github.com/" + gitRemote)}
                     />
+                    {IS_DEV && <QuickAction
+                        Icon={PaintbrushIcon}
+                        text="Open Component Playground"
+                        action={() => openPlayground()}
+                    />}
                 </QuickActionCard>
             </section>
 

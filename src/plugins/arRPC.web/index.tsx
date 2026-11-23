@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { popNotice, showNotice } from "@api/Notices";
+import { NoticeColors, showNotice } from "@api/Notices";
 import { Link } from "@components/Link";
 import { Devs } from "@utils/constants";
 import definePlugin, { ReporterTestable } from "@utils/types";
@@ -70,10 +70,16 @@ export default definePlugin({
 
         const connectionSuccessful = await new Promise(res => setTimeout(() => res(ws.readyState === WebSocket.OPEN), 5000)); // check if open after 5s
         if (!connectionSuccessful) {
-            showNotice("Failed to connect to arRPC, is it running?", "Retry", () => { // show notice about failure to connect, with retry/ignore
-                popNotice();
-                this.start();
+            showNotice({
+                message: "Failed to connect to arRPC, is it running?",
+                buttonText: "Retry",
+                color: NoticeColors.WARNING,
+                callback: ({ dismiss }) => {
+                    dismiss();
+                    this.start();
+                }
             });
+
             return;
         }
 

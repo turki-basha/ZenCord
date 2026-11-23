@@ -5,14 +5,20 @@
  */
 
 import { classNameFactory } from "@utils/css";
-import { extractAndLoadChunksLazy, findByPropsLazy } from "@webpack";
+import { DefaultExtractAndLoadChunksRegex, extractAndLoadChunksLazy, findByPropsLazy } from "@webpack";
 import { GuildRoleStore } from "@webpack/common";
 import { Guild, GuildMember, Role } from "@zencord/discord-types";
 import { PermissionOverwriteType } from "@zencord/discord-types/enums";
 
 import { PermissionsSortOrder, settings } from ".";
 
-export const loadGetGuildPermissionSpecMap = extractAndLoadChunksLazy([".PRIMARY,badgeTooltipDelay:"]);
+const memberModViewSidebar = 'name:"GuildMemberModViewSidebar"';
+
+// The sidebar's import is available at startup and includes the guild permission spec.
+export const loadGetGuildPermissionSpecMap = extractAndLoadChunksLazy(
+    [memberModViewSidebar],
+    new RegExp(String.raw`createPromise:\(\)=>${DefaultExtractAndLoadChunksRegex.source},webpackId:[^,]+,${memberModViewSidebar}`)
+);
 export const { getGuildPermissionSpecMap } = findByPropsLazy("getGuildPermissionSpecMap");
 
 export const cl = classNameFactory("vc-permviewer-");
@@ -39,11 +45,17 @@ export function sortPermissionOverwrites<T extends { id: string; type: number; }
     const roles = GuildRoleStore.getRolesSnapshot(guildId);
 
     return overwrites.sort((a, b) => {
-        if (a.type !== PermissionOverwriteType.ROLE || b.type !== PermissionOverwriteType.ROLE) return 0;
+        if (a.type !== b.type) {
+            return a.type === PermissionOverwriteType.ROLE ? -1 : 1;
+        }
 
-        const roleA = roles[a.id];
-        const roleB = roles[b.id];
+        if (a.id === guildId) return 1;
+        if (b.id === guildId) return -1;
 
-        return roleB.position - roleA.position;
+        if (a.type === PermissionOverwriteType.ROLE) {
+            return (roles[b.id]?.position ?? 0) - (roles[a.id]?.position ?? 0);
+        }
+
+        return 0;
     });
 }

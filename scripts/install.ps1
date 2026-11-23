@@ -5,10 +5,16 @@ $ErrorActionPreference = "Stop"
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host ""
-Write-Host "=========================================" -ForegroundColor Cyan
-Write-Host "         ZenCord Discord Client          " -ForegroundColor White
-Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host @"
+
+   _____            ______              __
+  /__  /___  ____  / ____/___  ________/ /
+    / // _ \/ __ \/ /   / __ \/ ___/ __  / 
+   / //  __/ / / / /___/ /_/ / /  / /_/ /  
+  /_/ \___/_/ /_/\____/\____/_/   \__,_/   
+
+   ZenCord Discord Client Mod - Windows Installer
+"@ -ForegroundColor Cyan
 Write-Host ""
 Write-Host "[*] Fetching latest ZenCord installer..." -ForegroundColor Yellow
 
