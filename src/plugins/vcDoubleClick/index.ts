@@ -5,8 +5,11 @@
  */
 
 import { Devs } from "@utils/constants";
+import { tryOrElse } from "@utils/misc";
 import definePlugin from "@utils/types";
 import { ChannelStore, SelectedChannelStore } from "@webpack/common";
+import type { Channel } from "@zencord/discord-types";
+import type { InviteTargetType } from "@zencord/discord-types/enums";
 
 const timers = {} as Record<string, {
     timeout?: NodeJS.Timeout;
@@ -37,15 +40,23 @@ export default definePlugin({
             ]
         },
         {
-            // channel mentions
-            find: 'className:"channelMention",children:[null!=',
+            find: ",acceptInviteAndTransitionToInviteChannel(",
             replacement: {
-                match: /onClick:(\i)(?=,.{0,30}className:"channelMention".+?(\i)\.inContent)/,
-                replace: (_, onClick, props) => ""
-                    + `onClick:(vcDoubleClickEvt)=>$self.shouldRunOnClick(vcDoubleClickEvt,${props})&&${onClick}()`,
+                match: /(\i)\.id&&\(0,\i\.\i\)\(\i\)&&(\i)\?\.autoJoin!==!1/,
+                replace: (match, channel, options) => `${match}&&$self.shouldAutoJoinInvite(${channel},${options})`
             }
         }
     ],
+
+    shouldAutoJoinInvite(channel: Channel, options?: {
+        targetType?: InviteTargetType;
+        isGuestInvite?: boolean;
+    }) {
+        if (options?.targetType != null || options?.isGuestInvite) {
+            return true;
+        }
+        return tryOrElse(() => !channel.isGuildVocal(), true);
+    },
 
     shouldRunOnClick(e: MouseEvent, { channelId }) {
         const channel = ChannelStore.getChannel(channelId);
